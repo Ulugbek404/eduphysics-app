@@ -553,7 +553,7 @@ function Dashboard({ setActiveTab, userXP, userLevel }) {
     <div className="space-y-8 animate-fadeIn">
       <header className="flex justify-between items-end">
         <div>
-          <h2 className="text-3xl font-bold text-white mb-1">Xush kelibsiz, Fizik! 👋</h2>
+          <h2 className="text-3xl font-bold text-white mb-1">Fizika Dunyosiga Xush Kelibsiz! 🚀</h2>
           <p className="text-slate-400">Bugungi maqsad: <span className="text-blue-400 font-semibold">Elektr toki</span> mavzusini tugatish.</p>
         </div>
         <div className="hidden md:flex items-center space-x-2 bg-orange-500/10 px-4 py-2 rounded-full border border-orange-500/20">
