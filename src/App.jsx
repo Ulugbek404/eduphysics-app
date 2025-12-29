@@ -6,7 +6,11 @@ import {
   Send, Sparkles, Loader, Bot, Key, Search, LogOut
 } from 'lucide-react';
 import { useAuth } from './contexts/AuthContext';
+import { getUserProgress, addUserXP, updateUserLevel, markLessonComplete, saveQuizResult } from './services/userService';
+import { lessonsData, calculateChapterProgress } from './data/lessonsData';
+import { testsData } from './data/testsData';
 import LoginPage from './components/LoginPage';
+import TestsModule from './components/TestsModule';
 
 // --- AI MODULI (API Sozlamalari bilan) ---
 const AI_CONFIG = {
@@ -38,11 +42,13 @@ export default function EduPhysicsApp() {
   // BARCHA STATE HOOKS - conditional return'dan OLDIN
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [userXP, setUserXP] = useState(1250);
-  const [userLevel, setUserLevel] = useState(5);
+  const [userXP, setUserXP] = useState(0);
+  const [userLevel, setUserLevel] = useState(1);
+  const [completedLessons, setCompletedLessons] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || 'AIzaSyCnJ76FBichqvewV5_4ZZJwqQKFnFp1x-8');
   const [showSettings, setShowSettings] = useState(false);
+  const [progressLoading, setProgressLoading] = useState(true);
 
   // Xabar chiqarish funksiyasi (Toast)
   const addNotification = (message, type = 'success') => {
@@ -61,6 +67,71 @@ export default function EduPhysicsApp() {
     setShowSettings(false);
   };
 
+  // User progress yuklash
+  useEffect(() => {
+    if (user) {
+      loadUserProgress();
+    }
+  }, [user]);
+
+  const loadUserProgress = async () => {
+    try {
+      setProgressLoading(true);
+      const progress = await getUserProgress(user.uid, {
+        displayName: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL
+      });
+
+      setUserXP(progress.xp || 0);
+      setUserLevel(progress.level || 1);
+      setCompletedLessons(progress.completedLessons || []);
+
+      console.log('User progress loaded:', progress);
+    } catch (error) {
+      console.error('Error loading progress:', error);
+      addNotification('Progress yuklanmadi', 'error');
+    } finally {
+      setProgressLoading(false);
+    }
+  };
+
+  // XP qo'shish va level tekshirish
+  const addXP = async (amount) => {
+    const newXP = userXP + amount;
+    setUserXP(newXP);
+
+    try {
+      // Firestore'ga saqlash
+      await addUserXP(user.uid, amount);
+
+      // Level tekshirish (har 1000 XP = 1 level)
+      const newLevel = Math.floor(newXP / 1000) + 1;
+      if (newLevel > userLevel) {
+        setUserLevel(newLevel);
+        await updateUserLevel(user.uid, newLevel);
+        addNotification(`🎉 Level ${newLevel}ga yetdingiz!`, 'success');
+      }
+    } catch (error) {
+      console.error('Error adding XP:', error);
+    }
+  };
+
+  // Darsni tugatish
+  const completeLesson = async (lessonId) => {
+    if (!completedLessons.includes(lessonId)) {
+      setCompletedLessons([...completedLessons, lessonId]);
+
+      try {
+        await markLessonComplete(user.uid, lessonId);
+        await addXP(50); // Dars uchun 50 XP
+        addNotification('✅ Dars tugallandi! +50 XP', 'success');
+      } catch (error) {
+        console.error('Error completing lesson:', error);
+      }
+    }
+  };
+
   // CONDITIONAL RETURNS - barcha hooks'dan KEYIN
   if (loading) {
     return <LoadingScreen />;
@@ -74,11 +145,12 @@ export default function EduPhysicsApp() {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard': return <Dashboard setActiveTab={setActiveTab} userXP={userXP} userLevel={userLevel} />;
-      case 'lessons': return <LessonsModule />;
+      case 'lessons': return <LessonsModule completedLessons={completedLessons} completeLesson={completeLesson} />;
+      case 'tests': return <TestsModule addXP={addXP} addNotification={addNotification} />;
       case 'lab': return <VirtualLab addNotification={addNotification} apiKey={apiKey} setShowSettings={setShowSettings} />;
       case 'quiz': return <QuizModule setUserXP={setUserXP} addNotification={addNotification} apiKey={apiKey} setShowSettings={setShowSettings} />;
       case 'profile': return <UserProfile userXP={userXP} userLevel={userLevel} />;
-      default: return <Dashboard setActiveTab={setActiveTab} />;
+      default: return <Dashboard setActiveTab={setActiveTab} userXP={userXP} userLevel={userLevel} />;
     }
   };
 
@@ -165,6 +237,7 @@ export default function EduPhysicsApp() {
         <nav className="mt-6 px-4 space-y-1 flex-1 overflow-y-auto custom-scrollbar">
           <SidebarItem icon={<BarChart2 />} label="Statistika" id="dashboard" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<Book />} label="Darslar" id="lessons" active={activeTab} set={setActiveTab} />
+          <SidebarItem icon={<Trophy />} label="Testlar" id="tests" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<Zap />} label="Laboratoriya" id="lab" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<Brain />} label="AI Test Sinovlari" id="quiz" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<User />} label="Profil" id="profile" active={activeTab} set={setActiveTab} />
@@ -683,59 +756,352 @@ function StatCard({ icon, title, value, suffix, desc, color }) {
   );
 }
 
-// 2. DARSLAR
-function LessonsModule() {
-  const lessons = [
-    { id: 1, title: "Kinematika asoslari", desc: "Harakat traektoriyasi, yo'l va ko'chish.", status: "completed", progress: 100 },
-    { id: 2, title: "Nyuton qonunlari", desc: "Kuch, massa va tezlanish bog'liqligi.", status: "completed", progress: 100 },
-    { id: 3, title: "Elektr toki. Om qonuni", desc: "Zanjir qismi uchun Om qonuni.", status: "current", progress: 65 },
-    { id: 4, title: "Optika va Yorug'lik", desc: "Yorug'likning sinishi va qaytishi.", status: "locked", progress: 0 },
-  ];
+// 2. DARSLAR MODULI
+function LessonsModule({ completedLessons = [], completeLesson }) {
+  const [selectedChapter, setSelectedChapter] = useState(null);
+  const [selectedLesson, setSelectedLesson] = useState(null);
 
+  // Chapter selection view
+  if (!selectedChapter) {
+    return <ChapterGrid onSelect={setSelectedChapter} completedLessons={completedLessons} />;
+  }
+
+  // Lesson list view
+  if (!selectedLesson) {
+    return (
+      <LessonList
+        chapter={selectedChapter}
+        onBack={() => setSelectedChapter(null)}
+        onSelect={setSelectedLesson}
+        completedLessons={completedLessons}
+      />
+    );
+  }
+
+  // Lesson detail view
+  return (
+    <LessonDetail
+      lesson={selectedLesson}
+      chapter={selectedChapter}
+      onBack={() => setSelectedLesson(null)}
+      onComplete={completeLesson}
+      isCompleted={completedLessons.includes(selectedLesson.id)}
+    />
+  );
+}
+
+// Chapter Grid Component
+function ChapterGrid({ onSelect, completedLessons }) {
   return (
     <div className="space-y-6 animate-fadeIn">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Fizika 9-sinf Mavzulari</h2>
-        <div className="text-sm text-slate-400">Jami: 4 ta bob</div>
+      <div className="text-center space-y-2">
+        <h2 className="text-3xl font-bold">9-Sinf Fizika Dasturi</h2>
+        <p className="text-slate-400">Barcha mavzularni o'rganing va ustoz bo'ling!</p>
       </div>
-      <div className="grid gap-4">
-        {lessons.map((lesson) => (
-          <LessonCard key={lesson.id} {...lesson} />
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {lessonsData.chapters.map((chapter) => (
+          <ChapterCard
+            key={chapter.id}
+            chapter={chapter}
+            onClick={() => onSelect(chapter)}
+            completedLessons={completedLessons}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-function LessonCard({ id, title, desc, status, progress }) {
-  const styles = {
-    completed: { border: 'border-green-500/30', bg: 'bg-slate-800', icon: <CheckCircle className="text-green-400" />, bar: 'bg-green-500' },
-    current: { border: 'border-blue-500', bg: 'bg-slate-800 shadow-[0_0_20px_rgba(59,130,246,0.15)]', icon: <Play className="text-blue-400 fill-blue-400" />, bar: 'bg-blue-500' },
-    locked: { border: 'border-slate-700', bg: 'bg-slate-800/50 opacity-60', icon: <Book className="text-slate-500" />, bar: 'bg-slate-600' }
+// Chapter Card Component
+function ChapterCard({ chapter, onClick, completedLessons }) {
+  const progress = calculateChapterProgress(chapter, completedLessons);
+  const colorClasses = {
+    blue: 'from-blue-600 to-blue-400',
+    yellow: 'from-yellow-600 to-yellow-400',
+    purple: 'from-purple-600 to-purple-400',
+    cyan: 'from-cyan-600 to-cyan-400',
+    amber: 'from-amber-600 to-amber-400',
+    green: 'from-green-600 to-green-400'
   };
-  const style = styles[status];
 
   return (
-    <div className={`relative overflow-hidden flex items-center p-5 rounded-2xl border ${style.border} ${style.bg} hover:bg-slate-750 transition-all cursor-pointer group`}>
-      {status === 'current' && <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>}
-      <span className={`text-2xl font-bold mr-6 w-8 ${status === 'locked' ? 'text-slate-600' : 'text-white'}`}>
-        {id < 10 ? `0${id}` : id}
-      </span>
-      <div className="flex-1 z-10">
-        <h3 className={`text-lg font-bold ${status === 'locked' ? 'text-slate-400' : 'text-white'} mb-1`}>{title}</h3>
-        <p className="text-sm text-slate-400">{desc}</p>
-        {status !== 'locked' && (
-          <div className="mt-3 w-32 h-1.5 bg-slate-700 rounded-full overflow-hidden">
-            <div className={`h-full rounded-full ${style.bar}`} style={{ width: `${progress}%` }}></div>
-          </div>
-        )}
-      </div>
-      <div className={`p-3 rounded-full bg-slate-900 border border-slate-700 ${status === 'current' ? 'animate-pulse' : ''}`}>
-        {style.icon}
+    <div
+      onClick={onClick}
+      className="bg-slate-800 rounded-2xl p-6 border border-slate-700 hover:border-blue-500 cursor-pointer transition-all group hover:scale-105"
+    >
+      {/* Icon */}
+      <div className="text-6xl mb-4">{chapter.icon}</div>
+
+      {/* Title */}
+      <h3 className="text-xl font-bold mb-2">{chapter.title}</h3>
+      <p className="text-slate-400 text-sm mb-4">{chapter.description}</p>
+
+      {/* Stats */}
+      <div className="space-y-2">
+        <div className="flex justify-between text-xs text-slate-400">
+          <span>{chapter.lessons.length} ta dars</span>
+          <span>{progress}%</span>
+        </div>
+
+        {/* Progress bar */}
+        <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+          <div
+            className={`h-full bg-gradient-to-r ${colorClasses[chapter.color] || 'from-blue-600 to-blue-400'} transition-all duration-500`}
+            style={{ width: `${progress}%` }}
+          />
+        </div>
       </div>
     </div>
   );
 }
+
+// Lesson List Component
+function LessonList({ chapter, onBack, onSelect, completedLessons }) {
+  return (
+    <div className="space-y-6 animate-fadeIn">
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={onBack}
+          className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+        >
+          <ChevronRight className="rotate-180" size={24} />
+        </button>
+        <div className="flex-1">
+          <div className="flex items-center gap-3">
+            <span className="text-4xl">{chapter.icon}</span>
+            <div>
+              <h2 className="text-3xl font-bold">{chapter.title}</h2>
+              <p className="text-slate-400">{chapter.description}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Lessons */}
+      <div className="space-y-4">
+        {chapter.lessons.map((lesson, index) => (
+          <LessonCard
+            key={lesson.id}
+            lesson={lesson}
+            index={index}
+            onClick={() => onSelect(lesson)}
+            isCompleted={completedLessons.includes(lesson.id)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Lesson Card Component
+function LessonCard({ lesson, index, onClick, isCompleted }) {
+  return (
+    <div
+      onClick={onClick}
+      className={`bg-slate-800 rounded-xl p-6 border ${isCompleted ? 'border-green-500' : 'border-slate-700'
+        } hover:border-blue-500 cursor-pointer transition-all group`}
+    >
+      <div className="flex items-center gap-4">
+        {/* Status Icon */}
+        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isCompleted ? 'bg-green-500/20' : 'bg-blue-500/20'
+          }`}>
+          {isCompleted ? (
+            <CheckCircle className="text-green-500" size={24} />
+          ) : (
+            <span className="text-blue-500 font-bold">{index + 1}</span>
+          )}
+        </div>
+
+        {/* Content */}
+        <div className="flex-1">
+          <h4 className="text-lg font-bold mb-1">{lesson.title}</h4>
+          <p className="text-slate-400 text-sm">{lesson.description}</p>
+        </div>
+
+        {/* Meta */}
+        <div className="text-right space-y-1">
+          <div className="text-sm text-slate-400">{lesson.duration}</div>
+          <div className="text-yellow-500 font-bold">+{lesson.xp} XP</div>
+        </div>
+
+        {/* Arrow */}
+        <ChevronRight className="text-slate-600 group-hover:text-blue-500 transition-colors" />
+      </div>
+    </div>
+  );
+}
+
+// Lesson Detail Component
+function LessonDetail({ lesson, chapter, onBack, onComplete, isCompleted }) {
+  const [activeTab, setActiveTab] = useState('theory');
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-6 animate-fadeIn">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-2 px-4 py-2 hover:bg-slate-800 rounded-lg transition-colors"
+        >
+          <ChevronRight className="rotate-180" size={20} />
+          <span>Orqaga</span>
+        </button>
+
+        {!isCompleted && (
+          <button
+            onClick={() => onComplete(lesson.id)}
+            className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-500 rounded-xl font-bold transition-all"
+          >
+            <CheckCircle size={20} />
+            Darsni Tugatish +{lesson.xp} XP
+          </button>
+        )}
+
+        {isCompleted && (
+          <div className="flex items-center gap-2 px-6 py-3 bg-green-500/20 border border-green-500 rounded-xl font-bold text-green-500">
+            <CheckCircle size={20} />
+            Tugallangan
+          </div>
+        )}
+      </div>
+
+      {/* Title */}
+      <div>
+        <div className="flex items-center gap-3 mb-2">
+          <span className="text-4xl">{chapter.icon}</span>
+          <div>
+            <div className="text-sm text-slate-400">{chapter.title}</div>
+            <h1 className="text-4xl font-bold">{lesson.title}</h1>
+          </div>
+        </div>
+        <p className="text-slate-400 text-lg">{lesson.description}</p>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-2 border-b border-slate-700">
+        <TabButton
+          active={activeTab === 'theory'}
+          onClick={() => setActiveTab('theory')}
+          icon={<Book size={18} />}
+          label="Nazariya"
+        />
+        <TabButton
+          active={activeTab === 'examples'}
+          onClick={() => setActiveTab('examples')}
+          icon={<Zap size={18} />}
+          label="Misollar"
+        />
+        <TabButton
+          active={activeTab === 'video'}
+          onClick={() => setActiveTab('video')}
+          icon={<Play size={18} />}
+          label="Video"
+        />
+      </div>
+
+      {/* Content */}
+      <div className="bg-slate-800 rounded-2xl p-8 min-h-[400px]">
+        {activeTab === 'theory' && <TheoryContent content={lesson.content.theory} formulas={lesson.content.formulas} />}
+        {activeTab === 'examples' && <ExamplesContent examples={lesson.content.examples} />}
+        {activeTab === 'video' && <VideoContent url={lesson.content.video} />}
+      </div>
+    </div>
+  );
+}
+
+// Tab Button Component
+function TabButton({ active, onClick, icon, label }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-2 px-6 py-3 font-bold transition-all ${active
+        ? 'text-blue-500 border-b-2 border-blue-500'
+        : 'text-slate-400 hover:text-white'
+        }`}
+    >
+      {icon}
+      {label}
+    </button>
+  );
+}
+
+// Theory Content Component
+function TheoryContent({ content, formulas }) {
+  return (
+    <div className="prose prose-invert max-w-none">
+      <div className="whitespace-pre-wrap text-slate-300 leading-relaxed">
+        {content}
+      </div>
+
+      {formulas && formulas.length > 0 && (
+        <div className="mt-8 space-y-4">
+          <h3 className="text-xl font-bold text-white">Formulalar:</h3>
+          {formulas.map((formula, index) => (
+            <div key={index} className="bg-slate-900 rounded-xl p-4 border border-slate-700">
+              <div className="font-bold text-blue-400 mb-1">{formula.name}</div>
+              <div className="text-2xl font-mono text-white mb-2">{formula.formula}</div>
+              <div className="text-sm text-slate-400">{formula.description}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Examples Content Component
+function ExamplesContent({ examples }) {
+  return (
+    <div className="space-y-6">
+      {examples.map((example, index) => (
+        <div key={index} className="bg-slate-900 rounded-xl p-6 border border-slate-700">
+          <h4 className="text-xl font-bold text-blue-400 mb-4">{example.title}</h4>
+
+          <div className="space-y-4">
+            <div>
+              <div className="text-sm text-slate-400 mb-2">Masala:</div>
+              <div className="text-white">{example.problem}</div>
+            </div>
+
+            <div>
+              <div className="text-sm text-slate-400 mb-2">Yechim:</div>
+              <div className="whitespace-pre-wrap text-slate-300 bg-slate-800 rounded-lg p-4">
+                {example.solution}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-green-400 font-bold">
+              <CheckCircle size={20} />
+              Javob: {example.answer}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Video Content Component
+function VideoContent({ url }) {
+  return (
+    <div className="space-y-4">
+      <div className="aspect-video bg-slate-900 rounded-xl overflow-hidden">
+        <iframe
+          src={url}
+          className="w-full h-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
+      <p className="text-slate-400 text-center">
+        Video darsni diqqat bilan tomosha qiling va asosiy tushunchalarni eslab qoling.
+      </p>
+    </div>
+  );
+}
+
 
 // 4. MUKAMMAL AI TEST TUZUVCHI (Quiz)
 function QuizModule({ setUserXP, addNotification, apiKey, setShowSettings }) {
