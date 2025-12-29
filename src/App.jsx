@@ -3,8 +3,10 @@ import {
   Book, Atom, Brain, Trophy, User, ChevronRight, Play,
   RotateCcw, Menu, X, CheckCircle, AlertCircle, BarChart2,
   Zap, Flame, Award, ArrowRight, Settings, MessageSquare,
-  Send, Sparkles, Loader, Bot, Key, Search
+  Send, Sparkles, Loader, Bot, Key, Search, LogOut
 } from 'lucide-react';
+import { useAuth } from './contexts/AuthContext';
+import LoginPage from './components/LoginPage';
 
 // --- AI MODULI (API Sozlamalari bilan) ---
 const AI_CONFIG = {
@@ -12,15 +14,33 @@ const AI_CONFIG = {
   baseUrl: "https://generativelanguage.googleapis.com/v1beta/models"
 };
 
+// --- LOADING SCREEN ---
+function LoadingScreen() {
+  return (
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="text-center space-y-4">
+        <div className="relative">
+          <div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-50 animate-pulse"></div>
+          <div className="relative bg-gradient-to-br from-blue-500 to-purple-600 p-6 rounded-2xl">
+            <Atom size={64} className="text-white animate-spin" />
+          </div>
+        </div>
+        <p className="text-slate-400 text-lg">Yuklanmoqda...</p>
+      </div>
+    </div>
+  );
+}
+
 // --- ASOSIY APP KOMPONENTI ---
 export default function EduPhysicsApp() {
+  const { user, loading, logout } = useAuth();
+
+  // BARCHA STATE HOOKS - conditional return'dan OLDIN
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userXP, setUserXP] = useState(1250);
   const [userLevel, setUserLevel] = useState(5);
   const [notifications, setNotifications] = useState([]);
-
-  // API Kalitni boshqarish
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || 'AIzaSyCnJ76FBichqvewV5_4ZZJwqQKFnFp1x-8');
   const [showSettings, setShowSettings] = useState(false);
 
@@ -41,6 +61,16 @@ export default function EduPhysicsApp() {
     setShowSettings(false);
   };
 
+  // CONDITIONAL RETURNS - barcha hooks'dan KEYIN
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  if (!user) {
+    return <LoginPage />;
+  }
+
+  // Render content function
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard': return <Dashboard setActiveTab={setActiveTab} userXP={userXP} userLevel={userLevel} />;
@@ -140,20 +170,37 @@ export default function EduPhysicsApp() {
           <SidebarItem icon={<User />} label="Profil" id="profile" active={activeTab} set={setActiveTab} />
         </nav>
 
-        <div className="p-4 border-t border-slate-700/50 bg-slate-900/30">
-          <button
-            onClick={() => setShowSettings(true)}
-            className="w-full flex items-center space-x-3 p-2 rounded-xl hover:bg-slate-700/50 transition-colors cursor-pointer group text-left"
-          >
-            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center font-bold text-sm shadow-lg group-hover:scale-105 transition-transform">
-              AZ
-            </div>
+        <div className="p-4 border-t border-slate-700/50 bg-slate-900/30 space-y-2">
+          {/* User Info */}
+          <div className="flex items-center space-x-3 p-2">
+            <img
+              src={user.photoURL || 'https://via.placeholder.com/40'}
+              alt={user.displayName}
+              className="w-10 h-10 rounded-full border-2 border-blue-500/30"
+            />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">Ulugbek R.</p>
-              <p className="text-xs text-slate-400 truncate">Sozlamalar</p>
+              <p className="text-sm font-medium truncate text-white">{user.displayName || 'User'}</p>
+              <p className="text-xs text-slate-400 truncate">{user.email}</p>
             </div>
-            <Settings size={16} className="text-slate-500 group-hover:text-white transition-colors animate-spin-slow-hover" />
-          </button>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => setShowSettings(true)}
+              className="flex items-center justify-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors text-xs font-medium text-slate-300 hover:text-white"
+            >
+              <Settings size={14} />
+              <span>Sozlamalar</span>
+            </button>
+            <button
+              onClick={logout}
+              className="flex items-center justify-center gap-2 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-colors text-xs font-medium text-red-400 hover:text-red-300"
+            >
+              <LogOut size={14} />
+              <span>Chiqish</span>
+            </button>
+          </div>
         </div>
       </aside>
 
