@@ -1,7 +1,9 @@
-// TESTS MODULE COMPONENTS - Insert this after LessonsModule (around line 1100)
+import React, { useState } from 'react';
+import { CheckCircle, AlertCircle, ChevronRight, Play, RotateCcw } from 'lucide-react';
+import { testsData } from '../data/testsData';
 
 // 3. TESTLAR MODULI
-function TestsModule({ addXP, addNotification }) {
+export default function TestsModule({ addXP, addNotification }) {
     const [selectedChapter, setSelectedChapter] = useState(null);
     const [isTestActive, setIsTestActive] = useState(false);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -298,14 +300,14 @@ function TestQuizInterface({ question, questionNumber, totalQuestions, selectedA
                             key={index}
                             onClick={() => onAnswer(index)}
                             className={`w-full text-left p-4 rounded-xl border-2 transition-all ${selectedAnswer === index
-                                    ? 'border-blue-500 bg-blue-500/10'
-                                    : 'border-slate-700 hover:border-slate-600 bg-slate-900'
+                                ? 'border-blue-500 bg-blue-500/10'
+                                : 'border-slate-700 hover:border-slate-600 bg-slate-900'
                                 }`}
                         >
                             <div className="flex items-center gap-3">
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${selectedAnswer === index
-                                        ? 'bg-blue-500 text-white'
-                                        : 'bg-slate-700 text-slate-400'
+                                    ? 'bg-blue-500 text-white'
+                                    : 'bg-slate-700 text-slate-400'
                                     }`}>
                                     {String.fromCharCode(65 + index)}
                                 </div>
@@ -320,8 +322,8 @@ function TestQuizInterface({ question, questionNumber, totalQuestions, selectedA
                     onClick={onNext}
                     disabled={selectedAnswer === undefined}
                     className={`w-full mt-6 py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2 ${selectedAnswer !== undefined
-                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500'
-                            : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500'
+                        : 'bg-slate-700 text-slate-500 cursor-not-allowed'
                         }`}
                 >
                     {isLastQuestion ? 'Natijani Ko\'rish' : 'Keyingi Savol'}
