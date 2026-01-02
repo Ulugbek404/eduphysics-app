@@ -86,7 +86,7 @@ s = 120 km
                                 answer: '120 km'
                             }
                         ],
-                        video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                        video: '',
                         formulas: [
                             { name: 'Yo\'l', formula: 's = v × t', description: 'Yo\'l = Tezlik × Vaqt' }
                         ]
@@ -162,7 +162,7 @@ v = 20 m/s
                                 answer: '20 m/s'
                             }
                         ],
-                        video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                        video: '',
                         formulas: [
                             { name: 'Tezlik', formula: 'v = s / t', description: 'Tezlik = Yo\'l / Vaqt' },
                             { name: 'O\'tkazish', formula: '1 m/s = 3.6 km/soat', description: 'Birliklarni o\'tkazish' }
@@ -253,7 +253,7 @@ s = 150 m
                                 answer: '150 m'
                             }
                         ],
-                        video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                        video: '',
                         formulas: [
                             { name: 'Tezlanish', formula: 'a = (v - v₀) / t', description: 'Tezlanish formulasi' },
                             { name: 'Tezlik', formula: 'v = v₀ + at', description: 'Oxirgi tezlik' },
@@ -339,7 +339,7 @@ v = 30 m/s
                                 answer: '30 m/s'
                             }
                         ],
-                        video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                        video: '',
                         formulas: [
                             { name: 'Tezlik', formula: 'v = gt', description: 'Erkin tushishdagi tezlik' },
                             { name: 'Balandlik', formula: 'h = (gt²)/2', description: 'Tushgan balandlik' },
@@ -355,8 +355,8 @@ v = 30 m/s
         // ========================================
         {
             id: 'energy',
-            title: 'Energiya va Ish',
-            description: 'Mexanik ish, quvvat, energiya turlari',
+            title: 'Dinamika',
+            description: 'Kuch, massa va harakat qonunlari',
             icon: '⚡',
             color: 'yellow',
             lessons: [
@@ -423,7 +423,7 @@ A = 500 J
                                 answer: '500 J'
                             }
                         ],
-                        video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                        video: '',
                         formulas: [
                             { name: 'Ish', formula: 'A = F × s × cos α', description: 'Mexanik ish formulasi' }
                         ]
@@ -486,7 +486,7 @@ P = 500 Vt
                                 answer: '500 Vt'
                             }
                         ],
-                        video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                        video: '',
                         formulas: [
                             { name: 'Quvvat', formula: 'P = A / t', description: 'Quvvat formulasi' },
                             { name: 'Quvvat-tezlik', formula: 'P = F × v', description: 'Quvvat va tezlik' }
@@ -548,7 +548,7 @@ P = 500 Vt
                                 answer: 'Muz, Suv, Bug\''
                             }
                         ],
-                        video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                        video: '',
                         formulas: []
                     }
                 },
@@ -590,7 +590,7 @@ Issiq suvda molekulalar tezroq harakat qiladi, shuning uchun diffuziya tezroq bo
                                 answer: 'Molekulalar tezroq harakatlanadi'
                             }
                         ],
-                        video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                        video: '',
                         formulas: []
                     }
                 }
@@ -659,7 +659,7 @@ I = 2 A
                                 answer: '2 A'
                             }
                         ],
-                        video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                        video: '',
                         formulas: [
                             { name: 'Tok kuchi', formula: 'I = q / t', description: 'Tok kuchi formulasi' }
                         ]
@@ -736,7 +736,7 @@ R = 5 Ω
                                 answer: '5 Ω'
                             }
                         ],
-                        video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                        video: '',
                         formulas: [
                             { name: 'Om qonuni', formula: 'I = U / R', description: 'Zanjir qismi uchun Om qonuni' },
                             { name: 'Kuchlanish', formula: 'U = I × R', description: 'Kuchlanish formulasi' },
@@ -802,7 +802,7 @@ Tushuvchi nur, qaytgan nur va perpendikular bir tekislikda yotadi.
                                 answer: '30°'
                             }
                         ],
-                        video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                        video: '',
                         formulas: [
                             { name: 'Qaytish qonuni', formula: 'α = β', description: 'Tushish va qaytish burchaklari teng' }
                         ]
@@ -857,7 +857,7 @@ D = 2 D
                                 answer: '2 D'
                             }
                         ],
-                        video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                        video: '',
                         formulas: [
                             { name: 'Optik kuch', formula: 'D = 1 / f', description: 'Linzaning optik kuchi' }
                         ]
@@ -922,7 +922,7 @@ Atom quyidagilardan iborat:
                                 answer: '6 elektron, A=12'
                             }
                         ],
-                        video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                        video: '',
                         formulas: [
                             { name: 'Massa soni', formula: 'A = Z + N', description: 'Protonlar + Neytronlar' }
                         ]
@@ -974,7 +974,7 @@ Gamma (γ) nurlanish eng xavfli, chunki:
                                 answer: 'Gamma nurlanish'
                             }
                         ],
-                        video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+                        video: '',
                         formulas: []
                     }
                 }

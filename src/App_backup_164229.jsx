@@ -3,8 +3,8 @@ import {
   Book, Atom, Brain, Trophy, User, ChevronRight, Play,
   RotateCcw, Menu, X, CheckCircle, AlertCircle, BarChart2,
   Zap, Flame, Award, ArrowRight, Settings, MessageSquare,
-  Info, Smartphone, Moon, Sun, Monitor, Volume2, VolumeX, Palette, Camera, Sparkles,
-  Send, Loader, Bot, Key, Search, LogOut
+
+  Send, Sparkles, Loader, Bot, Key, Search, LogOut
 } from 'lucide-react';
 import { useAuth } from './contexts/AuthContext';
 import { updateProfile } from 'firebase/auth'; // Import updateProfile
@@ -37,90 +37,8 @@ function LoadingScreen() {
   );
 }
 
-// --- THEME HELPER FUNCTION ---
-function getThemeClasses(theme) {
-  const themes = {
-    dark: {
-      bg: 'bg-gradient-to-br from-slate-900 to-black',
-      card: 'bg-slate-800',
-      cardHover: 'hover:bg-slate-700',
-      border: 'border-slate-700',
-      borderHover: 'hover:border-blue-500',
-      text: 'text-white',
-      textMuted: 'text-slate-400',
-      input: 'bg-slate-800 border-slate-700 text-white placeholder-slate-500',
-      sidebar: 'bg-slate-900',
-    },
-    white: {
-      bg: 'bg-gradient-to-br from-gray-50 to-white',
-      card: 'bg-white',
-      cardHover: 'hover:bg-gray-50',
-      border: 'border-gray-200',
-      borderHover: 'hover:border-blue-400',
-      text: 'text-gray-900',
-      textMuted: 'text-gray-600',
-      input: 'bg-white border-gray-300 text-gray-900 placeholder-gray-400',
-      sidebar: 'bg-white',
-    },
-    black: {
-      bg: 'bg-gradient-to-br from-black to-gray-950',
-      card: 'bg-gray-950',
-      cardHover: 'hover:bg-gray-900',
-      border: 'border-gray-800',
-      borderHover: 'hover:border-blue-500',
-      text: 'text-white',
-      textMuted: 'text-gray-400',
-      input: 'bg-gray-950 border-gray-800 text-white placeholder-gray-500',
-      sidebar: 'bg-black',
-    },
-  };
-  return themes[theme] || themes.dark;
-}
-
-// --- ERROR BOUNDARY ---
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    console.error("Uncaught error:", error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-10 text-white">
-          <div className="bg-red-900/50 p-8 rounded-2xl border border-red-500 max-w-2xl w-full">
-            <h1 className="text-3xl font-bold mb-4 flex items-center gap-3">
-              <AlertCircle size={32} className="text-red-400" />
-              Xatolik yuz berdi
-            </h1>
-            <p className="text-slate-300 mb-6">Dasturni yuklashda muammo bo'ldi. Iltimos, quyidagi xatoni administratorga yuboring:</p>
-            <pre className="bg-black/50 p-4 rounded-lg overflow-auto font-mono text-sm text-red-200 border border-red-500/30">
-              {this.state.error?.toString()}
-            </pre>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-6 px-6 py-3 bg-red-600 hover:bg-red-500 rounded-xl font-bold transition-colors w-full"
-            >
-              Sahifani yangilash
-            </button>
-          </div>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
 // --- ASOSIY APP KOMPONENTI ---
-function EduPhysicsAppContent() {
+export default function EduPhysicsApp() {
   const { user, loading, logout } = useAuth();
 
   // BARCHA STATE HOOKS - conditional return'dan OLDIN
@@ -146,85 +64,16 @@ function EduPhysicsAppContent() {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || import.meta.env.VITE_GEMINI_API_KEY || '');
   const [showSettings, setShowSettings] = useState(false);
 
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('eduphysics-theme') || 'dark';
-  });
+  const [theme, setTheme] = useState('dark'); // 'dark', 'midnight', 'ocean'
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [progressLoading, setProgressLoading] = useState(true);
 
-  // Theme localStorage persistence
-  useEffect(() => {
-    localStorage.setItem('eduphysics-theme', theme);
-  }, [theme]);
-
-  // Avatar state from localStorage (FIX for large base64 images)
-  const [userAvatar, setUserAvatar] = useState(null);
-
-  useEffect(() => {
-    if (user?.uid) {
-      const key = `user_avatar_${user.uid}`;
-      setUserAvatar(localStorage.getItem(key));
-
-      const handleAvatarUpdate = () => setUserAvatar(localStorage.getItem(key));
-      window.addEventListener('avatarUpdated', handleAvatarUpdate);
-      return () => window.removeEventListener('avatarUpdated', handleAvatarUpdate);
-    }
-  }, [user]);
-
-  // --- STATISTICS STATE ---
-  const [userStats, setUserStats] = useState(() => {
-    try {
-      const saved = localStorage.getItem('userStats');
-      return saved ? JSON.parse(saved) : { timeSpent: 0, testsSolved: 0, totalScore: 0, completedLabs: 0 };
-    } catch (e) {
-      return { timeSpent: 0, testsSolved: 0, totalScore: 0, completedLabs: 0 };
-    }
-  });
-
-  useEffect(() => {
-    localStorage.setItem('userStats', JSON.stringify(userStats));
-  }, [userStats]);
-
-  useEffect(() => {
-    let timer;
-    if (user && !loading) {
-      timer = setInterval(() => {
-        if (document.visibilityState === 'visible') {
-          setUserStats(prev => ({ ...prev, timeSpent: (prev.timeSpent || 0) + 1 }));
-        }
-      }, 1000);
-    }
-    return () => clearInterval(timer);
-  }, [user, loading]);
-
-  const updateUserStats = (data) => {
-    setUserStats(prev => {
-      const newStats = { ...prev };
-
-      if (typeof data === 'number') {
-        // Quiz result (percentage)
-        newStats.testsSolved = (prev.testsSolved || 0) + 1;
-        newStats.totalScore = (prev.totalScore || 0) + data;
-      } else if (data && data.labCompleted) {
-        // Lab completion
-        newStats.completedLabs = (prev.completedLabs || 0) + 1;
-      }
-
-      localStorage.setItem('userStats', JSON.stringify(newStats));
-      return newStats;
-    });
-  };
-
   const handleUpdateProfile = async (data) => {
-    if (user) {
-      const updates = {};
-      if (data.displayName) updates.displayName = data.displayName;
-      if (data.photoURL) updates.photoURL = data.photoURL;
-
-      if (Object.keys(updates).length > 0) {
-        await updateProfile(user, updates);
-        window.location.reload();
-      }
+    if (user && data.displayName) {
+      await updateProfile(user, { displayName: data.displayName });
+      // Force reload user or reload page? auth state change handles it usually.
+      // For simpler UX, we might just reload page or let auth listener catch it.
+      window.location.reload();
     }
   };
 
@@ -319,33 +168,36 @@ function EduPhysicsAppContent() {
     return <LoginPage />;
   }
 
-  // Get theme classes
-  const themeClasses = getThemeClasses(theme);
-
-  // Extended User with local avatar
-  const displayUser = user ? { ...user, photoURL: userAvatar || user.photoURL } : null;
+  // Theme to class logic
+  const getThemeClass = () => {
+    switch (theme) {
+      case 'midnight': return 'bg-blue-950';
+      case 'ocean': return 'bg-cyan-950';
+      default: return 'bg-slate-900';
+    }
+  };
 
   // Render content function
   const renderContent = () => {
     switch (activeTab) {
-      case 'dashboard': return <Dashboard setActiveTab={setActiveTab} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} completedLessons={completedLessons} totalLessons={lessonsData.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0)} />;
-      case 'lessons': return <LessonsModule completedLessons={completedLessons} completeLesson={completeLesson} theme={theme} />;
-      case 'tests': return <TestsModule addXP={addXP} addNotification={addNotification} theme={theme} />;
-      case 'lab': return <VirtualLab addNotification={addNotification} apiKey={apiKey} setShowSettings={setShowSettings} theme={theme} updateStats={updateUserStats} />;
-      case 'quiz': return <QuizModule setUserXP={setUserXP} addNotification={addNotification} apiKey={apiKey} setShowSettings={setShowSettings} theme={theme} updateStats={updateUserStats} />;
-      case 'profile': return <UserProfile user={displayUser} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} />;
-      default: return <Dashboard setActiveTab={setActiveTab} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} completedLessons={completedLessons} totalLessons={lessonsData.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0)} />;
+      case 'dashboard': return <Dashboard setActiveTab={setActiveTab} userXP={userXP} userLevel={userLevel} />;
+      case 'lessons': return <LessonsModule completedLessons={completedLessons} completeLesson={completeLesson} />;
+      case 'tests': return <TestsModule addXP={addXP} addNotification={addNotification} />;
+      case 'lab': return <VirtualLab addNotification={addNotification} apiKey={apiKey} setShowSettings={setShowSettings} />;
+      case 'quiz': return <QuizModule setUserXP={setUserXP} addNotification={addNotification} apiKey={apiKey} setShowSettings={setShowSettings} />;
+      case 'profile': return <UserProfile user={user} userXP={userXP} userLevel={userLevel} />;
+      default: return <Dashboard setActiveTab={setActiveTab} userXP={userXP} userLevel={userLevel} />;
     }
   };
 
   return (
-    <div className={`flex h - screen ${themeClasses.bg} ${themeClasses.text} font - sans overflow - hidden selection: bg - blue - 500 selection: text - white transition - colors duration - 500`}>
+    <div className={`flex h-screen ${getThemeClass()} text-white font-sans overflow-hidden selection:bg-blue-500 selection:text-white transition-colors duration-500`}>
 
       {/* Toast Notifications */}
       <div className="fixed top-4 right-4 z-[60] space-y-2 pointer-events-none">
         {notifications.map(n => (
-          <div key={n.id} className={`flex items - center space - x - 2 px - 4 py - 3 rounded - lg shadow - 2xl animate - slideInLeft ${n.type === 'success' ? 'bg-green-500/90' : 'bg-blue-500/90'
-            } backdrop - blur - sm text - white pointer - events - auto`}>
+          <div key={n.id} className={`flex items-center space-x-2 px-4 py-3 rounded-lg shadow-2xl animate-slideInLeft ${n.type === 'success' ? 'bg-green-500/90' : 'bg-blue-500/90'
+            } backdrop-blur-sm text-white pointer-events-auto`}>
             {n.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
             <span className="font-medium text-sm">{n.message}</span>
           </div>
@@ -356,14 +208,12 @@ function EduPhysicsAppContent() {
       <SettingsModal
         show={showSettings}
         onClose={() => setShowSettings(false)}
-        user={displayUser}
+        user={user}
         theme={theme}
         setTheme={setTheme}
         soundEnabled={soundEnabled}
         setSoundEnabled={setSoundEnabled}
         updateProfile={handleUpdateProfile}
-        apiKey={apiKey}
-        setApiKey={setApiKey}
       />
 
       {/* Hamburger menyu o'chirildi - icon-only sidebar doimo ko'rinadi */}
@@ -371,8 +221,8 @@ function EduPhysicsAppContent() {
       {/* Overlay o'chirildi - icon-only sidebar doimo ko'rinadi */}
 
       {/* Yon panel (Sidebar) - Icon-Only */}
-      <aside className={`fixed inset - y - 0 left - 0 z - 40 ${themeClasses.sidebar} backdrop - blur - xl border - r ${themeClasses.border} flex flex - col transition - all duration - 300 ${sidebarCollapsed ? '-translate-x-full w-20' : 'translate-x-0 w-20'
-        } `}>
+      <aside className={`fixed inset-y-0 left-0 z-40 bg-slate-800/95 backdrop-blur-xl border-r border-slate-700 flex flex-col transition-all duration-300 ${sidebarCollapsed ? '-translate-x-full w-20' : 'translate-x-0 w-20'
+        }`}>
         {/* Logo */}
         <div className="p-4 flex items-center justify-center border-b border-slate-700/50">
           <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg shadow-lg shadow-blue-500/20">
@@ -394,13 +244,11 @@ function EduPhysicsAppContent() {
         <div className="p-2 border-t border-slate-700/50 bg-slate-900/30 space-y-2">
           {/* User Avatar */}
           <div className="flex justify-center">
-            <div className="w-10 h-10 rounded-full border-2 border-blue-500/30 overflow-hidden bg-slate-800 flex items-center justify-center">
-              {displayUser?.photoURL ? (
-                <img src={displayUser.photoURL} alt="User" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-white font-bold text-sm">{displayUser?.displayName ? displayUser.displayName[0].toUpperCase() : 'U'}</span>
-              )}
-            </div>
+            <img
+              src={user.photoURL || 'https://via.placeholder.com/40'}
+              alt={user.displayName}
+              className="w-10 h-10 rounded-full border-2 border-blue-500/30"
+            />
           </div>
 
           {/* Action Buttons - Icon Only */}
@@ -426,17 +274,17 @@ function EduPhysicsAppContent() {
       {/* Toggle Button - Fixed, doimo ko'rinadi */}
       <button
         onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-        className={`fixed top - [120px] z - 50 bg - gradient - to - r from - blue - 600 to - purple - 600 text - white p - 2 rounded - r - lg shadow - lg hover: shadow - xl transition - all duration - 300 ${sidebarCollapsed ? 'left-0' : 'left-[60px]'
-          } `}
+        className={`fixed top-[120px] z-50 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-2 rounded-r-lg shadow-lg hover:shadow-xl transition-all duration-300 ${sidebarCollapsed ? 'left-0' : 'left-[60px]'
+          }`}
         title={sidebarCollapsed ? "Sidebar'ni ko'rsatish" : "Sidebar'ni yashirish"}
       >
-        <ChevronRight size={20} className={`transition - transform duration - 300 ${sidebarCollapsed ? 'rotate-0' : 'rotate-180'
-          } `} />
+        <ChevronRight size={20} className={`transition-transform duration-300 ${sidebarCollapsed ? 'rotate-0' : 'rotate-180'
+          }`} />
       </button>
 
       {/* Asosiy oyna */}
-      <main className={`flex - 1 overflow - y - auto ${themeClasses.bg} relative scroll - smooth transition - all duration - 300 ${sidebarCollapsed ? 'ml-0' : 'ml-20'
-        } `}>
+      <main className={`flex-1 overflow-y-auto bg-slate-900 relative scroll-smooth transition-all duration-300 ${sidebarCollapsed ? 'ml-0' : 'ml-20'
+        }`}>
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl mix-blend-screen"></div>
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/5 rounded-full blur-3xl mix-blend-screen"></div>
@@ -521,11 +369,11 @@ function AIAssistant({ apiKey, setShowSettings }) {
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-900/50 scrollbar-thin scrollbar-thumb-slate-700">
             {messages.map((msg, idx) => (
-              <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} `}>
-                <div className={`max - w - [85 %] p - 3 rounded - 2xl text - sm leading - relaxed ${msg.role === 'user'
+              <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[85%] p-3 rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
                   ? 'bg-blue-600 text-white rounded-br-none shadow-lg'
                   : 'bg-slate-700 text-slate-200 rounded-bl-none shadow-md'
-                  } `}>
+                  }`}>
                   {msg.text}
                 </div>
               </div>
@@ -580,7 +428,7 @@ function AIAssistant({ apiKey, setShowSettings }) {
 }
 
 // 3. MUKAMMAL VIRTUAL LABORATORIYA (AI Tahlil bilan)
-function VirtualLab({ addNotification, apiKey, setShowSettings, updateStats }) {
+function VirtualLab({ addNotification, apiKey, setShowSettings }) {
   const [voltage, setVoltage] = useState(12);
   const [resistance, setResistance] = useState(4);
   const [isRunning, setIsRunning] = useState(true);
@@ -618,14 +466,14 @@ function VirtualLab({ addNotification, apiKey, setShowSettings, updateStats }) {
     setIsAnalyzing(true);
     setAiAnalysis(null);
 
-    const prompt = `Men 9 - sinf fizika laboratoriyasida tajriba o'tkazyapman. 
-NATIJALAR:
-- Kuchlanish(U): ${voltage} Volt
-  - Qarshilik(R): ${resistance} Om
-    - Tok kuchi(I): ${current} Amper.
-
-      VAZIFA:
-    Ushbu natijani Om qonuniga(I = U / R) asosan qisqa, ilmiy va tushunarli tahlil qilib ber.Nega tok kuchi aynan shunday chiqdi ? Agar qarshilikni oshirsak nima bo'ladi? Javobni o'zbek tilida ber.`;
+    const prompt = `Men 9-sinf fizika laboratoriyasida tajriba o'tkazyapman. 
+    NATIJALAR: 
+    - Kuchlanish (U): ${voltage} Volt
+    - Qarshilik (R): ${resistance} Om
+    - Tok kuchi (I): ${current} Amper.
+    
+    VAZIFA:
+    Ushbu natijani Om qonuniga (I=U/R) asosan qisqa, ilmiy va tushunarli tahlil qilib ber. Nega tok kuchi aynan shunday chiqdi? Agar qarshilikni oshirsak nima bo'ladi? Javobni o'zbek tilida ber.`;
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
@@ -640,7 +488,6 @@ NATIJALAR:
       }
 
       setAiAnalysis(analysisText);
-      if (updateStats) updateStats({ labCompleted: true });
     } catch (error) {
       console.error(error);
       addNotification("AI tahlilida xatolik bo'ldi.", "error");
@@ -679,7 +526,7 @@ NATIJALAR:
                 <div className="relative w-80 h-48 border-4 border-slate-600 rounded-lg flex items-center justify-center">
                   {/* Battery */}
                   <div className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900 p-2">
-                    <div className={`w - 10 h - 16 border - 2 ${isRunning ? 'border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.4)]' : 'border-slate-500'} rounded bg - slate - 800 flex flex - col items - center justify - center transition - all`}>
+                    <div className={`w-10 h-16 border-2 ${isRunning ? 'border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.4)]' : 'border-slate-500'} rounded bg-slate-800 flex flex-col items-center justify-center transition-all`}>
                       <span className="text-yellow-500 font-bold text-xs">{voltage}V</span>
                     </div>
                   </div>
@@ -695,7 +542,7 @@ NATIJALAR:
                     <div
                       className="transition-all duration-500"
                       style={{
-                        filter: isRunning ? `drop - shadow(0 0 ${current * 5}px #FEF08A)` : 'none',
+                        filter: isRunning ? `drop-shadow(0 0 ${current * 5}px #FEF08A)` : 'none',
                         opacity: isRunning ? 1 : 0.5
                       }}
                     >
@@ -717,7 +564,7 @@ NATIJALAR:
                   <div key={idx} className="flex flex-col items-center gap-1 group relative" style={{ width: '15%' }}>
                     <div
                       className="w-full bg-blue-600/50 rounded-t transition-all duration-500 hover:bg-blue-500"
-                      style={{ height: `${(point.i / 6) * 100} px`, maxHeight: '80px' }}
+                      style={{ height: `${(point.i / 6) * 100}px`, maxHeight: '80px' }}
                     ></div>
                     <span className="text-[10px] text-slate-400">{point.u}V</span>
                   </div>
@@ -748,20 +595,20 @@ NATIJALAR:
           <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-700 p-6">
             <div className="flex justify-between items-end mb-2">
               <span className="text-slate-400 text-sm">Natija (I):</span>
-              <span className={`text - 4xl font - bold font - mono ${isRunning ? 'text-white' : 'text-slate-600'} `}>{current} A</span>
+              <span className={`text-4xl font-bold font-mono ${isRunning ? 'text-white' : 'text-slate-600'}`}>{current} A</span>
             </div>
             <div className="h-1 w-full bg-slate-700 rounded-full overflow-hidden">
-              <div className="h-full bg-blue-500 transition-all duration-300" style={{ width: `${Math.min(current * 10, 100)}% ` }}></div>
+              <div className="h-full bg-blue-500 transition-all duration-300" style={{ width: `${Math.min(current * 10, 100)}%` }}></div>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={handleToggle}
-              className={`col - span - 2 py - 4 rounded - xl font - bold text - lg shadow - lg transform transition - all active: scale - 95 flex items - center justify - center gap - 2 ${isRunning
+              className={`col-span-2 py-4 rounded-xl font-bold text-lg shadow-lg transform transition-all active:scale-95 flex items-center justify-center gap-2 ${isRunning
                 ? 'bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20'
                 : 'bg-green-600 text-white hover:bg-green-500 shadow-green-600/30'
-                } `}
+                }`}
             >
               {isRunning ? <><X /> Zanjirni Uzish</> : <><Play /> Zanjirni Ulash</>}
             </button>
@@ -785,14 +632,14 @@ function ControlPanel({ label, value, unit, color, accent, min, max, onChange })
   return (
     <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6">
       <div className="flex justify-between mb-4">
-        <span className={`font - bold ${color} `}>{label}</span>
+        <span className={`font-bold ${color}`}>{label}</span>
         <span className="font-mono font-bold text-white bg-slate-900 px-3 py-1 rounded-lg border border-slate-700">{value} {unit}</span>
       </div>
       <input
         type="range" min={min} max={max} step="1"
         value={value}
         onChange={(e) => onChange(parseInt(e.target.value))}
-        className={`w - full h - 2 bg - slate - 700 rounded - lg appearance - none cursor - pointer ${accent} `}
+        className={`w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer ${accent}`}
       />
       <div className="flex justify-between mt-2 text-xs text-slate-500 font-mono">
         <span>{min}</span>
@@ -873,7 +720,7 @@ function ChapterGrid({ onSelect, completedLessons }) {
                 <div className="w-full bg-slate-700 rounded-full h-1.5 overflow-hidden">
                   <div
                     className="bg-gradient-to-r from-blue-500 to-purple-500 h-full rounded-full transition-all duration-1000 ease-out"
-                    style={{ width: `${progress}% ` }}
+                    style={{ width: `${progress}%` }}
                   ></div>
                 </div>
               </div>
@@ -951,45 +798,61 @@ function LessonCard({ lesson, index, onClick, isCompleted }) {
   return (
     <button
       onClick={onClick}
-      className="w-full p-4 rounded-xl text-left bg-slate-800 border border-slate-700 hover:border-blue-500"
+      className={`w-full p-4 rounded-xl text-left transition-all border group flex items-center justify-between
+          ${isCompleted
+          ? 'bg-green-900/20 border-green-500/50 hover:bg-green-900/30'
+          : 'bg-slate-800 border-slate-700 hover:border-blue-500 hover:shadow-lg'
+        }`}
     >
       <div className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-sm text-white">
-          {index + 1}
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm
+            ${isCompleted ? 'bg-green-500 text-white' : 'bg-slate-700 text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-colors'}
+          `}>
+          {isCompleted ? <CheckCircle size={20} /> : index + 1}
         </div>
         <div>
-          <h4 className="font-bold text-white">
-            {lesson.title || 'Untitled'}
+          <h4 className={`font-bold ${isCompleted ? 'text-green-400' : 'text-white group-hover:text-blue-400 transition-colors'}`}>
+            {lesson.title || 'Untitled Lesson'}
           </h4>
-          <p className="text-xs text-slate-400">
-            {lesson.description || ''}
+          <p className="text-xs text-slate-500 mt-1 flex items-center gap-2">
+            <Clock size={12} /> {lesson.duration || '15 daqiqa'}
+            {lesson.videoUrl && <span className="flex items-center gap-1"><Video size={12} /> Video</span>}
           </p>
         </div>
       </div>
+      <ChevronRight size={20} className={`text-slate-600 group-hover:translate-x-1 transition-all ${isCompleted ? 'text-green-500' : 'group-hover:text-blue-500'}`} />
     </button>
   )
 }
 
 function LessonDetail({ lesson, onBack, onComplete, isCompleted }) {
-  if (!lesson) return <div>Loading...</div>;
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
-    <div className="space-y-8 pb-24">
+    <div className="animate-slideInRight space-y-8 pb-24">
       {/* Header */}
-      <button onClick={onBack} className="text-slate-400 hover:text-white">
-        ← Mavzularga qaytish
+      <button onClick={onBack} className="flex items-center space-x-2 text-slate-400 hover:text-white transition-colors group">
+        <ArrowRight className="rotate-180 group-hover:-translate-x-1 transition-transform" size={20} />
+        <span>Mavzularga qaytish</span>
       </button>
 
       <div>
-        <h1 className="text-3xl font-bold text-white mb-4">{lesson.title || 'Untitled'}</h1>
-        <p className="text-slate-400">{lesson.description || ''}</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">{lesson.title}</h1>
+        <div className="flex flex-wrap gap-4 text-sm text-slate-400">
+          <span className="flex items-center gap-1 bg-slate-800 px-3 py-1 rounded-full"><Book size={14} /> Nazariy</span>
+          {lesson.videoUrl && <span className="flex items-center gap-1 bg-slate-800 px-3 py-1 rounded-full"><Video size={14} /> Video dars</span>}
+          <span className="flex items-center gap-1 bg-slate-800 px-3 py-1 rounded-full"><Clock size={14} /> 15 daqiqa</span>
+        </div>
       </div>
 
+      {/* Video or Placeholder */}
+      <VideoContent url={lesson.videoUrl} />
+
       {/* Content */}
-      <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 text-slate-300">
-        <div className="whitespace-pre-wrap">
-          {lesson.content?.theory || 'Kontent yuklanmoqda...'}
-        </div>
+      <div className="bg-slate-800 rounded-2xl p-6 md:p-8 border border-slate-700 leading-relaxed text-lg text-slate-300 shadow-xl prose prose-invert max-w-none">
+        <div className="whitespace-pre-wrap">{lesson.content?.theory || lesson.content || 'Kontent yuklanmoqda...'}</div>
       </div>
 
       {/* Actions */}
@@ -1000,9 +863,21 @@ function LessonDetail({ lesson, onBack, onComplete, isCompleted }) {
         <button
           onClick={() => onComplete(lesson.id)}
           disabled={isCompleted}
-          className={`px - 8 py - 3 rounded - xl font - bold ${isCompleted ? 'bg-green-600' : 'bg-blue-600 hover:bg-blue-500'} text - white`}
+          className={`px-8 py-3 rounded-xl font-bold shadow-lg transition-all flex items-center gap-2
+              ${isCompleted
+              ? 'bg-green-600 text-white cursor-default'
+              : 'bg-blue-600 hover:bg-blue-500 text-white hover:scale-105 active:scale-95'
+            }`}
         >
-          {isCompleted ? 'Bajarildi' : 'Mavzuni Yakunlash'}
+          {isCompleted ? (
+            <>
+              <CheckCircle size={20} /> Bajarildi
+            </>
+          ) : (
+            <>
+              Mavzuni Yakunlash <ArrowRight size={20} />
+            </>
+          )}
         </button>
       </div>
     </div>
@@ -1046,7 +921,7 @@ function LessonsModule({ completedLessons, completeLesson }) {
 
 
 // 4. MUKAMMAL AI TEST TUZUVCHI (Quiz)
-function QuizModule({ setUserXP, addNotification, apiKey, setShowSettings, updateStats }) {
+function QuizModule({ setUserXP, addNotification, apiKey, setShowSettings }) {
   // Boshlang'ich (default) savollar
   const defaultQuestions = [
     { id: 1, q: "Elektr zanjirida kuchlanishni o'lchovchi asbob nima?", options: ["Ampermetr", "Voltmetr", "Ommetr", "Reostat"], ans: 1 },
@@ -1081,15 +956,15 @@ function QuizModule({ setUserXP, addNotification, apiKey, setShowSettings, updat
 
     // JSON formatda javob olish uchun aniq prompt
     const prompt = `Fizika bo'yicha "${topic}" mavzusida 5 ta qiziqarli test savoli tuz.
-      Javobni faqat va faqat quyidagi JSON formatda qaytar(boshqa hech qanday matnsiz):
-[
-  {
-    "q": "Savol matni",
-    "options": ["A javob", "B javob", "C javob", "D javob"],
-    "ans": to'g'ri_javob_indeksi_raqamda_0_dan_3_gacha
-  }
-]
-      Savollar 9 - sinf darajasida, o'zbek tilida bo'lsin.`;
+    Javobni faqat va faqat quyidagi JSON formatda qaytar (boshqa hech qanday matnsiz):
+    [
+      { 
+        "q": "Savol matni", 
+        "options": ["A javob", "B javob", "C javob", "D javob"], 
+        "ans": to'g'ri_javob_indeksi_raqamda_0_dan_3_gacha 
+      }
+    ]
+    Savollar 9-sinf darajasida, o'zbek tilida bo'lsin.`;
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
@@ -1140,11 +1015,6 @@ function QuizModule({ setUserXP, addNotification, apiKey, setShowSettings, updat
         const bonusXP = finalScore * 50;
         setUserXP(prev => prev + bonusXP);
         addNotification(`Tabriklaymiz! +${bonusXP} XP qo'shildi!`, 'success');
-
-        if (updateStats) {
-          const percentage = Math.round((finalScore / questions.length) * 100);
-          updateStats(percentage);
-        }
       }
     }, 800);
   };
@@ -1164,7 +1034,7 @@ function QuizModule({ setUserXP, addNotification, apiKey, setShowSettings, updat
     return (
       <div className="max-w-2xl mx-auto mt-10 space-y-8 animate-fadeIn">
         <div className="text-center space-y-4">
-          <div className="w-20 h-20 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-2xl mx-auto flex items-center justify-center shadow-xl">
+          <div className="w-20 h-20 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-2xl mx-auto flex items-center justify-center shadow-xl rotate-3">
             <Brain size={40} className="text-white" />
           </div>
           <h2 className="text-3xl font-bold text-white">AI Test Tuzuvchi</h2>
@@ -1313,7 +1183,7 @@ function QuizModule({ setUserXP, addNotification, apiKey, setShowSettings, updat
 }
 
 // 5. PROFIL
-function UserProfile({ user, userXP, userLevel, userStats = { timeSpent: 0, testsSolved: 0, totalScore: 0 } }) {
+function UserProfile({ user, userXP, userLevel }) {
   const getInitials = (name) => {
     if (!name) return "U";
     const parts = name.trim().split(' ');
@@ -1329,15 +1199,10 @@ function UserProfile({ user, userXP, userLevel, userStats = { timeSpent: 0, test
     <div className="max-w-4xl mx-auto space-y-6 animate-fadeIn">
       <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-700 rounded-3xl p-8 shadow-2xl">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-black opacity-10 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
         <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
           <div className="relative">
-            <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-blue-600 to-purple-600 shadow-2xl border-4 border-white/20 overflow-hidden">
-              {user?.photoURL ? (
-                <img src={user.photoURL} alt={user.displayName} className="w-full h-full object-cover" />
-              ) : (
-                initials
-              )}
+            <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-blue-600 to-purple-600 shadow-2xl border-4 border-white/20">
+              {initials}
             </div>
             <div className="absolute bottom-2 right-2 bg-yellow-400 text-black font-bold px-3 py-1 rounded-full text-xs shadow-lg border border-white">PRO</div>
           </div>
@@ -1368,22 +1233,9 @@ function UserProfile({ user, userXP, userLevel, userStats = { timeSpent: 0, test
         <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
           <h3 className="text-xl font-bold mb-6">Statistika</h3>
           <ul className="space-y-4">
-            <StatRow label="O'qilgan vaqt" value={(function (s) {
-              if (!s) return "0m";
-              const h = Math.floor(s / 3600);
-              const m = Math.floor((s % 3600) / 60);
-              if (h > 0) return `${h}s ${m}m`;
-              return `${m}m`;
-            })(userStats.timeSpent)} />
-            <StatRow label="Yechilgan testlar" value={`${userStats.testsSolved || 0} ta`} />
-            <StatRow
-              label="O'rtacha baho"
-              value={`${userStats.testsSolved ? Math.round(userStats.totalScore / userStats.testsSolved) : 0}%`}
-              color={
-                (userStats.testsSolved ? Math.round(userStats.totalScore / userStats.testsSolved) : 0) >= 80 ? "text-green-400" :
-                  (userStats.testsSolved ? Math.round(userStats.totalScore / userStats.testsSolved) : 0) >= 50 ? "text-yellow-400" : "text-red-400"
-              }
-            />
+            <StatRow label="O'qilgan vaqt" value="12s 30m" />
+            <StatRow label="Yechilgan testlar" value="45 ta" />
+            <StatRow label="O'rtacha baho" value="92%" color="text-green-400" />
           </ul>
         </div>
       </div>
@@ -1414,7 +1266,7 @@ function SidebarItem({ icon, label, id, active, set }) {
   return (
     <button
       onClick={() => set(id)}
-      className={`relative group w-full p-3 rounded-xl transition-all duration-200 active:scale-90 flex flex-col items-center justify-center gap-1 ${active === id ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+      className={`relative group w-full p-3 rounded-xl transition-all duration-200 flex flex-col items-center justify-center gap-1 ${active === id ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
     >
       <div className={`transition-transform duration-300 ${active === id ? 'scale-110' : 'group-hover:scale-110'}`}>
         {icon}
@@ -1427,22 +1279,7 @@ function SidebarItem({ icon, label, id, active, set }) {
 }
 
 // --- DASHBOARD COMPONENT ---
-function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLessons = [], totalLessons = 24 }) {
-
-  // Calculate dynamic stats
-  const progressPercent = totalLessons > 0 ? Math.round((completedLessons.length / totalLessons) * 100) : 0;
-  const labCount = userStats?.completedLabs || 0;
-
-  // Unlock achievements based on stats
-  const achievements = [
-    { id: 'first_step', title: "Birinchi Qadam", icon: <Zap />, unlocked: true }, // Always unlocked
-    { id: 'om_law', title: "Om Qonuni", icon: <Atom />, unlocked: labCount >= 1 },
-    { id: 'quiz_master', title: "Test Ustasi", icon: <Brain />, unlocked: (userStats?.testsSolved || 0) >= 5 },
-    { id: 'week_streak', title: "7 Kunlik", icon: <Flame />, unlocked: false }, // Mocked
-  ];
-
-  const unlockedCount = achievements.filter(a => a.unlocked).length;
-
+function Dashboard({ setActiveTab, userXP, userLevel }) {
   return (
     <div className="space-y-8 animate-fadeIn">
       <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 sm:p-12 shadow-2xl">
@@ -1475,7 +1312,7 @@ function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLesson
             <div className="p-3 bg-green-500/10 rounded-xl text-green-400"><Book size={24} /></div>
             <span className="text-xs font-bold text-slate-500 bg-slate-900 px-2 py-1 rounded-lg">6 BOB</span>
           </div>
-          <div className="text-3xl font-bold text-white mb-1">{progressPercent}%</div>
+          <div className="text-3xl font-bold text-white mb-1">0%</div>
           <div className="text-sm text-slate-400">Kurs progressi</div>
         </div>
         <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-purple-500/50 transition-colors">
@@ -1483,7 +1320,7 @@ function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLesson
             <div className="p-3 bg-purple-500/10 rounded-xl text-purple-400"><Zap size={24} /></div>
             <span className="text-xs font-bold text-slate-500 bg-slate-900 px-2 py-1 rounded-lg">LAB</span>
           </div>
-          <div className="text-3xl font-bold text-white mb-1">{labCount}</div>
+          <div className="text-3xl font-bold text-white mb-1">0</div>
           <div className="text-sm text-slate-400">Bajarilgan lablar</div>
         </div>
         <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-yellow-500/50 transition-colors">
@@ -1491,52 +1328,10 @@ function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLesson
             <div className="p-3 bg-yellow-500/10 rounded-xl text-yellow-400"><Award size={24} /></div>
             <span className="text-xs font-bold text-slate-500 bg-slate-900 px-2 py-1 rounded-lg">YUTUQLAR</span>
           </div>
-          <div className="text-3xl font-bold text-white mb-1">{unlockedCount}/10</div>
+          <div className="text-3xl font-bold text-white mb-1">2/10</div>
           <div className="text-sm text-slate-400">Ochilgan yutuqlar</div>
         </div>
       </div>
-
-      {/* Achievements List - Also Dynamic */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 bg-slate-800 rounded-2xl p-6 border border-slate-700">
-          <h3 className="text-xl font-bold mb-6 flex items-center gap-2"><Trophy className="text-yellow-500" /> Yutuqlarim</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {achievements.map(ach => (
-              <AchievementCard key={ach.id} title={ach.title} icon={ach.icon} unlocked={ach.unlocked} />
-            ))}
-          </div>
-        </div>
-        <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
-          <h3 className="text-xl font-bold mb-6">Statistika</h3>
-          <ul className="space-y-4">
-            <StatRow label="O'qilgan vaqt" value={(function (s) {
-              if (!s) return "0m";
-              const h = Math.floor(s / 3600);
-              const m = Math.floor((s % 3600) / 60);
-              if (h > 0) return `${h}s ${m}m`;
-              return `${m}m`;
-            })(userStats.timeSpent)} />
-            <StatRow label="Yechilgan testlar" value={`${userStats.testsSolved || 0} ta`} />
-            <StatRow
-              label="O'rtacha baho"
-              value={`${userStats.testsSolved ? Math.round(userStats.totalScore / userStats.testsSolved) : 0}%`}
-              color={
-                (userStats.testsSolved ? Math.round(userStats.totalScore / userStats.testsSolved) : 0) >= 80 ? "text-green-400" :
-                  (userStats.testsSolved ? Math.round(userStats.totalScore / userStats.testsSolved) : 0) >= 50 ? "text-yellow-400" : "text-red-400"
-              }
-            />
-          </ul>
-        </div>
-      </div>
     </div>
-  );
-}
-
-// --- APP WRAPPER ---
-export default function App() {
-  return (
-    <ErrorBoundary>
-      <EduPhysicsAppContent />
-    </ErrorBoundary>
   );
 }
