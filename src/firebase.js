@@ -3,24 +3,40 @@ import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 // Firebase konfiguratsiyasi
-// TODO: Firebase Console'dan o'z config'ingizni oling va bu yerga qo'ying
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "DEMO_API_KEY",
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "eduphysics-app.firebaseapp.com",
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "eduphysics-app",
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "eduphysics-app.appspot.com",
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "123456789",
-    appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:123456789:web:abcdef"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-// Firebase'ni ishga tushirish
-const app = initializeApp(firebaseConfig);
+let app = null;
+let auth = null;
+let googleProvider = null;
+let db = null;
 
-// Authentication
-export const auth = getAuth(app);
-export const googleProvider = new GoogleAuthProvider();
+try {
+    // Validatsiya: Asosiy kalitlar borligini tekshirish
+    if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+        throw new Error("Firebase API kalitlari topilmadi. .env faylini tekshiring.");
+    }
 
-// Firestore Database
-export const db = getFirestore(app);
+    // Firebase'ni ishga tushirish
+    app = initializeApp(firebaseConfig);
 
+    // Authentication
+    auth = getAuth(app);
+    googleProvider = new GoogleAuthProvider();
+
+    // Firestore Database
+    db = getFirestore(app);
+
+    console.log("Firebase muvaffaqiyatli ulandi.");
+} catch (error) {
+    console.error("Firebase ishga tushishida xatolik:", error);
+}
+
+export { auth, googleProvider, db };
 export default app;

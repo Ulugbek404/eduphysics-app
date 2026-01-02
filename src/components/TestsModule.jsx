@@ -184,9 +184,9 @@ function TestIntro({ chapter, onStart, onBack }) {
         <div className="max-w-2xl mx-auto space-y-6 animate-fadeIn">
             <button
                 onClick={onBack}
-                className="flex items-center gap-2 px-4 py-2 hover:bg-slate-800 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-xl transition-all shadow-lg text-white"
             >
-                <ChevronRight className="rotate-180" size={20} />
+                <ChevronRight className="rotate-180 text-white" size={20} />
                 <span>Orqaga</span>
             </button>
 
@@ -262,9 +262,9 @@ function TestQuizInterface({ question, questionNumber, totalQuestions, selectedA
             <div className="flex items-center justify-between">
                 <button
                     onClick={onBack}
-                    className="flex items-center gap-2 px-4 py-2 hover:bg-slate-800 rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-xl transition-all shadow-lg text-white"
                 >
-                    <ChevronRight className="rotate-180" size={20} />
+                    <ChevronRight className="rotate-180 text-white" size={20} />
                     <span>Chiqish</span>
                 </button>
 
@@ -349,9 +349,9 @@ function TestResults({ results, chapter, onRetry, onBack }) {
         <div className="max-w-3xl mx-auto space-y-6 animate-fadeIn">
             <button
                 onClick={onBack}
-                className="flex items-center gap-2 px-4 py-2 hover:bg-slate-800 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-xl transition-all shadow-lg text-white"
             >
-                <ChevronRight className="rotate-180" size={20} />
+                <ChevronRight className="rotate-180 text-white" size={20} />
                 <span>Testlarga qaytish</span>
             </button>
 

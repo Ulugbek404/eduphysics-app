@@ -44,7 +44,7 @@ export default function SettingsModal({ show, onClose, user, theme, setTheme, so
 
     return (
         <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
-            <div className={`w-full max-w-4xl bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-700 flex flex-col md:flex-row h-[600px] animate-scaleIn`}>
+            <div className={`w-full max-w-4xl bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-700 flex flex-col md:flex-row max-h-[90vh] md:h-[600px] animate-scaleIn`}>
 
                 {/* Sidebar */}
                 <div className="w-full md:w-64 bg-slate-800/50 p-6 border-r border-slate-700 flex flex-col">
@@ -230,3 +230,4 @@ export default function SettingsModal({ show, onClose, user, theme, setTheme, so
         </div>
     );
 }
+

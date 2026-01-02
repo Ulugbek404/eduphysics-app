@@ -125,6 +125,12 @@ function EduPhysicsAppContent() {
 
   // BARCHA STATE HOOKS - conditional return'dan OLDIN
   const [activeTab, setActiveTab] = useState('dashboard');
+
+  // DEBUGGING: Check active tab
+  useEffect(() => {
+    console.log("Current activeTab:", activeTab);
+  }, [activeTab]);
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false); // Sidebar yashirish/ko'rsatish
 
@@ -339,13 +345,13 @@ function EduPhysicsAppContent() {
   };
 
   return (
-    <div className={`flex h - screen ${themeClasses.bg} ${themeClasses.text} font - sans overflow - hidden selection: bg - blue - 500 selection: text - white transition - colors duration - 500`}>
+    <div className={`flex h-screen ${themeClasses.bg} ${themeClasses.text} font-sans overflow-hidden selection:bg-blue-500 selection:text-white transition-colors duration-500`}>
 
       {/* Toast Notifications */}
       <div className="fixed top-4 right-4 z-[60] space-y-2 pointer-events-none">
         {notifications.map(n => (
-          <div key={n.id} className={`flex items - center space - x - 2 px - 4 py - 3 rounded - lg shadow - 2xl animate - slideInLeft ${n.type === 'success' ? 'bg-green-500/90' : 'bg-blue-500/90'
-            } backdrop - blur - sm text - white pointer - events - auto`}>
+          <div key={n.id} className={`flex items-center space-x-2 px-4 py-3 rounded-lg shadow-2xl animate-slideInLeft ${n.type === 'success' ? 'bg-green-500/90' : 'bg-blue-500/90'
+            } backdrop-blur-sm text-white pointer-events-auto`}>
             {n.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
             <span className="font-medium text-sm">{n.message}</span>
           </div>
@@ -371,7 +377,7 @@ function EduPhysicsAppContent() {
       {/* Overlay o'chirildi - icon-only sidebar doimo ko'rinadi */}
 
       {/* Yon panel (Sidebar) - Icon-Only */}
-      <aside className={`fixed inset - y - 0 left - 0 z - 40 ${themeClasses.sidebar} backdrop - blur - xl border - r ${themeClasses.border} flex flex - col transition - all duration - 300 ${sidebarCollapsed ? '-translate-x-full w-20' : 'translate-x-0 w-20'
+      <aside className={`fixed inset-y-0 left-0 z-40 ${themeClasses.sidebar} backdrop-blur-xl border-r ${themeClasses.border} flex flex-col transition-all duration-300 ${sidebarCollapsed ? '-translate-x-full w-20' : 'translate-x-0 w-20'
         } `}>
         {/* Logo */}
         <div className="p-4 flex items-center justify-center border-b border-slate-700/50">
@@ -426,17 +432,16 @@ function EduPhysicsAppContent() {
       {/* Toggle Button - Fixed, doimo ko'rinadi */}
       <button
         onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-        className={`fixed top - [120px] z - 50 bg - gradient - to - r from - blue - 600 to - purple - 600 text - white p - 2 rounded - r - lg shadow - lg hover: shadow - xl transition - all duration - 300 ${sidebarCollapsed ? 'left-0' : 'left-[60px]'
+        className={`fixed top-[120px] z-50 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-2 rounded-r-lg shadow-lg hover:shadow-xl transition-all duration-300 ${sidebarCollapsed ? 'left-0' : 'left-[60px]'
           } `}
         title={sidebarCollapsed ? "Sidebar'ni ko'rsatish" : "Sidebar'ni yashirish"}
       >
-        <ChevronRight size={20} className={`transition - transform duration - 300 ${sidebarCollapsed ? 'rotate-0' : 'rotate-180'
+        <ChevronRight size={20} className={`transition-transform duration-300 ${sidebarCollapsed ? 'rotate-0' : 'rotate-180'
           } `} />
       </button>
 
       {/* Asosiy oyna */}
-      <main className={`flex - 1 overflow - y - auto ${themeClasses.bg} relative scroll - smooth transition - all duration - 300 ${sidebarCollapsed ? 'ml-0' : 'ml-20'
-        } `}>
+      <main className={`flex-1 overflow-y-auto ${themeClasses.bg} relative scroll-smooth transition-all duration-300 ${sidebarCollapsed ? 'ml-0' : 'ml-20'}`}>
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl mix-blend-screen"></div>
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/5 rounded-full blur-3xl mix-blend-screen"></div>
@@ -897,7 +902,7 @@ function LessonList({ chapter, onBack, onSelect, completedLessons }) {
         {/* Desktop: Qaytish tugmasi chap tomonda */}
         <button
           onClick={onBack}
-          className="hidden md:flex p-2 hover:bg-slate-800 rounded-lg transition-colors"
+          className="hidden md:flex p-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-xl transition-all shadow-lg text-white"
         >
           <ChevronRight className="rotate-180" size={24} />
         </button>
@@ -916,9 +921,9 @@ function LessonList({ chapter, onBack, onSelect, completedLessons }) {
             {/* Mobile: Qaytish tugmasi o'ng tomonda */}
             <button
               onClick={onBack}
-              className="md:hidden flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all shadow-lg"
+              className="md:hidden flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-xl transition-all shadow-lg text-white"
             >
-              <ChevronRight className="rotate-180" size={18} />
+              <ChevronRight className="rotate-180 text-white" size={18} />
               <span className="text-sm font-medium">Orqaga</span>
             </button>
           </div>
@@ -1444,7 +1449,7 @@ function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLesson
   const unlockedCount = achievements.filter(a => a.unlocked).length;
 
   return (
-    <div className="space-y-8 animate-fadeIn">
+    <div className="space-y-8">
       <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 sm:p-12 shadow-2xl">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-black opacity-10 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>

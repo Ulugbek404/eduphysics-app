@@ -20,6 +20,12 @@ export function AuthProvider({ children }) {
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        if (!auth) {
+            setError("Firebase konfiguratsiyasi xatosi: .env fayli yoki API kalitlari noto'g'ri. Iltimos, administratorga murojaat qiling.");
+            setLoading(false);
+            return;
+        }
+
         // Persistence sozlash - foydalanuvchi login qolsin
         setPersistence(auth, browserLocalPersistence).catch(console.error);
 
