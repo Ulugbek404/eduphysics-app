@@ -11,12 +11,10 @@ import { lessonsData, calculateChapterProgress } from './data/lessonsData';
 import { testsData } from './data/testsData';
 import LoginPage from './components/LoginPage';
 import TestsModule from './components/TestsModule';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// --- AI MODULI (API Sozlamalari bilan) ---
-const AI_CONFIG = {
-  model: "gemini-pro", // Barcha API kalitlar bilan ishlaydigan model
-  baseUrl: "https://generativelanguage.googleapis.com/v1beta/models"
-};
+// --- AI Model Config ---
+const MODEL_NAME = "gemini-2.5-flash";
 
 // --- LOADING SCREEN ---
 function LoadingScreen() {
@@ -42,11 +40,24 @@ export default function EduPhysicsApp() {
   // BARCHA STATE HOOKS - conditional return'dan OLDIN
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false); // Sidebar yashirish/ko'rsatish
+
+  // Sidebar ochilganda body scroll'ni to'xtatish
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [sidebarOpen]);
   const [userXP, setUserXP] = useState(0);
   const [userLevel, setUserLevel] = useState(1);
   const [completedLessons, setCompletedLessons] = useState([]);
   const [notifications, setNotifications] = useState([]);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || 'AIzaSyCnJ76FBichqvewV5_4ZZJwqQKFnFp1x-8');
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || import.meta.env.VITE_GEMINI_API_KEY || '');
   const [showSettings, setShowSettings] = useState(false);
   const [progressLoading, setProgressLoading] = useState(true);
 
@@ -211,30 +222,22 @@ export default function EduPhysicsApp() {
         </div>
       )}
 
-      {/* Mobil menyu tugmasi */}
-      <div className="md:hidden fixed top-4 left-4 z-50">
-        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 bg-blue-600 rounded-lg shadow-lg active:scale-95 transition-transform">
-          {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
+      {/* Hamburger menyu o'chirildi - icon-only sidebar doimo ko'rinadi */}
 
-      {/* Yon panel (Sidebar) */}
-      <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-800/95 backdrop-blur-xl border-r border-slate-700 transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 flex flex-col`}>
-        <div className="p-6 flex items-center space-x-3 border-b border-slate-700/50">
+      {/* Overlay o'chirildi - icon-only sidebar doimo ko'rinadi */}
+
+      {/* Yon panel (Sidebar) - Icon-Only */}
+      <aside className={`fixed inset-y-0 left-0 z-40 bg-slate-800/95 backdrop-blur-xl border-r border-slate-700 flex flex-col transition-all duration-300 ${sidebarCollapsed ? '-translate-x-full w-20' : 'translate-x-0 w-20'
+        }`}>
+        {/* Logo */}
+        <div className="p-4 flex items-center justify-center border-b border-slate-700/50">
           <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg shadow-lg shadow-blue-500/20">
-            <Atom size={28} className="text-white animate-spin-slow" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-              EduPhysics
-            </h1>
-            <span className="text-[10px] uppercase tracking-wider text-blue-400 font-bold flex items-center gap-1">
-              AI Powered <Sparkles size={10} />
-            </span>
+            <Atom size={24} className="text-white animate-spin-slow" />
           </div>
         </div>
 
-        <nav className="mt-6 px-4 space-y-1 flex-1 overflow-y-auto custom-scrollbar">
+        {/* Navigation - Icon Only */}
+        <nav className="mt-3 px-2 space-y-2 flex-1 overflow-y-auto custom-scrollbar">
           <SidebarItem icon={<BarChart2 />} label="Statistika" id="dashboard" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<Book />} label="Darslar" id="lessons" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<Trophy />} label="Testlar" id="tests" active={activeTab} set={setActiveTab} />
@@ -243,42 +246,51 @@ export default function EduPhysicsApp() {
           <SidebarItem icon={<User />} label="Profil" id="profile" active={activeTab} set={setActiveTab} />
         </nav>
 
-        <div className="p-4 border-t border-slate-700/50 bg-slate-900/30 space-y-2">
-          {/* User Info */}
-          <div className="flex items-center space-x-3 p-2">
+        {/* User Section - Icon Only */}
+        <div className="p-2 border-t border-slate-700/50 bg-slate-900/30 space-y-2">
+          {/* User Avatar */}
+          <div className="flex justify-center">
             <img
               src={user.photoURL || 'https://via.placeholder.com/40'}
               alt={user.displayName}
               className="w-10 h-10 rounded-full border-2 border-blue-500/30"
             />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate text-white">{user.displayName || 'User'}</p>
-              <p className="text-xs text-slate-400 truncate">{user.email}</p>
-            </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="grid grid-cols-2 gap-2">
+          {/* Action Buttons - Icon Only */}
+          <div className="space-y-2">
             <button
               onClick={() => setShowSettings(true)}
-              className="flex items-center justify-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors text-xs font-medium text-slate-300 hover:text-white"
+              className="w-full flex items-center justify-center p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors text-slate-300 hover:text-white"
+              title="Sozlamalar"
             >
-              <Settings size={14} />
-              <span>Sozlamalar</span>
+              <Settings size={18} />
             </button>
             <button
               onClick={logout}
-              className="flex items-center justify-center gap-2 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-colors text-xs font-medium text-red-400 hover:text-red-300"
+              className="w-full flex items-center justify-center p-2 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-colors text-red-400 hover:text-red-300"
+              title="Chiqish"
             >
-              <LogOut size={14} />
-              <span>Chiqish</span>
+              <LogOut size={18} />
             </button>
           </div>
         </div>
       </aside>
 
+      {/* Toggle Button - Fixed, doimo ko'rinadi */}
+      <button
+        onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+        className={`fixed top-[120px] z-50 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-2 rounded-r-lg shadow-lg hover:shadow-xl transition-all duration-300 ${sidebarCollapsed ? 'left-0' : 'left-[60px]'
+          }`}
+        title={sidebarCollapsed ? "Sidebar'ni ko'rsatish" : "Sidebar'ni yashirish"}
+      >
+        <ChevronRight size={20} className={`transition-transform duration-300 ${sidebarCollapsed ? 'rotate-0' : 'rotate-180'
+          }`} />
+      </button>
+
       {/* Asosiy oyna */}
-      <main className="flex-1 overflow-y-auto bg-slate-900 relative scroll-smooth">
+      <main className={`flex-1 overflow-y-auto bg-slate-900 relative scroll-smooth transition-all duration-300 ${sidebarCollapsed ? 'ml-0' : 'ml-20'
+        }`}>
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl mix-blend-screen"></div>
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/5 rounded-full blur-3xl mix-blend-screen"></div>
@@ -323,29 +335,24 @@ function AIAssistant({ apiKey, setShowSettings }) {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        `${AI_CONFIG.baseUrl}/${AI_CONFIG.model}:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: userMsg }] }],
-            systemInstruction: { parts: [{ text: "Sen 9-sinf o'quvchilari uchun 'EduPhysics' ilovasida ishlaydigan do'stona va bilimdon fizik ustozsan. Javoblarni o'zbek tilida, sodda, qiziqarli misollar bilan va ilmiy asoslangan holda ber. O'quvchini ilhomlantir. Formulalar ishlatsang, ularni tushuntirib ber." }] }
-          })
-        }
-      );
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({
+        model: MODEL_NAME,
+        systemInstruction: "Sen 9-sinf o'quvchilari uchun 'EduPhysics' ilovasida ishlaydigan do'stona va bilimdon fizik ustozsan. Javoblarni o'zbek tilida, sodda, qiziqarli misollar bilan va ilmiy asoslangan holda ber. O'quvchini ilhomlantir. Formulalar ishlatsang, ularni tushuntirib ber."
+      });
 
-      const data = await response.json();
+      const result = await model.generateContent(userMsg);
+      const response = await result.response;
+      const text = response.text();
 
-      if (data.error) {
-        throw new Error(data.error.message);
-      }
-
-      const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Uzr, tushunarsiz javob oldim.";
-      setMessages(prev => [...prev, { role: 'ai', text: aiText }]);
+      setMessages(prev => [...prev, { role: 'ai', text: text }]);
     } catch (error) {
       console.error("AI Error:", error);
-      setMessages(prev => [...prev, { role: 'ai', text: "Xatolik yuz berdi. API kalitni tekshiring yoki internetni ko'zdan kechiring." }]);
+      let errorMessage = "Xatolik yuz berdi.";
+      if (error.message.includes("404")) errorMessage = "Model topilmadi.";
+      if (error.message.includes("403")) errorMessage = "API kalit noto'g'ri.";
+
+      setMessages(prev => [...prev, { role: 'ai', text: errorMessage + " Iltimos, sozlamalarni tekshiring." }]);
     } finally {
       setIsLoading(false);
     }
@@ -475,20 +482,18 @@ function VirtualLab({ addNotification, apiKey, setShowSettings }) {
     Ushbu natijani Om qonuniga (I=U/R) asosan qisqa, ilmiy va tushunarli tahlil qilib ber. Nega tok kuchi aynan shunday chiqdi? Agar qarshilikni oshirsak nima bo'ladi? Javobni o'zbek tilida ber.`;
 
     try {
-      const response = await fetch(
-        `${AI_CONFIG.baseUrl}/${AI_CONFIG.model}:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
-          })
-        }
-      );
-      const data = await response.json();
-      if (data.error) throw new Error(data.error.message);
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
-      setAiAnalysis(data.candidates?.[0]?.content?.parts?.[0]?.text);
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const analysisText = response.text();
+
+      if (!analysisText) {
+        throw new Error("AI javob bo'sh qaytardi.");
+      }
+
+      setAiAnalysis(analysisText);
     } catch (error) {
       console.error(error);
       addNotification("AI tahlilida xatolik bo'ldi.", "error");
@@ -655,14 +660,21 @@ function SidebarItem({ icon, label, id, active, set }) {
   return (
     <button
       onClick={() => set(id)}
-      className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-        ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20 translate-x-1'
+      className={`relative w-full flex items-center justify-center p-3 rounded-xl transition-all duration-200 group ${isActive
+        ? 'bg-blue-600/20 text-blue-400'
         : 'text-slate-400 hover:bg-slate-800 hover:text-white'
         }`}
+      title={label}
     >
-      <span className={`transition-transform duration-200 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>{icon}</span>
-      <span className="font-medium">{label}</span>
-      {isActive && <ChevronRight size={16} className="ml-auto animate-pulse" />}
+      {/* Active Indicator - Chap tomonda vertikal bar */}
+      {isActive && (
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-500 rounded-r-full"></div>
+      )}
+
+      {/* Icon */}
+      <span className={`transition-transform duration-200 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
+        {icon}
+      </span>
     </button>
   );
 }
@@ -861,20 +873,34 @@ function LessonList({ chapter, onBack, onSelect, completedLessons }) {
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+        {/* Desktop: Qaytish tugmasi chap tomonda */}
         <button
           onClick={onBack}
-          className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+          className="hidden md:flex p-2 hover:bg-slate-800 rounded-lg transition-colors"
         >
           <ChevronRight className="rotate-180" size={24} />
         </button>
-        <div className="flex-1">
-          <div className="flex items-center gap-3">
-            <span className="text-4xl">{chapter.icon}</span>
-            <div>
-              <h2 className="text-3xl font-bold">{chapter.title}</h2>
-              <p className="text-slate-400">{chapter.description}</p>
+
+        {/* Content */}
+        <div className="flex-1 w-full">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span className="text-4xl">{chapter.icon}</span>
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold">{chapter.title}</h2>
+                <p className="text-slate-400 text-sm">{chapter.description}</p>
+              </div>
             </div>
+
+            {/* Mobile: Qaytish tugmasi o'ng tomonda */}
+            <button
+              onClick={onBack}
+              className="md:hidden flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all shadow-lg"
+            >
+              <ChevronRight className="rotate-180" size={18} />
+              <span className="text-sm font-medium">Orqaga</span>
+            </button>
           </div>
         </div>
       </div>
@@ -940,22 +966,34 @@ function LessonDetail({ lesson, chapter, onBack, onComplete, isCompleted }) {
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-fadeIn">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        {/* Desktop: Qaytish tugmasi chap tomonda */}
         <button
           onClick={onBack}
-          className="flex items-center gap-2 px-4 py-2 hover:bg-slate-800 rounded-lg transition-colors"
+          className="hidden md:flex items-center gap-2 px-4 py-2 hover:bg-slate-800 rounded-lg transition-colors"
         >
           <ChevronRight className="rotate-180" size={20} />
           <span>Orqaga</span>
         </button>
 
+        {/* Mobile: Qaytish tugmasi o'ng tomonda */}
+        <button
+          onClick={onBack}
+          className="md:hidden self-end flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all shadow-lg"
+        >
+          <ChevronRight className="rotate-180" size={18} />
+          <span className="text-sm font-medium">Orqaga</span>
+        </button>
+
         {!isCompleted && (
           <button
             onClick={() => onComplete(lesson.id)}
-            className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-500 rounded-xl font-bold transition-all"
+            className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-500 rounded-xl font-bold transition-all shadow-lg shadow-green-600/20"
           >
             <CheckCircle size={20} />
-            Darsni Tugatish +{lesson.xp} XP
+            <span className="hidden md:inline">Darsni Tugatish</span>
+            <span className="md:hidden">Tugatish</span>
+            <span>+{lesson.xp} XP</span>
           </button>
         )}
 
@@ -1150,19 +1188,16 @@ function QuizModule({ setUserXP, addNotification, apiKey, setShowSettings }) {
     Savollar 9-sinf darajasida, o'zbek tilida bo'lsin.`;
 
     try {
-      const response = await fetch(
-        `${AI_CONFIG.baseUrl}/${AI_CONFIG.model}:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
-          })
-        }
-      );
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
-      const data = await response.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+
+      if (!text) {
+        throw new Error("AI javob bo'sh qaytardi.");
+      }
 
       // JSONni tozalash (ba'zan AI ```json ... ``` deb qaytaradi)
       const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
