@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Key Setup - Ulugbek Fizika</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: monospace;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .success {
+            background: #10b981;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .info {
+            background: #f3f4f6;
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .current-key {
+            background: #fef3c7;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .current-key strong {
+            color: #92400e;
+        }
+
+        .key-display {
+            font-family: monospace;
+            background: white;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 8px;
+            word-break: break-all;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔑 API Key Sozlash</h1>
+        <p class="subtitle">Ulugbek Fizika - AI Funksiyalari</p>
+
+        <div class="current-key">
+            <strong>Sizning API key (.env dan):</strong>
+            <div class="key-display">AIzaSyCTiUUTfKKtxbXygQtkuFUnbybRKjcu_lk</div>
+        </div>
+
+        <div class="info">
+            <strong>⚠️ Muammo:</strong> Vite dev server .env faylini o'qimayapti.<br>
+            <strong>✅ Yechim:</strong> API key'ni qo'lda localStorage'ga saqlash.
+        </div>
+
+        <div class="input-group">
+            <label for="apiKey">Gemini API Key</label>
+            <input type="text" id="apiKey" placeholder="AIzaSy..." value="AIzaSyCTiUUTfKKtxbXygQtkuFUnbybRKjcu_lk">
+        </div>
+
+        <button onclick="saveApiKey()">💾 Saqlash va Ilovaga O'tish</button>
+
+        <div class="success" id="success">
+            ✅ API key saqlandi! Ilova ochilmoqda...
+        </div>
+    </div>
+
+    <script>
+        function saveApiKey() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+
+            if (!apiKey) {
+                alert('⚠️ Iltimos, API key kiriting!');
+                return;
+            }
+
+            if (!apiKey.startsWith('AIzaSy')) {
+                alert('⚠️ API key noto\'g\'ri formatda. "AIzaSy" bilan boshlanishi kerak.');
+                return;
+            }
+
+            // localStorage ga saqlash
+            localStorage.setItem('gemini_api_key', apiKey);
+
+            // Success message
+            document.getElementById('success').style.display = 'block';
+
+            // 1.5 sekunddan keyin ilovaga o'tish
+            setTimeout(() => {
+                window.location.href = 'http://localhost:5173';
+            }, 1500);
+        }
+
+        // Enter tugmasi bilan saqlash
+        document.getElementById('apiKey').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                saveApiKey();
+            }
+        });
+    </script>
+</body>
+
+</html>

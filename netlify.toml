@@ -2,9 +2,14 @@
 [build]
   publish = "dist"
   command = "npm run build"
+  functions = "netlify/functions"
 
 # Redirect rules for SPA
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Functions settings
+[functions]
+  node_bundler = "esbuild"

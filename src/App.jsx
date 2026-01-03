@@ -4,7 +4,7 @@ import {
   RotateCcw, Menu, X, CheckCircle, AlertCircle, BarChart2,
   Zap, Flame, Award, ArrowRight, Settings, MessageSquare,
   Info, Smartphone, Moon, Sun, Monitor, Volume2, VolumeX, Palette, Camera, Sparkles,
-  Send, Loader, Bot, Key, Search, LogOut
+  Send, Loader, Bot, Key, Search, LogOut, BookOpen
 } from 'lucide-react';
 import { useAuth } from './contexts/AuthContext';
 import { updateProfile } from 'firebase/auth'; // Import updateProfile
@@ -15,7 +15,10 @@ import { testsData } from './data/testsData';
 import LoginPage from './components/LoginPage';
 import TestsModule from './components/TestsModule';
 import SettingsModal from './components/SettingsModal';
+import AIRecommendations from './components/AIRecommendations';
+import HomeworkHelper from './components/homework/HomeworkHelper';
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { askAITutor } from './services/aiService';
 
 // --- AI Model Config ---
 const MODEL_NAME = "gemini-2.5-flash";
@@ -149,7 +152,21 @@ function EduPhysicsAppContent() {
   const [userLevel, setUserLevel] = useState(1);
   const [completedLessons, setCompletedLessons] = useState([]);
   const [notifications, setNotifications] = useState([]);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || import.meta.env.VITE_GEMINI_API_KEY || '');
+  const [apiKey, setApiKey] = useState(() => {
+    // 1. localStorage'dan tekshirish
+    const savedKey = localStorage.getItem('gemini_api_key');
+    if (savedKey) return savedKey;
+
+    // 2. .env faylidan olish (default)
+    const envKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (envKey) {
+      // Avtomatik localStorage'ga saqlash
+      localStorage.setItem('gemini_api_key', envKey);
+      return envKey;
+    }
+
+    return '';
+  });
   const [showSettings, setShowSettings] = useState(false);
 
   const [theme, setTheme] = useState(() => {
@@ -337,6 +354,7 @@ function EduPhysicsAppContent() {
       case 'dashboard': return <Dashboard setActiveTab={setActiveTab} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} completedLessons={completedLessons} totalLessons={lessonsData.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0)} />;
       case 'lessons': return <LessonsModule completedLessons={completedLessons} completeLesson={completeLesson} theme={theme} />;
       case 'tests': return <TestsModule addXP={addXP} addNotification={addNotification} theme={theme} />;
+      case 'homework': return <HomeworkHelper apiKey={apiKey} setShowSettings={setShowSettings} addNotification={addNotification} addXP={addXP} theme={theme} />;
       case 'lab': return <VirtualLab addNotification={addNotification} apiKey={apiKey} setShowSettings={setShowSettings} theme={theme} updateStats={updateUserStats} />;
       case 'quiz': return <QuizModule setUserXP={setUserXP} addNotification={addNotification} apiKey={apiKey} setShowSettings={setShowSettings} theme={theme} updateStats={updateUserStats} />;
       case 'profile': return <UserProfile user={displayUser} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} />;
@@ -391,6 +409,7 @@ function EduPhysicsAppContent() {
           <SidebarItem icon={<BarChart2 />} label="Statistika" id="dashboard" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<Book />} label="Darslar" id="lessons" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<Trophy />} label="Testlar" id="tests" active={activeTab} set={setActiveTab} />
+          <SidebarItem icon={<BookOpen />} label="Uy Vazifasi" id="homework" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<Zap />} label="Laboratoriya" id="lab" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<Brain />} label="AI Test Sinovlari" id="quiz" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<User />} label="Profil" id="profile" active={activeTab} set={setActiveTab} />
@@ -474,8 +493,10 @@ function AIAssistant({ apiKey, setShowSettings }) {
 
   const handleSend = async () => {
     if (!input.trim()) return;
+
+    // API key tekshirish
     if (!apiKey) {
-      setMessages(prev => [...prev, { role: 'ai', text: "Iltimos, avval Sozlamalar bo'limida API Kalitni kiriting." }]);
+      setMessages(prev => [...prev, { role: 'ai', text: "⚠️ API kalit topilmadi. Iltimos, Sozlamalar bo'limida Gemini API kalitni kiriting." }]);
       setShowSettings(true);
       return;
     }
@@ -486,6 +507,9 @@ function AIAssistant({ apiKey, setShowSettings }) {
     setIsLoading(true);
 
     try {
+      // Development mode: to'g'ridan-to'g'ri Gemini API ishlatamiz
+      // Production mode: Netlify Functions ishlatiladi
+
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({
         model: MODEL_NAME,
@@ -499,11 +523,19 @@ function AIAssistant({ apiKey, setShowSettings }) {
       setMessages(prev => [...prev, { role: 'ai', text: text }]);
     } catch (error) {
       console.error("AI Error:", error);
-      let errorMessage = "Xatolik yuz berdi.";
-      if (error.message.includes("404")) errorMessage = "Model topilmadi.";
-      if (error.message.includes("403")) errorMessage = "API kalit noto'g'ri.";
 
-      setMessages(prev => [...prev, { role: 'ai', text: errorMessage + " Iltimos, sozlamalarni tekshiring." }]);
+      let errorMessage = "Xatolik yuz berdi. ";
+      if (error.message.includes("404")) {
+        errorMessage += "Model topilmadi. Iltimos, internet ulanishini tekshiring.";
+      } else if (error.message.includes("403") || error.message.includes("401")) {
+        errorMessage += "API kalit noto'g'ri yoki muddati tugagan. Sozlamalarni tekshiring.";
+      } else if (error.message.includes("429")) {
+        errorMessage += "Juda ko'p so'rovlar. Iltimos, bir oz kuting.";
+      } else {
+        errorMessage += "Qaytadan urinib ko'ring.";
+      }
+
+      setMessages(prev => [...prev, { role: 'ai', text: errorMessage }]);
     } finally {
       setIsLoading(false);
     }
@@ -851,10 +883,6 @@ function ChapterGrid({ onSelect, completedLessons }) {
             onClick={() => onSelect(chapter)}
             className="group relative bg-slate-800 rounded-2xl p-6 text-left border border-slate-700 hover:border-blue-500 transition-all hover:shadow-2xl hover:shadow-blue-500/20 active:scale-95 overflow-hidden"
           >
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <span className="text-6xl">{chapter.icon}</span>
-            </div>
-
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-4">
                 <span className="text-4xl shadow-sm">{chapter.icon}</span>
@@ -1532,6 +1560,20 @@ function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLesson
             />
           </ul>
         </div>
+      </div>
+
+      {/* AI Recommendations - NEW! */}
+      <div>
+        <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <Sparkles className="text-purple-500" />
+          AI Shaxsiy Tavsiyalar
+        </h3>
+        <AIRecommendations
+          userStats={userStats}
+          completedLessons={completedLessons}
+          userLevel={userLevel}
+          theme="dark"
+        />
       </div>
     </div>
   );
