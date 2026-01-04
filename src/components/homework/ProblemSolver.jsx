@@ -8,7 +8,7 @@ import FormulaDisplay from './FormulaDisplay';
  * Masala yechuvchi komponent
  * AI yordamida fizika masalalarini yechadi
  */
-export default function ProblemSolver({ apiKey, setShowSettings, addNotification, theme = 'dark' }) {
+export default function ProblemSolver({ setShowSettings, addNotification, theme = 'dark' }) {
     const [problemText, setProblemText] = useState('');
     const [topic, setTopic] = useState('');
     const [solution, setSolution] = useState(null);
@@ -30,17 +30,11 @@ export default function ProblemSolver({ apiKey, setShowSettings, addNotification
             return;
         }
 
-        if (!apiKey) {
-            addNotification?.('API kalit topilmadi. Sozlamalarni tekshiring.', 'error');
-            setShowSettings?.(true);
-            return;
-        }
-
         setIsLoading(true);
         setSolution(null);
 
         try {
-            const result = await solveProblem(apiKey, problemText, topic);
+            const result = await solveProblem(problemText, topic);
 
             if (result.success) {
                 setSolution(result.data);

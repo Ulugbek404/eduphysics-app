@@ -3,77 +3,70 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const MODEL_NAME = "gemini-2.0-flash-exp";
 
 /**
- * Fizika masalasini AI yordamida yechish
- * @param {string} apiKey - Gemini API key
+ * Fizika masalasini AI yordamida yechish (Netlify Function orqali)
  * @param {string} problemText - Masala matni
  * @param {string} topic - Mavzu nomi
  * @returns {Promise<Object>} Yechim ma'lumotlari
  */
-export async function solveProblem(apiKey, problemText, topic = '') {
-    if (!apiKey) {
-        throw new Error('API kalit topilmadi');
-    }
-
-    const prompt = `
-Sen 9-sinf fizika o'qituvchisisan. Quyidagi masalani qadam-baqadam yech:
-
-MASALA: ${problemText}
-${topic ? `MAVZU: ${topic}` : ''}
-
-TALABLAR:
-1. Har bir qadamni alohida ko'rsat
-2. Har bir qadamni tushuntir
-3. Formulalarni LaTeX formatida yoz (masalan: $F = ma$)
-4. Hisoblashlarni aniq ko'rsat
-5. Final javobni aniq ko'rsat
-6. O'zbek tilida yoz
-
-FORMAT (JSON formatida javob ber):
-{
-  "steps": [
-    {
-      "number": 1,
-      "title": "Qadam nomi",
-      "explanation": "Tushuntirish",
-      "formula": "$formula$",
-      "calculation": "Hisoblash",
-      "result": "Natija"
-    }
-  ],
-  "finalAnswer": "Final javob",
-  "topic": "Mavzu nomi"
-}
-`;
+export async function solveProblem(problemText, topic = '') {
+    const API_BASE_URL = import.meta.env.DEV
+        ? 'http://localhost:8888/.netlify/functions'
+        : 'https://ulugbekfizika.netlify.app/.netlify/functions';
 
     try {
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+        const response = await fetch(`${API_BASE_URL}/homework-helper`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                problem: problemText,
+                topic: topic
+            })
+        });
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
-
-        // JSON parsing
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-            const data = JSON.parse(jsonMatch[0]);
-            return {
-                success: true,
-                data: data,
-                rawText: text
-            };
-        } else {
-            // Agar JSON formatida bo'lmasa, oddiy text qaytarish
-            return {
-                success: true,
-                data: parseTextSolution(text),
-                rawText: text
-            };
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
+
+        const data = await response.json();
+
+        // Parse solution from response
+        return {
+            success: true,
+            data: parseSolution(data.solution),
+            rawText: data.solution
+        };
     } catch (error) {
         console.error('Problem solving error:', error);
         throw error;
     }
+}
+
+function parseSolution(text) {
+    // Try to parse JSON
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+        try {
+            return JSON.parse(jsonMatch[0]);
+        } catch (e) {
+            // If JSON parsing fails, return text solution
+        }
+    }
+
+    // Return text solution
+    return {
+        steps: [{
+            number: 1,
+            title: "Yechim",
+            explanation: text,
+            formula: "",
+            calculation: "",
+            result: ""
+        }],
+        finalAnswer: "Yuqoridagi yechimga qarang",
+        topic: ""
+    };
 }
 
 /**
