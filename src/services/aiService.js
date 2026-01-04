@@ -8,7 +8,7 @@
 // API base URL (development va production uchun)
 const API_BASE_URL = import.meta.env.DEV
     ? 'http://localhost:8888/.netlify/functions'
-    : '/.netlify/functions';
+    : 'https://ulugbekfizika.netlify.app/.netlify/functions';
 
 /**
  * AI Tutor - Fizika savollariga javob beradi
