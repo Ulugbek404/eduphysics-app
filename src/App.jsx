@@ -17,6 +17,7 @@ import TestsModule from './components/TestsModule';
 import SettingsModal from './components/SettingsModal';
 import AIRecommendations from './components/AIRecommendations';
 import HomeworkHelper from './components/homework/HomeworkHelper';
+import PDFViewer from './components/PDFViewer';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { askAITutor } from './services/aiService';
 
@@ -1017,6 +1018,16 @@ function LessonDetail({ lesson, onBack, onComplete, isCompleted }) {
         <h1 className="text-3xl font-bold text-white mb-4">{lesson.title || 'Untitled'}</h1>
         <p className="text-slate-400">{lesson.description || ''}</p>
       </div>
+
+      {/* PDF Kitob */}
+      {lesson.hasPdf && (
+        <PDFViewer
+          pdfUrl="/fizika toliq kitob.pdf"
+          page={lesson.pdfPage}
+          pageEnd={lesson.pdfPageEnd}
+          title={lesson.title}
+        />
+      )}
 
       {/* Content */}
       <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 text-slate-300">
