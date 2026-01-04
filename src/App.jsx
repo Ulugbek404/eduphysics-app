@@ -475,13 +475,6 @@ function AIAssistant({ apiKey, setShowSettings }) {
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    // API key tekshirish
-    if (!apiKey) {
-      setMessages(prev => [...prev, { role: 'ai', text: "⚠️ API kalit topilmadi. Iltimos, Sozlamalar bo'limida Gemini API kalitni kiriting." }]);
-      setShowSettings(true);
-      return;
-    }
-
     const userMsg = input;
     setInput("");
     setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
@@ -567,13 +560,12 @@ function AIAssistant({ apiKey, setShowSettings }) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-              placeholder={apiKey ? "Savol bering..." : "API Kalit kiritilmagan"}
-              disabled={!apiKey}
-              className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors disabled:opacity-50"
+              placeholder="Savol bering..."
+              className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors"
             />
             <button
               onClick={handleSend}
-              disabled={isLoading || !input.trim() || !apiKey}
+              disabled={isLoading || !input.trim()}
               className="p-2 bg-blue-600 rounded-xl hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-white"
             >
               <Send size={18} />
@@ -625,11 +617,6 @@ function VirtualLab({ addNotification, apiKey, setShowSettings, updateStats }) {
   const handleAnalyze = async () => {
     if (!isRunning) {
       addNotification("Tahlil qilish uchun zanjirni ulang!", "error");
-      return;
-    }
-    if (!apiKey) {
-      addNotification("AI ishlashi uchun Sozlamalardan API kalit kiriting", "warning");
-      setShowSettings(true);
       return;
     }
 
@@ -1093,11 +1080,6 @@ function QuizModule({ setUserXP, addNotification, apiKey, setShowSettings, updat
   const generateQuiz = async () => {
     if (!topic.trim()) {
       addNotification("Iltimos, test mavzusini yozing!", "warning");
-      return;
-    }
-    if (!apiKey) {
-      addNotification("AI ishlashi uchun API kalit kiriting", "warning");
-      setShowSettings(true);
       return;
     }
 
