@@ -1022,7 +1022,7 @@ function LessonDetail({ lesson, onBack, onComplete, isCompleted }) {
       {/* PDF Kitob */}
       {lesson.hasPdf && (
         <PDFViewer
-          pdfUrl="/fizika toliq kitob.pdf"
+          pdfUrl="/fizika-kitob.pdf"
           page={lesson.pdfPage}
           pageEnd={lesson.pdfPageEnd}
           title={lesson.title}

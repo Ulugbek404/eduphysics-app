@@ -17,7 +17,7 @@ function PDFViewer({ pdfUrl, page, pageEnd, title }) {
             >
                 <BookOpen size={20} />
                 <span className="font-medium">
-                    Kitobni O'qish ({page}-{pageEnd} bet)
+                    Kitobni O'qish
                 </span>
                 <ExternalLink size={16} className="opacity-70" />
             </button>
