@@ -6,7 +6,7 @@ import ProblemSolver from './ProblemSolver';
  * Asosiy Homework Helper komponenti
  * 4 ta rejimni boshqaradi
  */
-export default function HomeworkHelper({ apiKey, setShowSettings, addNotification, addXP, theme = 'dark' }) {
+export default function HomeworkHelper({ setShowSettings, addNotification, addXP, theme = 'dark' }) {
     const [activeMode, setActiveMode] = useState('solver');
 
     const modes = [
@@ -59,10 +59,10 @@ export default function HomeworkHelper({ apiKey, setShowSettings, addNotificatio
                             onClick={() => !mode.disabled && setActiveMode(mode.id)}
                             disabled={mode.disabled}
                             className={`relative overflow-hidden p-4 rounded-xl border-2 transition-all ${isActive
-                                    ? 'border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-500/20'
-                                    : mode.disabled
-                                        ? 'border-slate-700 bg-slate-800/50 opacity-50 cursor-not-allowed'
-                                        : 'border-slate-700 bg-slate-800/50 hover:border-blue-500/50 hover:bg-slate-700/50'
+                                ? 'border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-500/20'
+                                : mode.disabled
+                                    ? 'border-slate-700 bg-slate-800/50 opacity-50 cursor-not-allowed'
+                                    : 'border-slate-700 bg-slate-800/50 hover:border-blue-500/50 hover:bg-slate-700/50'
                                 }`}
                         >
                             {mode.disabled && (
@@ -91,7 +91,6 @@ export default function HomeworkHelper({ apiKey, setShowSettings, addNotificatio
             <div>
                 {activeMode === 'solver' && (
                     <ProblemSolver
-                        apiKey={apiKey}
                         setShowSettings={setShowSettings}
                         addNotification={addNotification}
                         addXP={addXP}

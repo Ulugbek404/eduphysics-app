@@ -153,21 +153,9 @@ function EduPhysicsAppContent() {
   const [userLevel, setUserLevel] = useState(1);
   const [completedLessons, setCompletedLessons] = useState([]);
   const [notifications, setNotifications] = useState([]);
-  const [apiKey, setApiKey] = useState(() => {
-    // 1. localStorage'dan tekshirish
-    const savedKey = localStorage.getItem('gemini_api_key');
-    if (savedKey) return savedKey;
 
-    // 2. .env faylidan olish (default)
-    const envKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (envKey) {
-      // Avtomatik localStorage'ga saqlash
-      localStorage.setItem('gemini_api_key', envKey);
-      return envKey;
-    }
-
-    return '';
-  });
+  // API key butunlay backend'da (Netlify Functions)
+  // Frontend'da hech qanday API key saqlanmaydi
   const [showSettings, setShowSettings] = useState(false);
 
   const [theme, setTheme] = useState(() => {
@@ -261,13 +249,7 @@ function EduPhysicsAppContent() {
     }, 3000);
   };
 
-  // API Kalitni saqlash
-  const saveApiKey = (key) => {
-    setApiKey(key);
-    localStorage.setItem('gemini_api_key', key);
-    addNotification("API kalit saqlandi!", "success");
-    setShowSettings(false);
-  };
+  // API Key artiq frontend'da kerak emas - Netlify Functions ishlatadi
 
   // User progress yuklash
   useEffect(() => {
@@ -355,9 +337,9 @@ function EduPhysicsAppContent() {
       case 'dashboard': return <Dashboard setActiveTab={setActiveTab} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} completedLessons={completedLessons} totalLessons={lessonsData.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0)} />;
       case 'lessons': return <LessonsModule completedLessons={completedLessons} completeLesson={completeLesson} theme={theme} />;
       case 'tests': return <TestsModule addXP={addXP} addNotification={addNotification} theme={theme} />;
-      case 'homework': return <HomeworkHelper apiKey={apiKey} setShowSettings={setShowSettings} addNotification={addNotification} addXP={addXP} theme={theme} />;
-      case 'lab': return <VirtualLab addNotification={addNotification} apiKey={apiKey} setShowSettings={setShowSettings} theme={theme} updateStats={updateUserStats} />;
-      case 'quiz': return <QuizModule setUserXP={setUserXP} addNotification={addNotification} apiKey={apiKey} setShowSettings={setShowSettings} theme={theme} updateStats={updateUserStats} />;
+      case 'homework': return <HomeworkHelper setShowSettings={setShowSettings} addNotification={addNotification} addXP={addXP} theme={theme} />;
+      case 'lab': return <VirtualLab addNotification={addNotification} setShowSettings={setShowSettings} theme={theme} updateStats={updateUserStats} />;
+      case 'quiz': return <QuizModule setUserXP={setUserXP} addNotification={addNotification} setShowSettings={setShowSettings} theme={theme} updateStats={updateUserStats} />;
       case 'profile': return <UserProfile user={displayUser} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} />;
       default: return <Dashboard setActiveTab={setActiveTab} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} completedLessons={completedLessons} totalLessons={lessonsData.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0)} />;
     }
@@ -387,8 +369,6 @@ function EduPhysicsAppContent() {
         soundEnabled={soundEnabled}
         setSoundEnabled={setSoundEnabled}
         updateProfile={handleUpdateProfile}
-        apiKey={apiKey}
-        setApiKey={setApiKey}
       />
 
       {/* Hamburger menyu o'chirildi - icon-only sidebar doimo ko'rinadi */}
@@ -473,7 +453,7 @@ function EduPhysicsAppContent() {
       </main>
 
       {/* ✨ GLOBAL AI ASSISTANT ✨ */}
-      <AIAssistant apiKey={apiKey} setShowSettings={setShowSettings} />
+      <AIAssistant setShowSettings={setShowSettings} />
     </div>
   );
 }
