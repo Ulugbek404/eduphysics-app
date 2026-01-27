@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
 import {
   Book, Atom, Brain, Trophy, User, ChevronRight, Play,
   RotateCcw, Menu, X, CheckCircle, AlertCircle, BarChart2,
@@ -7,19 +7,27 @@ import {
   Send, Loader, Bot, Key, Search, LogOut, BookOpen
 } from 'lucide-react';
 import { useAuth } from './contexts/AuthContext';
-import { updateProfile } from 'firebase/auth'; // Import updateProfile
-import { auth } from './firebase'; // Assume auth is exported from firebase service
+import { updateProfile } from 'firebase/auth';
+import { auth } from './firebase';
 import { getUserProgress, addUserXP, updateUserLevel, markLessonComplete, saveQuizResult } from './services/userService';
 import { lessonsData, calculateChapterProgress } from './data/lessonsData';
 import { testsData } from './data/testsData';
 import LoginPage from './components/LoginPage';
-import TestsModule from './components/TestsModule';
 import SettingsModal from './components/SettingsModal';
 import AIRecommendations from './components/AIRecommendations';
-import HomeworkHelper from './components/homework/HomeworkHelper';
-import PDFViewer from './components/PDFViewer';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { askAITutor } from './services/aiService';
+import BottomNav from './components/ui/BottomNav';
+import EmptyState from './components/ui/EmptyState';
+import PageHeader from './components/ui/PageHeader';
+import MobileMenu from './components/MobileMenu';
+import { ComponentLoader } from './components/ui/Skeleton';
+
+// Lazy load katta komponentlar - Performance optimization
+const TestsModule = lazy(() => import('./components/TestsModule'));
+const AITutorModule = lazy(() => import('./components/AITutorModule'));
+const HomeworkHelper = lazy(() => import('./components/homework/HomeworkHelper'));
+const PDFViewer = lazy(() => import('./components/PDFViewer'));
 
 // --- AI Model Config ---
 const MODEL_NAME = "gemini-2.5-flash";
@@ -136,7 +144,6 @@ function EduPhysicsAppContent() {
   }, [activeTab]);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false); // Sidebar yashirish/ko'rsatish
 
   // Sidebar ochilganda body scroll'ni to'xtatish
   useEffect(() => {
@@ -335,12 +342,75 @@ function EduPhysicsAppContent() {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard': return <Dashboard setActiveTab={setActiveTab} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} completedLessons={completedLessons} totalLessons={lessonsData.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0)} />;
-      case 'lessons': return <LessonsModule completedLessons={completedLessons} completeLesson={completeLesson} theme={theme} />;
-      case 'tests': return <TestsModule addXP={addXP} addNotification={addNotification} theme={theme} />;
-      case 'homework': return <HomeworkHelper setShowSettings={setShowSettings} addNotification={addNotification} addXP={addXP} theme={theme} />;
-      case 'lab': return <VirtualLab addNotification={addNotification} setShowSettings={setShowSettings} theme={theme} updateStats={updateUserStats} />;
-      case 'quiz': return <QuizModule setUserXP={setUserXP} addNotification={addNotification} setShowSettings={setShowSettings} theme={theme} updateStats={updateUserStats} />;
-      case 'profile': return <UserProfile user={displayUser} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} />;
+
+      case 'menu': return (
+        <MobileMenu
+          setActiveTab={setActiveTab}
+          onMenuClick={(action) => {
+            if (action === 'settings') setShowSettings(true);
+            else if (action === 'logout') logout();
+            else if (action === 'ai') setActiveTab('ai-tutor');
+          }}
+          setShowSettings={setShowSettings}
+          logout={logout}
+          setAiModalOpen={() => setActiveTab('ai-tutor')}
+        />
+      );
+
+      case 'ai-tutor': return (
+        <AITutorModule setActiveTab={setActiveTab} />
+      );
+
+      case 'lessons': return (
+        <div className="space-y-6">
+          <PageHeader title="Darslar" onBack={() => setActiveTab('menu')} />
+          <LessonsModule completedLessons={completedLessons} completeLesson={completeLesson} theme={theme} />
+        </div>
+      );
+
+      case 'tests': return (
+        <div className="space-y-6">
+          <PageHeader title="Testlar" onBack={() => setActiveTab('menu')} />
+          <TestsModule addXP={addXP} addNotification={addNotification} theme={theme} />
+        </div>
+      );
+
+      case 'homework': return (
+        <div className="space-y-6">
+          <PageHeader title="Uy Vazifasi" onBack={() => setActiveTab('menu')} />
+          <HomeworkHelper setShowSettings={setShowSettings} addNotification={addNotification} addXP={addXP} theme={theme} />
+        </div>
+      );
+
+      case 'lab': return (
+        <div className="space-y-6">
+          <PageHeader title="Virtual Laboratoriya" onBack={() => setActiveTab('menu')} />
+          <VirtualLab addNotification={addNotification} setShowSettings={setShowSettings} theme={theme} updateStats={updateUserStats} />
+        </div>
+      );
+
+      case 'quiz': return (
+        <div className="space-y-6">
+          <PageHeader title="AI Test Sinovlari" onBack={() => setActiveTab('menu')} />
+          <QuizModule setUserXP={setUserXP} addNotification={addNotification} setShowSettings={setShowSettings} theme={theme} updateStats={updateUserStats} />
+        </div>
+      );
+
+      case 'profile': return (
+        <div className="space-y-6">
+          <PageHeader title="Profil" onBack={() => setActiveTab('dashboard')} />
+          <UserProfile
+            user={displayUser}
+            userXP={userXP}
+            userLevel={userLevel}
+            theme={theme}
+            userStats={userStats}
+            completedLessons={completedLessons}
+            totalLessons={lessonsData.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0)}
+          />
+        </div>
+      );
+
       default: return <Dashboard setActiveTab={setActiveTab} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} completedLessons={completedLessons} totalLessons={lessonsData.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0)} />;
     }
   };
@@ -375,9 +445,8 @@ function EduPhysicsAppContent() {
 
       {/* Overlay o'chirildi - icon-only sidebar doimo ko'rinadi */}
 
-      {/* Yon panel (Sidebar) - Icon-Only */}
-      <aside className={`fixed inset-y-0 left-0 z-40 ${themeClasses.sidebar} backdrop-blur-xl border-r ${themeClasses.border} flex flex-col transition-all duration-300 ${sidebarCollapsed ? '-translate-x-full w-20' : 'translate-x-0 w-20'
-        } `}>
+      {/* Yon panel (Sidebar) - Icon-Only - Hidden on Mobile */}
+      <aside className="hidden md:flex fixed inset-y-0 left-0 z-40 w-20 bg-slate-900 backdrop-blur-xl border-r border-slate-700 flex-col transition-all duration-300">
         {/* Logo */}
         <div className="p-4 flex items-center justify-center border-b border-slate-700/50">
           <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg shadow-lg shadow-blue-500/20">
@@ -387,7 +456,7 @@ function EduPhysicsAppContent() {
 
         {/* Navigation - Icon Only */}
         <nav className="mt-3 px-2 space-y-2 flex-1 overflow-y-auto custom-scrollbar">
-          <SidebarItem icon={<BarChart2 />} label="Statistika" id="dashboard" active={activeTab} set={setActiveTab} />
+          <SidebarItem icon={<BarChart2 />} label="Asosiy" id="dashboard" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<Book />} label="Darslar" id="lessons" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<Trophy />} label="Testlar" id="tests" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<BookOpen />} label="Uy Vazifasi" id="homework" active={activeTab} set={setActiveTab} />
@@ -429,38 +498,51 @@ function EduPhysicsAppContent() {
         </div>
       </aside>
 
-      {/* Toggle Button - Fixed, doimo ko'rinadi */}
-      <button
-        onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-        className={`fixed top-[120px] z-50 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-2 rounded-r-lg shadow-lg hover:shadow-xl transition-all duration-300 ${sidebarCollapsed ? 'left-0' : 'left-[60px]'
-          } `}
-        title={sidebarCollapsed ? "Sidebar'ni ko'rsatish" : "Sidebar'ni yashirish"}
-      >
-        <ChevronRight size={20} className={`transition-transform duration-300 ${sidebarCollapsed ? 'rotate-0' : 'rotate-180'
-          } `} />
-      </button>
+
 
       {/* Asosiy oyna */}
-      <main className={`flex-1 overflow-y-auto ${themeClasses.bg} relative scroll-smooth transition-all duration-300 ${sidebarCollapsed ? 'ml-0' : 'ml-20'}`}>
+      <main className={`
+        flex-1 overflow-y-auto ${themeClasses.bg} 
+        relative scroll-smooth transition-all duration-300 
+        md:ml-20 md:pb-0 pb-20
+        landscape:md:pb-0
+      `}>
+        {/* Background Decorations */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl mix-blend-screen"></div>
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/5 rounded-full blur-3xl mix-blend-screen"></div>
         </div>
 
-        <div className="relative z-10 p-4 md:p-8 max-w-7xl mx-auto min-h-full pb-24">
+        {/* Content Container - Responsive */}
+        <div className="
+          relative z-10 
+          min-h-full
+          px-4 py-4
+          sm:px-6 sm:py-6
+          md:px-8 md:py-8
+          lg:px-10 lg:py-10
+          max-w-[1600px] mx-auto
+          pb-24 md:pb-8
+        ">
           {renderContent()}
         </div>
       </main>
 
-      {/* ✨ GLOBAL AI ASSISTANT ✨ */}
-      <AIAssistant setShowSettings={setShowSettings} />
+
+      {/* 📱 BOTTOM NAVIGATION (Mobile Only) */}
+      <BottomNav
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
     </div>
   );
 }
 
 // --- AI CHAT ASSISTANT COMPONENT ---
-function AIAssistant({ apiKey, setShowSettings }) {
-  const [isOpen, setIsOpen] = useState(false);
+function AIAssistant({ apiKey, setShowSettings, isOpen: externalIsOpen, setIsOpen: externalSetIsOpen }) {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
+  const setIsOpen = externalSetIsOpen || setInternalIsOpen;
   const [messages, setMessages] = useState([
     { role: 'ai', text: "Salom! Men AI Fizik Ustozman. Menga dars bo'yicha har qanday savol berishingiz mumkin. ⚛️" }
   ]);
@@ -590,7 +672,11 @@ function AIAssistant({ apiKey, setShowSettings }) {
 }
 
 // 3. MUKAMMAL VIRTUAL LABORATORIYA (AI Tahlil bilan)
-function VirtualLab({ addNotification, apiKey, setShowSettings, updateStats }) {
+function VirtualLab({ addNotification, setShowSettings, updateStats }) {
+  const API_KEYS = [
+    "AIzaSyCC8uEzh1px6KKsXP8FEkh_JS_3F1ErtDQ",
+    "AIzaSyBUzgU8ARMbZX1OYGv0f_cIqQJqaWdlGVM"
+  ];
   const [voltage, setVoltage] = useState(12);
   const [resistance, setResistance] = useState(4);
   const [isRunning, setIsRunning] = useState(true);
@@ -633,6 +719,7 @@ NATIJALAR:
     Ushbu natijani Om qonuniga(I = U / R) asosan qisqa, ilmiy va tushunarli tahlil qilib ber.Nega tok kuchi aynan shunday chiqdi ? Agar qarshilikni oshirsak nima bo'ladi? Javobni o'zbek tilida ber.`;
 
     try {
+      const apiKey = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
@@ -1057,7 +1144,11 @@ function LessonsModule({ completedLessons, completeLesson }) {
 
 
 // 4. MUKAMMAL AI TEST TUZUVCHI (Quiz)
-function QuizModule({ setUserXP, addNotification, apiKey, setShowSettings, updateStats }) {
+function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }) {
+  const API_KEYS = [
+    "AIzaSyCC8uEzh1px6KKsXP8FEkh_JS_3F1ErtDQ",
+    "AIzaSyBUzgU8ARMbZX1OYGv0f_cIqQJqaWdlGVM"
+  ];
   // Boshlang'ich (default) savollar
   const defaultQuestions = [
     { id: 1, q: "Elektr zanjirida kuchlanishni o'lchovchi asbob nima?", options: ["Ampermetr", "Voltmetr", "Ommetr", "Reostat"], ans: 1 },
@@ -1098,6 +1189,7 @@ function QuizModule({ setUserXP, addNotification, apiKey, setShowSettings, updat
       Savollar 9 - sinf darajasida, o'zbek tilida bo'lsin.`;
 
     try {
+      const apiKey = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
@@ -1319,7 +1411,7 @@ function QuizModule({ setUserXP, addNotification, apiKey, setShowSettings, updat
 }
 
 // 5. PROFIL
-function UserProfile({ user, userXP, userLevel, userStats = { timeSpent: 0, testsSolved: 0, totalScore: 0 } }) {
+function UserProfile({ user, userXP, userLevel, userStats = { timeSpent: 0, testsSolved: 0, totalScore: 0 }, completedLessons = [], totalLessons = 24 }) {
   const getInitials = (name) => {
     if (!name) return "U";
     const parts = name.trim().split(' ');
@@ -1330,6 +1422,20 @@ function UserProfile({ user, userXP, userLevel, userStats = { timeSpent: 0, test
   };
 
   const initials = getInitials(user?.displayName);
+
+  // Calculate dynamic stats
+  const progressPercent = totalLessons > 0 ? Math.round((completedLessons.length / totalLessons) * 100) : 0;
+  const labCount = userStats?.completedLabs || 0;
+
+  // Unlock achievements based on stats
+  const achievements = [
+    { id: 'first_step', title: "Birinchi Qadam", icon: <Zap />, unlocked: true },
+    { id: 'om_law', title: "Om Qonuni", icon: <Atom />, unlocked: labCount >= 1 },
+    { id: 'quiz_master', title: "Test Ustasi", icon: <Brain />, unlocked: (userStats?.testsSolved || 0) >= 5 },
+    { id: 'week_streak', title: "7 Kunlik", icon: <Flame />, unlocked: false },
+  ];
+
+  const unlockedCount = achievements.filter(a => a.unlocked).length;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-fadeIn">
@@ -1361,14 +1467,49 @@ function UserProfile({ user, userXP, userLevel, userStats = { timeSpent: 0, test
         </div>
       </div>
 
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-3 bg-blue-500/10 rounded-xl text-blue-400"><Trophy size={24} /></div>
+            <span className="text-xs font-bold text-slate-500 bg-slate-900 px-2 py-1 rounded-lg">LEVEL {userLevel}</span>
+          </div>
+          <div className="text-3xl font-bold text-white mb-1">{userXP}</div>
+          <div className="text-sm text-slate-400">Umumiy XP ballar</div>
+        </div>
+        <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-green-500/50 transition-colors">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-3 bg-green-500/10 rounded-xl text-green-400"><Book size={24} /></div>
+            <span className="text-xs font-bold text-slate-500 bg-slate-900 px-2 py-1 rounded-lg">6 BOB</span>
+          </div>
+          <div className="text-3xl font-bold text-white mb-1">{progressPercent}%</div>
+          <div className="text-sm text-slate-400">Kurs progressi</div>
+        </div>
+        <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-purple-500/50 transition-colors">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-3 bg-purple-500/10 rounded-xl text-purple-400"><Zap size={24} /></div>
+            <span className="text-xs font-bold text-slate-500 bg-slate-900 px-2 py-1 rounded-lg">LAB</span>
+          </div>
+          <div className="text-3xl font-bold text-white mb-1">{labCount}</div>
+          <div className="text-sm text-slate-400">Bajarilgan lablar</div>
+        </div>
+        <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-yellow-500/50 transition-colors">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-3 bg-yellow-500/10 rounded-xl text-yellow-400"><Award size={24} /></div>
+            <span className="text-xs font-bold text-slate-500 bg-slate-900 px-2 py-1 rounded-lg">YUTUQLAR</span>
+          </div>
+          <div className="text-3xl font-bold text-white mb-1">{unlockedCount}/10</div>
+          <div className="text-sm text-slate-400">Ochilgan yutuqlar</div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 bg-slate-800 rounded-2xl p-6 border border-slate-700">
           <h3 className="text-xl font-bold mb-6 flex items-center gap-2"><Trophy className="text-yellow-500" /> Yutuqlarim</h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <AchievementCard title="Birinchi Qadam" icon={<Zap />} unlocked={true} />
-            <AchievementCard title="Om Qonuni" icon={<Atom />} unlocked={true} />
-            <AchievementCard title="Test Ustasi" icon={<Brain />} unlocked={false} />
-            <AchievementCard title="7 Kunlik" icon={<Flame />} unlocked={false} />
+            {achievements.map(ach => (
+              <AchievementCard key={ach.id} title={ach.title} icon={ach.icon} unlocked={ach.unlocked} />
+            ))}
           </div>
         </div>
         <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
@@ -1435,22 +1576,9 @@ function SidebarItem({ icon, label, id, active, set }) {
 // --- DASHBOARD COMPONENT ---
 function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLessons = [], totalLessons = 24 }) {
 
-  // Calculate dynamic stats
-  const progressPercent = totalLessons > 0 ? Math.round((completedLessons.length / totalLessons) * 100) : 0;
-  const labCount = userStats?.completedLabs || 0;
-
-  // Unlock achievements based on stats
-  const achievements = [
-    { id: 'first_step', title: "Birinchi Qadam", icon: <Zap />, unlocked: true }, // Always unlocked
-    { id: 'om_law', title: "Om Qonuni", icon: <Atom />, unlocked: labCount >= 1 },
-    { id: 'quiz_master', title: "Test Ustasi", icon: <Brain />, unlocked: (userStats?.testsSolved || 0) >= 5 },
-    { id: 'week_streak', title: "7 Kunlik", icon: <Flame />, unlocked: false }, // Mocked
-  ];
-
-  const unlockedCount = achievements.filter(a => a.unlocked).length;
-
   return (
     <div className="space-y-8">
+      {/* Hero Banner */}
       <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 sm:p-12 shadow-2xl">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-black opacity-10 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
@@ -1467,75 +1595,8 @@ function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLesson
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors">
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-blue-500/10 rounded-xl text-blue-400"><Trophy size={24} /></div>
-            <span className="text-xs font-bold text-slate-500 bg-slate-900 px-2 py-1 rounded-lg">LEVEL {userLevel}</span>
-          </div>
-          <div className="text-3xl font-bold text-white mb-1">{userXP}</div>
-          <div className="text-sm text-slate-400">Umumiy XP ballar</div>
-        </div>
-        <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-green-500/50 transition-colors">
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-green-500/10 rounded-xl text-green-400"><Book size={24} /></div>
-            <span className="text-xs font-bold text-slate-500 bg-slate-900 px-2 py-1 rounded-lg">6 BOB</span>
-          </div>
-          <div className="text-3xl font-bold text-white mb-1">{progressPercent}%</div>
-          <div className="text-sm text-slate-400">Kurs progressi</div>
-        </div>
-        <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-purple-500/50 transition-colors">
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-purple-500/10 rounded-xl text-purple-400"><Zap size={24} /></div>
-            <span className="text-xs font-bold text-slate-500 bg-slate-900 px-2 py-1 rounded-lg">LAB</span>
-          </div>
-          <div className="text-3xl font-bold text-white mb-1">{labCount}</div>
-          <div className="text-sm text-slate-400">Bajarilgan lablar</div>
-        </div>
-        <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-yellow-500/50 transition-colors">
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-yellow-500/10 rounded-xl text-yellow-400"><Award size={24} /></div>
-            <span className="text-xs font-bold text-slate-500 bg-slate-900 px-2 py-1 rounded-lg">YUTUQLAR</span>
-          </div>
-          <div className="text-3xl font-bold text-white mb-1">{unlockedCount}/10</div>
-          <div className="text-sm text-slate-400">Ochilgan yutuqlar</div>
-        </div>
-      </div>
 
-      {/* Achievements List - Also Dynamic */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 bg-slate-800 rounded-2xl p-6 border border-slate-700">
-          <h3 className="text-xl font-bold mb-6 flex items-center gap-2"><Trophy className="text-yellow-500" /> Yutuqlarim</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {achievements.map(ach => (
-              <AchievementCard key={ach.id} title={ach.title} icon={ach.icon} unlocked={ach.unlocked} />
-            ))}
-          </div>
-        </div>
-        <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
-          <h3 className="text-xl font-bold mb-6">Statistika</h3>
-          <ul className="space-y-4">
-            <StatRow label="O'qilgan vaqt" value={(function (s) {
-              if (!s) return "0m";
-              const h = Math.floor(s / 3600);
-              const m = Math.floor((s % 3600) / 60);
-              if (h > 0) return `${h}s ${m}m`;
-              return `${m}m`;
-            })(userStats.timeSpent)} />
-            <StatRow label="Yechilgan testlar" value={`${userStats.testsSolved || 0} ta`} />
-            <StatRow
-              label="O'rtacha baho"
-              value={`${userStats.testsSolved ? Math.round(userStats.totalScore / userStats.testsSolved) : 0}%`}
-              color={
-                (userStats.testsSolved ? Math.round(userStats.totalScore / userStats.testsSolved) : 0) >= 80 ? "text-green-400" :
-                  (userStats.testsSolved ? Math.round(userStats.totalScore / userStats.testsSolved) : 0) >= 50 ? "text-yellow-400" : "text-red-400"
-              }
-            />
-          </ul>
-        </div>
-      </div>
-
-      {/* AI Recommendations - NEW! */}
+      {/* AI Recommendations */}
       <div>
         <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
           <Sparkles className="text-purple-500" />

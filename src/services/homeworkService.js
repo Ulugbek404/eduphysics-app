@@ -1,41 +1,71 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const MODEL_NAME = "gemini-2.0-flash-exp";
+const MODEL_NAME = "gemini-2.5-flash";
+const API_KEYS = [
+    "AIzaSyCC8uEzh1px6KKsXP8FEkh_JS_3F1ErtDQ",
+    "AIzaSyBUzgU8ARMbZX1OYGv0f_cIqQJqaWdlGVM"
+];
 
-/**
- * Fizika masalasini AI yordamida yechish (Netlify Function orqali)
- * @param {string} problemText - Masala matni
- * @param {string} topic - Mavzu nomi
- * @returns {Promise<Object>} Yechim ma'lumotlari
- */
+const getGenAI = () => {
+    const apiKey = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
+    return new GoogleGenerativeAI(apiKey);
+};
+
 export async function solveProblem(problemText, topic = '') {
-    const API_BASE_URL = import.meta.env.DEV
-        ? 'http://localhost:8888/.netlify/functions'
-        : 'https://ulugbekfizika.netlify.app/.netlify/functions';
-
     try {
-        const response = await fetch(`${API_BASE_URL}/homework-helper`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                problem: problemText,
-                topic: topic
-            })
-        });
+        const genAI = getGenAI();
+        const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+        const prompt = `
+Fizika masalasini yech:
+MASALA: ${problemText}
+MAVZU: ${topic}
+
+TALABLAR:
+1. Berilganlarni yoz
+2. Formulalarni yoz
+3. Hisoblashlarni ko'rsat
+4. Javobni aniq yoz
+5. O'zbek tilida
+6. JSON formatida javob ber
+
+FORMAT:
+{
+  "steps": [
+    {
+      "number": 1,
+      "title": "Berilganlar",
+      "explanation": "...",
+      "formula": "...",
+      "calculation": "...",
+      "result": "..."
+    }
+  ],
+  "finalAnswer": "...",
+  "topic": "${topic}"
+}
+`;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        let data;
+        if (jsonMatch) {
+            try {
+                data = JSON.parse(jsonMatch[0]);
+            } catch (e) {
+                data = parseTextSolution(text);
+            }
+        } else {
+            data = parseTextSolution(text);
         }
 
-        const data = await response.json();
-
-        // Parse solution from response
         return {
             success: true,
-            data: parseSolution(data.solution),
-            rawText: data.solution
+            data: data,
+            rawText: text
         };
     } catch (error) {
         console.error('Problem solving error:', error);
@@ -43,45 +73,13 @@ export async function solveProblem(problemText, topic = '') {
     }
 }
 
-function parseSolution(text) {
-    // Try to parse JSON
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-        try {
-            return JSON.parse(jsonMatch[0]);
-        } catch (e) {
-            // If JSON parsing fails, return text solution
-        }
-    }
+export async function checkSolution(apiKeyIgnored, problemText, studentSolution) {
+    // API Key parametrini ignore qilamiz, o'zimiznikini ishlatamiz
+    try {
+        const genAI = getGenAI();
+        const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
-    // Return text solution
-    return {
-        steps: [{
-            number: 1,
-            title: "Yechim",
-            explanation: text,
-            formula: "",
-            calculation: "",
-            result: ""
-        }],
-        finalAnswer: "Yuqoridagi yechimga qarang",
-        topic: ""
-    };
-}
-
-/**
- * O'quvchi yechimini tekshirish
- * @param {string} apiKey - Gemini API key
- * @param {string} problemText - Masala matni
- * @param {string} studentSolution - O'quvchi yechimi
- * @returns {Promise<Object>} Tahlil natijalari
- */
-export async function checkSolution(apiKey, problemText, studentSolution) {
-    if (!apiKey) {
-        throw new Error('API kalit topilmadi');
-    }
-
-    const prompt = `
+        const prompt = `
 Sen 9-sinf fizika o'qituvchisisan. O'quvchining yechimini tahlil qil:
 
 MASALA: ${problemText}
@@ -108,17 +106,13 @@ FORMAT (JSON formatida javob ber):
     }
   ],
   "correctSolution": {
-    "steps": [...],
+    "steps": [],
     "finalAnswer": "..."
   },
   "feedback": "Umumiy feedback",
   "suggestions": ["Maslahat 1", "Maslahat 2"]
 }
 `;
-
-    try {
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
@@ -144,25 +138,18 @@ FORMAT (JSON formatida javob ber):
     }
 }
 
-/**
- * Amaliyot masalasi generatsiya qilish
- * @param {string} apiKey - Gemini API key
- * @param {string} topic - Mavzu
- * @param {string} difficulty - Qiyinlik darajasi (easy, medium, hard)
- * @returns {Promise<Object>} Yangi masala
- */
-export async function generatePracticeProblem(apiKey, topic, difficulty = 'medium') {
-    if (!apiKey) {
-        throw new Error('API kalit topilmadi');
-    }
+export async function generatePracticeProblem(apiKeyIgnored, topic, difficulty = 'medium') {
+    try {
+        const genAI = getGenAI();
+        const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
-    const difficultyMap = {
-        easy: 'Oson',
-        medium: "O'rta",
-        hard: 'Qiyin'
-    };
+        const difficultyMap = {
+            easy: 'Oson',
+            medium: "O'rta",
+            hard: 'Qiyin'
+        };
 
-    const prompt = `
+        const prompt = `
 9-sinf fizika uchun "${topic}" mavzusida ${difficultyMap[difficulty]} darajadagi amaliyot masalasi yarat.
 
 TALABLAR:
@@ -177,7 +164,7 @@ FORMAT (JSON formatida javob ber):
   "given": ["Ma'lumot 1", "Ma'lumot 2"],
   "find": "Nima topish kerak",
   "solution": {
-    "steps": [...],
+    "steps": [],
     "finalAnswer": "..."
   },
   "topic": "${topic}",
@@ -185,10 +172,6 @@ FORMAT (JSON formatida javob ber):
   "hints": ["Maslahat 1", "Maslahat 2"]
 }
 `;
-
-    try {
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
@@ -214,19 +197,12 @@ FORMAT (JSON formatida javob ber):
     }
 }
 
-/**
- * Fizika tushunchasini tushuntirish
- * @param {string} apiKey - Gemini API key
- * @param {string} question - Savol
- * @param {string} context - Kontekst (optional)
- * @returns {Promise<Object>} Tushuntirish
- */
-export async function explainConcept(apiKey, question, context = '') {
-    if (!apiKey) {
-        throw new Error('API kalit topilmadi');
-    }
+export async function explainConcept(apiKeyIgnored, question, context = '') {
+    try {
+        const genAI = getGenAI();
+        const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
-    const prompt = `
+        const prompt = `
 Sen 9-sinf o'quvchisi uchun fizika tushuntirayotgan do'stona o'qituvchisan.
 
 SAVOL: ${question}
@@ -250,10 +226,6 @@ FORMAT (JSON formatida javob ber):
   "tips": ["Maslahat 1", "Maslahat 2"]
 }
 `;
-
-    try {
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
@@ -279,10 +251,7 @@ FORMAT (JSON formatida javob ber):
     }
 }
 
-// Helper functions for parsing non-JSON responses
-
 function parseTextSolution(text) {
-    // Oddiy text yechimni parsing qilish
     return {
         steps: [{
             number: 1,

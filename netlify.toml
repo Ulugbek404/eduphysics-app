@@ -1,15 +1,16 @@
-# Build settings
 [build]
-  publish = "dist"
   command = "npm run build"
+  publish = "dist"
   functions = "netlify/functions"
 
-# Redirect rules for SPA
+[functions]
+  node_bundler = "esbuild"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-# Functions settings
-[functions]
-  node_bundler = "esbuild"
+[context.production.environment]
+  GEMINI_API_KEY_1 = "AIzaSyCC8uEzh1px6KKsXP8FEkh_JS_3F1ErtDQ"
+  GEMINI_API_KEY_2 = "AIzaSyBUzgU8ARMbZX1OYGv0f_cIqQJqaWdlGVM"
