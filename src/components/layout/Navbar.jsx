@@ -64,19 +64,25 @@ const Navbar = () => {
             <motion.nav
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
-                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-                    ? 'bg-slate-900/95 backdrop-blur-lg border-b border-slate-800 shadow-lg'
-                    : 'bg-transparent'
-                    }`}
+                className="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-lg border-b border-slate-800 shadow-2xl transition-all duration-300"
+                style={{
+                    boxShadow: '0 2px 20px rgba(0, 0, 0, 0.3)'
+                }}
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         {/* Logo */}
-                        <button onClick={() => scrollToSection('hero')} className="flex items-center space-x-2 group">
-                            <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg group-hover:scale-110 transition-transform">
-                                <Atom size={24} className="text-white" />
+                        <button onClick={() => scrollToSection('hero')} className="flex items-center space-x-3 group">
+                            <img
+                                src="/assets/nurfizika.jpg"
+                                alt="NurFizika"
+                                className="h-12 md:h-14 rounded-2xl transition-transform group-hover:scale-110"
+                                style={{ filter: 'drop-shadow(0 4px 10px rgba(255, 215, 0, 0.3))' }}
+                            />
+                            <div className="flex flex-col items-start">
+                                <span className="text-xl md:text-2xl font-bold text-white">NurFizika</span>
+                                <span className="text-xs text-yellow-300 italic">Kuch — bilimda, bilim — bizda!</span>
                             </div>
-                            <span className="text-xl font-bold text-white">EduPhysics</span>
                         </button>
 
                         {/* Desktop Navigation */}
@@ -148,7 +154,10 @@ const Navbar = () => {
                                     <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg">
                                         <Atom size={20} className="text-white" />
                                     </div>
-                                    <span className="text-lg font-bold text-white">EduPhysics</span>
+                                    <div className="flex flex-col">
+                                        <span className="text-lg font-bold text-white">NurFizika</span>
+                                        <span className="text-xs text-yellow-300 italic">Kuch — bilimda, bilim — bizda!</span>
+                                    </div>
                                 </div>
                                 <button
                                     onClick={() => setIsMobileMenuOpen(false)}

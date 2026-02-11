@@ -48,8 +48,8 @@ const Contact = () => {
 
     const faqs = [
         {
-            question: "EduPhysics platformasi butunlay bepulmi?",
-            answer: "Ha, EduPhysics platformasi to'liq bepul. Hech qanday yashirin to'lovlar yoki obuna haqi yo'q."
+            question: "NurFizika platformasi butunlay bepulmi?",
+            answer: "Ha, NurFizika platformasi to'liq bepul. Hech qanday yashirin to'lovlar yoki obuna haqi yo'q."
         },
         {
             question: "Platformadan foydalanish uchun nima kerak?",
@@ -66,7 +66,7 @@ const Contact = () => {
     ];
 
     return (
-        <section id="contact" className="py-20 bg-gradient-to-br from-slate-900 to-slate-800">
+        <section className="min-h-screen flex items-center justify-center py-20 pt-20" style={{ background: 'linear-gradient(135deg, #1E3A8A 0%, #3730A3 100%)' }}>
             <div className="container mx-auto px-4">
                 {/* Section Header */}
                 <motion.div

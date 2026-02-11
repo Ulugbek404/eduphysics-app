@@ -16,7 +16,7 @@ const Hero = () => {
     ];
 
     return (
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+        <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20" style={{ background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%)' }}>
             {/* Animated Background */}
             <div className="absolute inset-0 overflow-hidden">
                 {/* Gradient Orbs */}

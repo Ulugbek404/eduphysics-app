@@ -44,7 +44,8 @@ const Footer = () => {
                             <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg">
                                 <Atom size={24} className="text-white" />
                             </div>
-                            <span className="text-xl font-bold text-white">EduPhysics</span>
+                            <span className="text-xl font-bold text-white">NurFizika</span>
+                            <span className="text-sm text-yellow-300 italic">Kuch — bilimda, bilim — bizda!</span>
                         </div>
                         <p className="text-slate-400 mb-4 leading-relaxed">
                             Sun'iy intellekt yordamida 9-sinf fizikasini o'rganish platformasi.
@@ -125,7 +126,7 @@ const Footer = () => {
                     <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                         {/* Copyright */}
                         <div className="text-slate-400 text-sm">
-                            © {currentYear} EduPhysics. Barcha huquqlar himoyalangan.
+                            © {currentYear} NurFizika. Barcha huquqlar himoyalangan.
                         </div>
 
                         {/* Social Links */}

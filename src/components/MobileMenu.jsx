@@ -157,7 +157,7 @@ export default function MobileMenu({ setActiveTab, onMenuClick, setShowSettings,
 
             {/* Footer info */}
             <div className="mt-8 text-center text-xs text-slate-600">
-                EduPhysics v2.5 (2026)
+                NurFizika v2.5 (2026)
             </div>
         </div>
     );

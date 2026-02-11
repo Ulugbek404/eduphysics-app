@@ -15,7 +15,7 @@ import {
 
 const About = () => {
     return (
-        <section id="about" className="py-20 bg-slate-900/50">
+        <section className="min-h-screen flex items-center justify-center py-20 pt-20" style={{ background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)' }}>
             <div className="container mx-auto px-4">
                 {/* Section Header */}
                 <motion.div
@@ -24,12 +24,12 @@ const About = () => {
                     viewport={{ once: true }}
                     className="text-center mb-16"
                 >
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                    <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
                         Biz haqimizda
                     </h2>
-                    <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-                        EduPhysics - O'zbekistonda birinchi sun'iy intellektga asoslangan
-                        fizika o'rganish platformasi
+                    <p className="text-xl text-slate-700 max-w-3xl mx-auto">
+                        NurFizika - O'zbekistonda birinchi sun'iy intellektga asoslangan
+                        fizika o'rganish platformasi. Kuch — bilimda, bilim — bizda!
                     </p>
                 </motion.div>
 
@@ -78,9 +78,9 @@ const About = () => {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-3xl font-bold text-white text-center mb-12"
+                        className="text-3xl font-bold text-slate-900 text-center mb-12"
                     >
-                        Nima uchun EduPhysics?
+                        Nima uchun NurFizika?
                     </motion.h3>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -128,13 +128,13 @@ const About = () => {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                                className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6 hover:border-blue-500/50 transition-all group"
+                                className="bg-white/80 backdrop-blur-sm border border-blue-200 rounded-2xl p-6 hover:border-indigo-400 hover:shadow-lg transition-all group"
                             >
-                                <div className={`w-12 h-12 bg-gradient-to-br from-${feature.color}-500 to-${feature.color}-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                                <div className={`w-12 h-12 bg-gradient-to-br from-${feature.color}-500 to-${feature.color}-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform text-white`}>
                                     {feature.icon}
                                 </div>
-                                <h4 className="text-lg font-bold text-white mb-2">{feature.title}</h4>
-                                <p className="text-slate-400 text-sm">{feature.description}</p>
+                                <h4 className="text-lg font-bold text-slate-900 mb-2">{feature.title}</h4>
+                                <p className="text-slate-600 text-sm">{feature.description}</p>
                             </motion.div>
                         ))}
                     </div>

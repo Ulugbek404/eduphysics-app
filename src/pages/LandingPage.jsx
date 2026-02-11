@@ -12,28 +12,28 @@ const LandingPage = () => {
         <>
             {/* SEO Meta Tags */}
             <Helmet>
-                <title>EduPhysics - 9-sinf Fizikani AI bilan o'rgan</title>
+                <title>NurFizika - 9-sinf Fizikani AI bilan o'rgan</title>
                 <meta
                     name="description"
-                    content="Sun'iy intellekt yordamida 9-sinf fizikasini o'rganing. Virtual laboratoriya, AI ustoz, 100+ test va interaktiv darslar. Butunlay bepul!"
+                    content="NurFizika - 9-sinf fizika kursi. AI ustoz, virtual laboratoriya, 100+ test. Kuch — bilimda, bilim — bizda!"
                 />
                 <meta
                     name="keywords"
-                    content="fizika, 9-sinf, AI, sun'iy intellekt, virtual laboratoriya, testlar, o'zbek tili, ta'lim"
+                    content="NurFizika bilan fizikani oson va qiziqarli o'rganing. AI ustoz, virtual laboratoriya va 100+ test."
                 />
 
                 {/* Open Graph / Facebook */}
                 <meta property="og:type" content="website" />
-                <meta property="og:title" content="EduPhysics - 9-sinf Fizikani AI bilan o'rgan" />
+                <meta property="og:title" content="NurFizika - 9-sinf Fizikani AI bilan o'rgan" />
                 <meta
                     property="og:description"
-                    content="Sun'iy intellekt yordamida 9-sinf fizikasini o'rganing. Virtual laboratoriya, AI ustoz, 100+ test va interaktiv darslar."
+                    content="NurFizika bilan fizikani oson va qiziqarli o'rganing. AI ustoz, virtual laboratoriya va 100+ test. Kuch — bilimda, bilim — bizda!"
                 />
                 <meta property="og:url" content="https://eduphysics.uz" />
 
                 {/* Twitter */}
                 <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="EduPhysics - 9-sinf Fizikani AI bilan o'rgan" />
+                <meta name="twitter:title" content="NurFizika - 9-sinf Fizikani AI bilan o'rgan" />
                 <meta
                     name="twitter:description"
                     content="Sun'iy intellekt yordamida 9-sinf fizikasini o'rganing. Virtual laboratoriya, AI ustoz, 100+ test va interaktiv darslar."
@@ -43,21 +43,21 @@ const LandingPage = () => {
             {/* Navigation */}
             <Navbar />
 
-            {/* Main Content - 4 sections only */}
-            <main className="overflow-x-hidden scroll-smooth">
-                <section id="hero">
+            {/* Main Content - 4 sections with snap scroll */}
+            <main className="overflow-y-scroll snap-y snap-mandatory h-screen overflow-x-hidden">
+                <section id="hero" className="snap-start snap-always">
                     <Hero />
                 </section>
 
-                <section id="features">
+                <section id="features" className="snap-start snap-always">
                     <Features />
                 </section>
 
-                <section id="about">
+                <section id="about" className="snap-start snap-always">
                     <About />
                 </section>
 
-                <section id="contact">
+                <section id="contact" className="snap-start snap-always">
                     <Contact />
                 </section>
             </main>

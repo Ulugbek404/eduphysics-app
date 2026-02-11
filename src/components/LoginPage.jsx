@@ -138,7 +138,8 @@ export default function LoginPage() {
                     </div>
                     <div>
                         <h1 className="text-4xl font-extrabold bg-gradient-to-r from-blue-400 via-purple-400 to-white bg-clip-text text-transparent tracking-tight">
-                            EduPhysics
+                            <span className="text-3xl font-bold">NurFizika</span>
+                            <span className="text-sm text-yellow-300 italic">Kuch — bilimda, bilim — bizda!</span>
                         </h1>
                         <p className="text-slate-400 flex items-center justify-center gap-2 mt-2 font-medium">
                             AI-powered Fizika Platformasi
@@ -315,7 +316,7 @@ export default function LoginPage() {
                 </Card>
 
                 <p className="text-center text-xs text-slate-600 font-medium">
-                    © 2025 EduPhysics. Barcha huquqlar himoyalangan.
+                    © 2026 NurFizika. Barcha huquqlar himoyalangan.
                 </p>
             </div>
 

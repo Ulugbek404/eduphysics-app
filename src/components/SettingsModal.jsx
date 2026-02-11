@@ -263,7 +263,8 @@ export default function SettingsModal({ show, onClose, user, theme, setTheme, so
                     <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center shadow-xl mb-6 animate-pulse-slow">
                         <Atom size={48} className="text-white animate-spin-slow" />
                     </div>
-                    <h2 className="text-2xl font-bold mb-2">EduPhysics</h2>
+                    <h2 className="text-2xl font-bold mb-2">NurFizika</h2>
+                    <p className="text-sm text-slate-400 italic">Kuch — bilimda, bilim — bizda!</p>
                     <p className="text-blue-400 font-medium mb-6">9-Sinf Fizika O'quv Platformasi</p>
                     <p className="text-sm text-slate-400 leading-relaxed max-w-sm mx-auto">
                         Ushbu ilova o'quvchilarga fizikani qiziqarli va interaktiv usulda o'rganishga yordam beradi.
@@ -284,7 +285,7 @@ export default function SettingsModal({ show, onClose, user, theme, setTheme, so
 
                 <div className="pt-8">
                     <p className="text-xs text-slate-600">
-                        &copy; 2026 EduPhysics. Barcha huquqlar himoyalangan.
+                        &copy; 2026 NurFizika. Barcha huquqlar himoyalangan.
                     </p>
                 </div>
             </div>

@@ -1,9 +1,15 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   build: {
     rollupOptions: {
       output: {
@@ -32,5 +38,15 @@ export default defineConfig({
   server: {
     port: 5173,
     open: false,
+    host: true, // Expose to local network (useful for Docker/WSL2)
+    hmr: {
+      host: 'localhost',
+      protocol: 'ws',
+      port: 5173,
+    },
+    watch: {
+      usePolling: true, // Use polling instead of WebSocket (for firewall issues)
+      interval: 1000, // Check for changes every 1 second
+    },
   }
 })
