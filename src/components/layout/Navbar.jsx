@@ -1,0 +1,205 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Atom, Menu, X, LogIn, UserPlus } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+
+const Navbar = () => {
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const navigate = useNavigate();
+
+    // Handle scroll effect
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 20);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Close mobile menu when clicking outside
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+    }, [isMobileMenuOpen]);
+
+    const navLinks = [
+        { label: 'Bosh sahifa', section: 'hero' },
+        { label: 'Imkoniyatlar', section: 'features' },
+        { label: 'Biz haqimizda', section: 'about' },
+        { label: 'Bog\'lanish', section: 'contact' },
+    ];
+
+    const scrollToSection = (sectionId) => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+            const navbarHeight = 64; // Height of fixed navbar
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+            setIsMobileMenuOpen(false);
+        } else {
+            console.error(`Section with id "${sectionId}" not found`);
+        }
+    };
+
+    const handleNavClick = (link) => {
+        if (link.section) {
+            scrollToSection(link.section);
+        } else if (link.path) {
+            navigate(link.path);
+        }
+    };
+
+    return (
+        <>
+            <motion.nav
+                initial={{ y: -100 }}
+                animate={{ y: 0 }}
+                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
+                    ? 'bg-slate-900/95 backdrop-blur-lg border-b border-slate-800 shadow-lg'
+                    : 'bg-transparent'
+                    }`}
+            >
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between h-16">
+                        {/* Logo */}
+                        <button onClick={() => scrollToSection('hero')} className="flex items-center space-x-2 group">
+                            <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg group-hover:scale-110 transition-transform">
+                                <Atom size={24} className="text-white" />
+                            </div>
+                            <span className="text-xl font-bold text-white">EduPhysics</span>
+                        </button>
+
+                        {/* Desktop Navigation */}
+                        <div className="hidden md:flex items-center space-x-8">
+                            {navLinks.map((link, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => handleNavClick(link)}
+                                    className="text-slate-300 hover:text-white transition-colors font-medium"
+                                >
+                                    {link.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Desktop Auth Buttons */}
+                        <div className="hidden md:flex items-center space-x-4">
+                            <button
+                                onClick={() => navigate('/login')}
+                                className="flex items-center space-x-2 px-4 py-2 text-white hover:text-blue-400 transition-colors font-medium"
+                            >
+                                <LogIn size={18} />
+                                <span>Kirish</span>
+                            </button>
+                            <button
+                                onClick={() => navigate('/register')}
+                                className="flex items-center space-x-2 px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105"
+                            >
+                                <UserPlus size={18} />
+                                <span>Ro'yxatdan o'tish</span>
+                            </button>
+                        </div>
+
+                        {/* Mobile Menu Button */}
+                        <button
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            className="md:hidden p-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
+                        >
+                            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                        </button>
+                    </div>
+                </div>
+            </motion.nav>
+
+            {/* Mobile Menu */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <>
+                        {/* Overlay */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+                        />
+
+                        {/* Menu Panel */}
+                        <motion.div
+                            initial={{ x: '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '100%' }}
+                            transition={{ type: 'tween', duration: 0.3 }}
+                            className="fixed top-0 right-0 bottom-0 w-80 bg-slate-900 border-l border-slate-800 z-50 md:hidden overflow-y-auto"
+                        >
+                            {/* Header */}
+                            <div className="flex items-center justify-between p-4 border-b border-slate-800">
+                                <div className="flex items-center space-x-2">
+                                    <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg">
+                                        <Atom size={20} className="text-white" />
+                                    </div>
+                                    <span className="text-lg font-bold text-white">EduPhysics</span>
+                                </div>
+                                <button
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            {/* Navigation Links */}
+                            <div className="p-4 space-y-2">
+                                {navLinks.map((link, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => handleNavClick(link)}
+                                        className="w-full text-left px-4 py-3 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium"
+                                    >
+                                        {link.label}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Auth Buttons */}
+                            <div className="p-4 space-y-3 border-t border-slate-800">
+                                <button
+                                    onClick={() => {
+                                        navigate('/login');
+                                        setIsMobileMenuOpen(false);
+                                    }}
+                                    className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors font-medium"
+                                >
+                                    <LogIn size={18} />
+                                    <span>Kirish</span>
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        navigate('/register');
+                                        setIsMobileMenuOpen(false);
+                                    }}
+                                    className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold hover:shadow-lg hover:shadow-blue-500/50 transition-all"
+                                >
+                                    <UserPlus size={18} />
+                                    <span>Ro'yxatdan o'tish</span>
+                                </button>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+        </>
+    );
+};
+
+export default Navbar;

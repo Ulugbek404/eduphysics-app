@@ -107,13 +107,6 @@ export default function MobileMenu({ setActiveTab, onMenuClick, setShowSettings,
                 </h2>
             </div>
 
-            {/* Swipe Hint */}
-            <div className="mb-4 text-center">
-                <p className="text-xs text-slate-500">
-                    ← Chapga surish orqali yopish
-                </p>
-            </div>
-
             {/* Menu Sections */}
             <div className="space-y-6">
                 {menuSections.map((section, idx) => (
