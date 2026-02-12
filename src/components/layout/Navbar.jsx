@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Atom, Menu, X, LogIn, UserPlus } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
+import LanguageSwitcher from '../LanguageSwitcher';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
+    const { t } = useLanguage();
 
     // Handle scroll effect
     useEffect(() => {
@@ -28,10 +31,10 @@ const Navbar = () => {
     }, [isMobileMenuOpen]);
 
     const navLinks = [
-        { label: 'Bosh sahifa', section: 'hero' },
+        { label: t('nav.home'), section: 'hero' },
         { label: 'Imkoniyatlar', section: 'features' },
-        { label: 'Biz haqimizda', section: 'about' },
-        { label: 'Bog\'lanish', section: 'contact' },
+        { label: t('nav.about'), section: 'about' },
+        { label: t('nav.contact'), section: 'contact' },
     ];
 
     const scrollToSection = (sectionId) => {
@@ -119,21 +122,22 @@ const Navbar = () => {
                             ))}
                         </div>
 
-                        {/* Desktop Auth Buttons */}
+                        {/* Desktop Auth Buttons & Language Switcher */}
                         <div className="hidden md:flex items-center space-x-4">
+                            <LanguageSwitcher variant="navbar" />
                             <button
                                 onClick={() => navigate('/login')}
                                 className="flex items-center space-x-2 px-4 py-2 text-white hover:text-blue-400 transition-colors font-medium"
                             >
                                 <LogIn size={18} />
-                                <span>Kirish</span>
+                                <span>{t('nav.login')}</span>
                             </button>
                             <button
                                 onClick={() => navigate('/register')}
                                 className="flex items-center space-x-2 px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105"
                             >
                                 <UserPlus size={18} />
-                                <span>Ro'yxatdan o'tish</span>
+                                <span>{t('nav.register')}</span>
                             </button>
                         </div>
 

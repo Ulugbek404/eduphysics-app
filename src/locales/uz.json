@@ -1,0 +1,92 @@
+{
+    "nav": {
+        "home": "Bosh sahifa",
+        "about": "Biz haqimizda",
+        "contact": "Aloqa",
+        "login": "Kirish",
+        "register": "Ro'yxatdan o'tish"
+    },
+    "hero": {
+        "title": "Fizika olamiga xush kelibsiz!",
+        "subtitle": "9-sinf fizika kursini interaktiv usulda o'rganing. Darslar, testlar va virtual laboratoriya sizni kutmoqda.",
+        "slogan": "Kuch — bilimda, bilim — bizda!",
+        "startLessons": "Darslarni Boshlash",
+        "aiTest": "AI Test"
+    },
+    "dashboard": {
+        "main": "Asosiy",
+        "lessons": "Darslar",
+        "tests": "Testlar",
+        "homework": "Uy Vazifasi",
+        "lab": "Laboratoriya",
+        "aiTutor": "AI Ustoz",
+        "profile": "Profil",
+        "settings": "Sozlamalar",
+        "logout": "Chiqish"
+    },
+    "stats": {
+        "totalXP": "Jami XP",
+        "level": "Daraja",
+        "streak": "Kun ketma-ketligi",
+        "timeSpent": "Sarflangan vaqt",
+        "lessonsCompleted": "Tugallangan darslar",
+        "testsCompleted": "Tugallangan testlar",
+        "labsCompleted": "Tugallangan laboratoriyalar",
+        "averageScore": "O'rtacha ball",
+        "achievements": "Yutuqlar",
+        "overallProgress": "Umumiy progress"
+    },
+    "common": {
+        "loading": "Yuklanmoqda...",
+        "save": "Saqlash",
+        "cancel": "Bekor qilish",
+        "delete": "O'chirish",
+        "edit": "Tahrirlash",
+        "close": "Yopish",
+        "search": "Qidirish",
+        "filter": "Filtrlash",
+        "sort": "Saralash",
+        "yes": "Ha",
+        "no": "Yo'q",
+        "ok": "OK",
+        "error": "Xatolik",
+        "success": "Muvaffaqiyatli",
+        "warning": "Ogohlantirish",
+        "info": "Ma'lumot"
+    },
+    "auth": {
+        "email": "Email",
+        "password": "Parol",
+        "confirmPassword": "Parolni tasdiqlang",
+        "forgotPassword": "Parolni unutdingizmi?",
+        "loginTitle": "Hisobingizga kiring",
+        "registerTitle": "Ro'yxatdan o'ting",
+        "loginButton": "Kirish",
+        "registerButton": "Ro'yxatdan o'tish",
+        "orContinueWith": "Yoki davom eting",
+        "googleLogin": "Google orqali kirish",
+        "noAccount": "Hisobingiz yo'qmi?",
+        "haveAccount": "Hisobingiz bormi?",
+        "signUp": "Ro'yxatdan o'ting",
+        "signIn": "Kirish"
+    },
+    "settings": {
+        "title": "Sozlamalar",
+        "language": "Til",
+        "theme": "Mavzu",
+        "notifications": "Bildirishnomalar",
+        "sound": "Tovush",
+        "profile": "Profil sozlamalari",
+        "account": "Hisob",
+        "privacy": "Maxfiylik",
+        "about": "Dastur haqida"
+    },
+    "footer": {
+        "platform": "Platforma",
+        "support": "Yordam",
+        "legal": "Huquqiy",
+        "followUs": "Bizni kuzatib boring",
+        "allRightsReserved": "Barcha huquqlar himoyalangan",
+        "madeWith": "❤️ bilan yaratildi"
+    }
+}

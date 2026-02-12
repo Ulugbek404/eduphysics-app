@@ -7,6 +7,7 @@ import {
   Send, Loader, Bot, Key, Search, LogOut, BookOpen
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { updateProfile } from 'firebase/auth';
 import { auth } from '../firebase';
 import { getUserProgress, addUserXP, updateUserLevel, markLessonComplete, saveQuizResult } from '../services/userService';
@@ -133,6 +134,7 @@ class ErrorBoundary extends React.Component {
 // --- ASOSIY APP KOMPONENTI ---
 function EduPhysicsAppContent() {
   const { user, loading, logout } = useAuth();
+  const { t } = useLanguage();
 
   // BARCHA STATE HOOKS - conditional return'dan OLDIN
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -449,13 +451,13 @@ function EduPhysicsAppContent() {
 
         {/* Navigation - With Labels */}
         <nav className="mt-4 px-3 space-y-1.5 flex-1 overflow-y-auto custom-scrollbar">
-          <SidebarItem icon={<BarChart2 />} label="Asosiy" id="dashboard" active={activeTab} set={setActiveTab} />
-          <SidebarItem icon={<Book />} label="Darslar" id="lessons" active={activeTab} set={setActiveTab} />
-          <SidebarItem icon={<Trophy />} label="Testlar" id="tests" active={activeTab} set={setActiveTab} />
-          <SidebarItem icon={<BookOpen />} label="Uy Vazifasi" id="homework" active={activeTab} set={setActiveTab} />
-          <SidebarItem icon={<Zap />} label="Laboratoriya" id="lab" active={activeTab} set={setActiveTab} />
-          <SidebarItem icon={<Brain />} label="AI Ustoz" id="quiz" active={activeTab} set={setActiveTab} />
-          <SidebarItem icon={<User />} label="Profil" id="profile" active={activeTab} set={setActiveTab} />
+          <SidebarItem icon={<BarChart2 />} label={t('dashboard.main')} id="dashboard" active={activeTab} set={setActiveTab} />
+          <SidebarItem icon={<Book />} label={t('dashboard.lessons')} id="lessons" active={activeTab} set={setActiveTab} />
+          <SidebarItem icon={<Trophy />} label={t('dashboard.tests')} id="tests" active={activeTab} set={setActiveTab} />
+          <SidebarItem icon={<BookOpen />} label={t('dashboard.homework')} id="homework" active={activeTab} set={setActiveTab} />
+          <SidebarItem icon={<Zap />} label={t('dashboard.lab')} id="lab" active={activeTab} set={setActiveTab} />
+          <SidebarItem icon={<Brain />} label={t('dashboard.aiTutor')} id="quiz" active={activeTab} set={setActiveTab} />
+          <SidebarItem icon={<User />} label={t('dashboard.profile')} id="profile" active={activeTab} set={setActiveTab} />
         </nav>
 
         {/* User Section - Expanded */}
@@ -486,14 +488,14 @@ function EduPhysicsAppContent() {
               className="w-full flex items-center gap-3 px-4 py-2.5 bg-slate-800/50 hover:bg-slate-700/70 rounded-lg transition-all duration-200 text-slate-300 hover:text-white group border border-slate-700/30 hover:border-slate-600/50"
             >
               <Settings size={18} className="flex-shrink-0 group-hover:rotate-90 transition-transform duration-300" />
-              <span className="text-sm font-medium">Sozlamalar</span>
+              <span className="text-sm font-medium">{t('dashboard.settings')}</span>
             </button>
             <button
               onClick={logout}
               className="w-full flex items-center gap-3 px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-all duration-200 text-red-400 hover:text-red-300 group border border-red-500/20 hover:border-red-500/30"
             >
               <LogOut size={18} className="flex-shrink-0" />
-              <span className="text-sm font-medium">Chiqish</span>
+              <span className="text-sm font-medium">{t('dashboard.logout')}</span>
             </button>
           </div>
         </div>

@@ -1,0 +1,92 @@
+{
+    "nav": {
+        "home": "Главная",
+        "about": "О нас",
+        "contact": "Контакты",
+        "login": "Войти",
+        "register": "Регистрация"
+    },
+    "hero": {
+        "title": "Добро пожаловать в мир физики!",
+        "subtitle": "Изучайте физику 9 класса интерактивно. Уроки, тесты и виртуальная лаборатория ждут вас.",
+        "slogan": "Сила — в знаниях, знания — у нас!",
+        "startLessons": "Начать уроки",
+        "aiTest": "AI Тест"
+    },
+    "dashboard": {
+        "main": "Главная",
+        "lessons": "Уроки",
+        "tests": "Тесты",
+        "homework": "Домашнее задание",
+        "lab": "Лаборатория",
+        "aiTutor": "AI Учитель",
+        "profile": "Профиль",
+        "settings": "Настройки",
+        "logout": "Выйти"
+    },
+    "stats": {
+        "totalXP": "Всего XP",
+        "level": "Уровень",
+        "streak": "Серия дней",
+        "timeSpent": "Потрачено времени",
+        "lessonsCompleted": "Завершено уроков",
+        "testsCompleted": "Завершено тестов",
+        "labsCompleted": "Завершено лабораторий",
+        "averageScore": "Средний балл",
+        "achievements": "Достижения",
+        "overallProgress": "Общий прогресс"
+    },
+    "common": {
+        "loading": "Загрузка...",
+        "save": "Сохранить",
+        "cancel": "Отмена",
+        "delete": "Удалить",
+        "edit": "Редактировать",
+        "close": "Закрыть",
+        "search": "Поиск",
+        "filter": "Фильтр",
+        "sort": "Сортировка",
+        "yes": "Да",
+        "no": "Нет",
+        "ok": "ОК",
+        "error": "Ошибка",
+        "success": "Успешно",
+        "warning": "Предупреждение",
+        "info": "Информация"
+    },
+    "auth": {
+        "email": "Email",
+        "password": "Пароль",
+        "confirmPassword": "Подтвердите пароль",
+        "forgotPassword": "Забыли пароль?",
+        "loginTitle": "Войдите в аккаунт",
+        "registerTitle": "Зарегистрируйтесь",
+        "loginButton": "Войти",
+        "registerButton": "Регистрация",
+        "orContinueWith": "Или продолжите с",
+        "googleLogin": "Войти через Google",
+        "noAccount": "Нет аккаунта?",
+        "haveAccount": "Есть аккаунт?",
+        "signUp": "Зарегистрироваться",
+        "signIn": "Войти"
+    },
+    "settings": {
+        "title": "Настройки",
+        "language": "Язык",
+        "theme": "Тема",
+        "notifications": "Уведомления",
+        "sound": "Звук",
+        "profile": "Настройки профиля",
+        "account": "Аккаунт",
+        "privacy": "Конфиденциальность",
+        "about": "О приложении"
+    },
+    "footer": {
+        "platform": "Платформа",
+        "support": "Поддержка",
+        "legal": "Правовая информация",
+        "followUs": "Следите за нами",
+        "allRightsReserved": "Все права защищены",
+        "madeWith": "Сделано с ❤️"
+    }
+}

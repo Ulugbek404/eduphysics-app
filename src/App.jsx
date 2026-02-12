@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { HelmetProvider } from 'react-helmet-async';
 import { useAuth } from './contexts/AuthContext';
 import { ProgressProvider } from './contexts/ProgressContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 
 // Pages
 import LandingPage from './pages/LandingPage';
@@ -29,16 +30,19 @@ function LoadingScreen() {
     );
 }
 
+
 // Main App Component
 function App() {
     console.log('App component rendered'); // DEBUG
     return (
         <HelmetProvider>
-            <Router>
-                <ProgressProvider>
-                    <AppRoutes />
-                </ProgressProvider>
-            </Router>
+            <LanguageProvider>
+                <Router>
+                    <ProgressProvider>
+                        <AppRoutes />
+                    </ProgressProvider>
+                </Router>
+            </LanguageProvider>
         </HelmetProvider>
     );
 }
