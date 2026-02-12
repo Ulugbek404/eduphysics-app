@@ -433,54 +433,67 @@ function EduPhysicsAppContent() {
 
       {/* Overlay o'chirildi - icon-only sidebar doimo ko'rinadi */}
 
-      {/* Yon panel (Sidebar) - Icon-Only - Hidden on Mobile */}
-      <aside className="hidden md:flex fixed inset-y-0 left-0 z-40 w-20 bg-slate-900 backdrop-blur-xl border-r border-slate-700 flex-col transition-all duration-300">
-        {/* Logo */}
-        <div className="p-4 flex items-center justify-center border-b border-slate-700/50">
-          <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg shadow-lg shadow-blue-500/20">
-            <Atom size={24} className="text-white animate-spin-slow" />
+
+      {/* Yon panel (Sidebar) - Expanded with Labels - Hidden on Mobile */}
+      <aside className="hidden md:flex fixed inset-y-0 left-0 z-40 w-64 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 backdrop-blur-xl border-r border-slate-700/50 flex-col transition-all duration-300 shadow-2xl">
+        {/* Logo & Brand */}
+        <div className="p-6 flex items-center gap-3 border-b border-slate-700/50">
+          <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2.5 rounded-xl shadow-lg shadow-blue-500/30">
+            <Atom size={28} className="text-white animate-spin-slow" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-white font-bold text-lg">NurFizika</span>
+            <span className="text-xs text-yellow-300 italic">Kuch — bilimda!</span>
           </div>
         </div>
 
-        {/* Navigation - Icon Only */}
-        <nav className="mt-3 px-2 space-y-2 flex-1 overflow-y-auto custom-scrollbar">
+        {/* Navigation - With Labels */}
+        <nav className="mt-4 px-3 space-y-1.5 flex-1 overflow-y-auto custom-scrollbar">
           <SidebarItem icon={<BarChart2 />} label="Asosiy" id="dashboard" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<Book />} label="Darslar" id="lessons" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<Trophy />} label="Testlar" id="tests" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<BookOpen />} label="Uy Vazifasi" id="homework" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<Zap />} label="Laboratoriya" id="lab" active={activeTab} set={setActiveTab} />
-          <SidebarItem icon={<Brain />} label="AI Test Sinovlari" id="quiz" active={activeTab} set={setActiveTab} />
+          <SidebarItem icon={<Brain />} label="AI Ustoz" id="quiz" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<User />} label="Profil" id="profile" active={activeTab} set={setActiveTab} />
         </nav>
 
-        {/* User Section - Icon Only */}
-        <div className="p-2 border-t border-slate-700/50 bg-slate-900/30 space-y-2">
-          {/* User Avatar */}
-          <div className="flex justify-center">
-            <div className="w-10 h-10 rounded-full border-2 border-blue-500/30 overflow-hidden bg-slate-800 flex items-center justify-center">
+        {/* User Section - Expanded */}
+        <div className="p-4 border-t border-slate-700/50 bg-slate-900/50 space-y-3">
+          {/* User Info Card */}
+          <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-xl border border-slate-700/30 hover:bg-slate-800/70 transition-all duration-200">
+            <div className="w-10 h-10 rounded-full border-2 border-blue-500/40 overflow-hidden bg-slate-800 flex items-center justify-center flex-shrink-0">
               {displayUser?.photoURL ? (
                 <img src={displayUser.photoURL} alt="User" className="w-full h-full object-cover" />
               ) : (
                 <span className="text-white font-bold text-sm">{displayUser?.displayName ? displayUser.displayName[0].toUpperCase() : 'U'}</span>
               )}
             </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-white font-medium text-sm truncate">
+                {displayUser?.displayName || 'Foydalanuvchi'}
+              </p>
+              <p className="text-slate-400 text-xs truncate">
+                {displayUser?.email || 'email@example.com'}
+              </p>
+            </div>
           </div>
 
-          {/* Action Buttons - Icon Only */}
+          {/* Action Buttons - With Labels */}
           <div className="space-y-2">
             <button
               onClick={() => setShowSettings(true)}
-              className="w-full flex items-center justify-center p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors text-slate-300 hover:text-white"
-              title="Sozlamalar"
+              className="w-full flex items-center gap-3 px-4 py-2.5 bg-slate-800/50 hover:bg-slate-700/70 rounded-lg transition-all duration-200 text-slate-300 hover:text-white group border border-slate-700/30 hover:border-slate-600/50"
             >
-              <Settings size={18} />
+              <Settings size={18} className="flex-shrink-0 group-hover:rotate-90 transition-transform duration-300" />
+              <span className="text-sm font-medium">Sozlamalar</span>
             </button>
             <button
               onClick={logout}
-              className="w-full flex items-center justify-center p-2 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-colors text-red-400 hover:text-red-300"
-              title="Chiqish"
+              className="w-full flex items-center gap-3 px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-all duration-200 text-red-400 hover:text-red-300 group border border-red-500/20 hover:border-red-500/30"
             >
-              <LogOut size={18} />
+              <LogOut size={18} className="flex-shrink-0" />
+              <span className="text-sm font-medium">Chiqish</span>
             </button>
           </div>
         </div>
@@ -492,7 +505,7 @@ function EduPhysicsAppContent() {
       <main className={`
         flex-1 overflow-y-auto ${themeClasses.bg} 
         relative scroll-smooth transition-all duration-300 
-        md:ml-20 md:pb-0 pb-20
+        md:ml-64 md:pb-0 pb-20
         landscape:md:pb-0
       `}>
         {/* Background Decorations */}
@@ -1544,22 +1557,6 @@ function StatRow({ label, value, color = "text-white" }) {
   )
 }
 
-// --- SIDEBAR ITEM COMPONENT ---
-function SidebarItem({ icon, label, id, active, set }) {
-  return (
-    <button
-      onClick={() => set(id)}
-      className={`relative group w-full p-3 rounded-xl transition-all duration-200 active:scale-90 flex flex-col items-center justify-center gap-1 ${active === id ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
-    >
-      <div className={`transition-transform duration-300 ${active === id ? 'scale-110' : 'group-hover:scale-110'}`}>
-        {icon}
-      </div>
-      <span className="text-[10px] font-medium opacity-0 group-hover:opacity-100 absolute -bottom-2 transition-all duration-200 bg-slate-900 px-2 py-0.5 rounded-full border border-slate-700 pointer-events-none whitespace-nowrap z-50">
-        {label}
-      </span>
-    </button>
-  );
-}
 
 // --- DASHBOARD COMPONENT ---
 function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLessons = [], totalLessons = 24 }) {
@@ -1598,6 +1595,46 @@ function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLesson
         />
       </div>
     </div>
+  );
+}
+
+// --- SIDEBAR ITEM COMPONENT ---
+function SidebarItem({ icon, label, id, active, set }) {
+  const isActive = active === id;
+
+  return (
+    <button
+      onClick={() => set(id)}
+      className={`
+        w-full flex items-center gap-3 px-4 py-3 rounded-xl
+        transition-all duration-200 group relative
+        ${isActive
+          ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/30'
+          : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+        }
+      `}
+    >
+      {/* Icon */}
+      <div className={`
+        flex-shrink-0 transition-transform duration-200
+        ${isActive ? 'scale-110' : 'group-hover:scale-110'}
+      `}>
+        {React.cloneElement(icon, { size: 20 })}
+      </div>
+
+      {/* Label */}
+      <span className={`
+        text-sm font-medium transition-all duration-200
+        ${isActive ? 'font-bold' : 'font-normal'}
+      `}>
+        {label}
+      </span>
+
+      {/* Active Indicator */}
+      {isActive && (
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-l-full" />
+      )}
+    </button>
   );
 }
 
