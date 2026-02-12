@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { useAuth } from './contexts/AuthContext';
+import { ProgressProvider } from './contexts/ProgressContext';
 
 // Pages
 import LandingPage from './pages/LandingPage';
@@ -10,6 +11,7 @@ import ContactPage from './pages/ContactPage';
 import LoginPage from './components/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
 import DashboardPage from './pages/DashboardPage';
+import ProgressPage from './pages/ProgressPage';
 
 // Components
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -33,7 +35,9 @@ function App() {
     return (
         <HelmetProvider>
             <Router>
-                <AppRoutes />
+                <ProgressProvider>
+                    <AppRoutes />
+                </ProgressProvider>
             </Router>
         </HelmetProvider>
     );
@@ -81,6 +85,15 @@ function AppRoutes() {
             />
 
             {/* Protected Routes */}
+            <Route
+                path="/progress"
+                element={
+                    <ProtectedRoute>
+                        <ProgressPage />
+                    </ProtectedRoute>
+                }
+            />
+
             <Route
                 path="/dashboard/*"
                 element={

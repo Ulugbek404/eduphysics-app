@@ -35,19 +35,40 @@ const Navbar = () => {
     ];
 
     const scrollToSection = (sectionId) => {
+        // First, navigate to home if not already there
+        if (window.location.pathname !== '/') {
+            navigate('/');
+            // Wait for navigation to complete, then scroll
+            setTimeout(() => {
+                performScroll(sectionId);
+            }, 100);
+        } else {
+            performScroll(sectionId);
+        }
+    };
+
+    const performScroll = (sectionId) => {
         const element = document.getElementById(sectionId);
         if (element) {
-            const navbarHeight = 64; // Height of fixed navbar
-            const elementPosition = element.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
+            // Get the main scroll container
+            const mainContainer = document.querySelector('main');
+            if (mainContainer) {
+                // Scroll the main container, not the window
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                // Fallback to window scroll
+                const navbarHeight = 80;
+                const elementPosition = element.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
 
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-            });
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
             setIsMobileMenuOpen(false);
         } else {
-            console.error(`Section with id "${sectionId}" not found`);
+            console.warn(`Section "${sectionId}" not found. Make sure you're on the landing page.`);
         }
     };
 
