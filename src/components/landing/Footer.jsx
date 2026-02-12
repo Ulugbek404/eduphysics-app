@@ -27,10 +27,10 @@ const Footer = () => {
     };
 
     const socialLinks = [
-        { icon: Facebook, url: '#', label: 'Facebook' },
-        { icon: Instagram, url: '#', label: 'Instagram' },
-        { icon: Youtube, url: '#', label: 'YouTube' },
-        { icon: Send, url: '#', label: 'Telegram' },
+        { icon: Facebook, url: 'https://www.facebook.com/share/1D3cRY2PHc/', label: 'Facebook' },
+        { icon: Instagram, url: 'https://www.instagram.com/ulugbek_455', label: 'Instagram' },
+        { icon: Youtube, url: 'https://youtube.com/@NurrFizika001-?=UcmdwQtAhZO3Z-Vv', label: 'YouTube' },
+        { icon: Send, url: 'https://t.me/Ulugbek1434', label: 'Telegram' },
     ];
 
     return (
@@ -56,11 +56,11 @@ const Footer = () => {
                         <div className="space-y-2 text-sm text-slate-400">
                             <div className="flex items-center space-x-2">
                                 <Mail size={16} className="text-blue-400" />
-                                <span>info@eduphysics.uz</span>
+                                <span>support@ulugbekedu.uz</span>
                             </div>
                             <div className="flex items-center space-x-2">
                                 <Phone size={16} className="text-blue-400" />
-                                <span>+998 90 123 45 67</span>
+                                <span>+998 (93) 186-34-04</span>
                             </div>
                             <div className="flex items-center space-x-2">
                                 <MapPin size={16} className="text-blue-400" />

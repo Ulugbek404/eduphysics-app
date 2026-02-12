@@ -1,191 +1,258 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Atom, Zap, Brain, Trophy, ArrowRight, Sparkles } from 'lucide-react';
+import { Atom, Zap, Brain, Trophy, ArrowRight, Sparkles, Rocket, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Hero = () => {
     const navigate = useNavigate();
 
-    // Floating icons animation
-    const floatingIcons = [
-        { Icon: Atom, delay: 0, x: '10%', y: '20%' },
-        { Icon: Zap, delay: 0.2, x: '80%', y: '15%' },
-        { Icon: Brain, delay: 0.4, x: '15%', y: '70%' },
-        { Icon: Trophy, delay: 0.6, x: '85%', y: '75%' },
-        { Icon: Sparkles, delay: 0.8, x: '50%', y: '10%' },
-    ];
-
     return (
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20" style={{ background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%)' }}>
-            {/* Animated Background */}
-            <div className="absolute inset-0 overflow-hidden">
-                {/* Gradient Orbs */}
+        <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+            {/* Modern Gradient Background - Dark to Light */}
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+                {/* Animated Mesh Gradient Overlay */}
+                <div className="absolute inset-0 opacity-30">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 via-purple-500/20 to-pink-500/20 animate-pulse"></div>
+                </div>
+            </div>
+
+            {/* Animated Grid Pattern */}
+            <div className="absolute inset-0 opacity-10">
+                <div className="absolute inset-0" style={{
+                    backgroundImage: `linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
+                                     linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px)`,
+                    backgroundSize: '50px 50px',
+                    animation: 'grid-move 20s linear infinite'
+                }}></div>
+            </div>
+
+            {/* Floating Orbs - Modern Style */}
+            <motion.div
+                className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full blur-3xl opacity-20"
+                animate={{
+                    x: [0, 50, 0],
+                    y: [0, 30, 0],
+                    scale: [1, 1.1, 1],
+                }}
+                transition={{
+                    duration: 8,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                }}
+            />
+            <motion.div
+                className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full blur-3xl opacity-20"
+                animate={{
+                    x: [0, -50, 0],
+                    y: [0, -30, 0],
+                    scale: [1.1, 1, 1.1],
+                }}
+                transition={{
+                    duration: 10,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                }}
+            />
+            <motion.div
+                className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full blur-3xl opacity-15"
+                animate={{
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 180, 360],
+                }}
+                transition={{
+                    duration: 15,
+                    repeat: Infinity,
+                    ease: "linear"
+                }}
+            />
+
+            {/* Floating Icons - Subtle */}
+            {[
+                { Icon: Atom, x: '15%', y: '20%', delay: 0 },
+                { Icon: Zap, x: '85%', y: '25%', delay: 0.2 },
+                { Icon: Brain, x: '10%', y: '70%', delay: 0.4 },
+                { Icon: Trophy, x: '90%', y: '65%', delay: 0.6 },
+                { Icon: Sparkles, x: '50%', y: '15%', delay: 0.8 },
+            ].map(({ Icon, x, y, delay }, index) => (
                 <motion.div
-                    className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl"
+                    key={index}
+                    className="absolute hidden md:block"
+                    style={{ left: x, top: y }}
+                    initial={{ opacity: 0, scale: 0 }}
                     animate={{
+                        opacity: [0.1, 0.3, 0.1],
                         scale: [1, 1.2, 1],
-                        opacity: [0.3, 0.5, 0.3],
+                        y: [0, -20, 0],
                     }}
                     transition={{
-                        duration: 8,
+                        duration: 4,
                         repeat: Infinity,
+                        delay: delay,
                         ease: "easeInOut"
                     }}
-                />
-                <motion.div
-                    className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl"
-                    animate={{
-                        scale: [1.2, 1, 1.2],
-                        opacity: [0.5, 0.3, 0.5],
-                    }}
-                    transition={{
-                        duration: 8,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                    }}
-                />
+                >
+                    <Icon className="w-8 h-8 text-blue-300" />
+                </motion.div>
+            ))}
 
-                {/* Floating Physics Icons */}
-                {floatingIcons.map(({ Icon, delay, x, y }, index) => (
+            {/* Main Content */}
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                    className="space-y-8"
+                >
+                    {/* Badge */}
                     <motion.div
-                        key={index}
-                        className="absolute text-blue-400/20"
-                        style={{ left: x, top: y }}
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={{
-                            opacity: [0.2, 0.4, 0.2],
-                            scale: [1, 1.2, 1],
-                            y: [0, -20, 0],
-                        }}
-                        transition={{
-                            duration: 4,
-                            delay: delay,
-                            repeat: Infinity,
-                            ease: "easeInOut"
-                        }}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-sm text-white"
                     >
-                        <Icon size={48} />
+                        <Sparkles className="w-4 h-4 text-yellow-300" />
+                        <span>AI-Powered Fizika Platformasi</span>
+                        <Star className="w-4 h-4 text-yellow-300" />
                     </motion.div>
-                ))}
 
-                {/* Grid Pattern */}
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
-            </div>
-
-            {/* Content */}
-            <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                {/* Badge */}
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="inline-flex items-center space-x-2 bg-blue-500/10 backdrop-blur-sm border border-blue-500/20 rounded-full px-4 py-2 mb-8"
-                >
-                    <Sparkles size={16} className="text-blue-400" />
-                    <span className="text-blue-300 text-sm font-medium">Sun'iy Intellekt bilan o'qitish platformasi</span>
-                </motion.div>
-
-                {/* Main Headline */}
-                <motion.h1
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                    className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight"
-                >
-                    9-sinf Fizikani{' '}
-                    <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                        AI bilan o'rgan!
-                    </span>
-                </motion.h1>
-
-                {/* Subheadline */}
-                <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                    className="text-lg sm:text-xl md:text-2xl text-slate-300 mb-12 max-w-3xl mx-auto leading-relaxed"
-                >
-                    Virtual laboratoriya, AI ustoz, 100+ test va interaktiv darslar bilan fizikani oson va qiziqarli o'rganing.
-                    <span className="text-blue-400 font-semibold"> Butunlay bepul!</span>
-                </motion.p>
-
-                {/* CTA Buttons */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.6 }}
-                    className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
-                >
-                    {/* Primary CTA */}
-                    <button
-                        onClick={() => navigate('/register')}
-                        className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-lg shadow-lg shadow-blue-500/50 hover:shadow-xl hover:shadow-blue-500/70 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center space-x-2"
-                    >
-                        <span>Bepul Boshlash</span>
-                        <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
-                    </button>
-
-                    {/* Secondary CTA */}
-                    <button
-                        onClick={() => {
-                            document.getElementById('features')?.scrollIntoView({
-                                behavior: 'smooth'
-                            });
-                        }}
-                        className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-xl font-bold text-lg border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105 active:scale-95"
-                    >
-                        Batafsil Ma'lumot
-                    </button>
-                </motion.div>
-
-                {/* Stats Preview */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.8 }}
-                    className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto"
-                >
-                    {[
-                        { value: '1000+', label: 'Foydalanuvchilar' },
-                        { value: '50+', label: 'Darslar' },
-                        { value: '100+', label: 'Test Savollari' },
-                        { value: '20+', label: 'Virtual Tajribalar' },
-                    ].map((stat, index) => (
-                        <motion.div
-                            key={index}
-                            whileHover={{ scale: 1.05 }}
-                            className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4"
+                    {/* Main Heading */}
+                    <div className="space-y-4">
+                        <motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.3 }}
+                            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold"
                         >
-                            <div className="text-2xl md:text-3xl font-bold text-blue-400 mb-1">
-                                {stat.value}
-                            </div>
-                            <div className="text-sm text-slate-400">
-                                {stat.label}
-                            </div>
-                        </motion.div>
-                    ))}
-                </motion.div>
+                            <span className="block text-white mb-2">
+                                Fizikani
+                            </span>
+                            <span className="block bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent">
+                                AI bilan o'rgan
+                            </span>
+                        </motion.h1>
 
-                {/* Scroll Indicator */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 1, delay: 1.2 }}
-                    className="absolute bottom-8 left-1/2 -translate-x-1/2"
-                >
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.5 }}
+                            className="text-xl sm:text-2xl md:text-3xl font-bold text-yellow-300"
+                        >
+                            Kuch — bilimda, bilim — bizda!
+                        </motion.p>
+
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.6 }}
+                            className="text-lg sm:text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed"
+                        >
+                            9-sinf fizikasini sun'iy intellekt yordamida o'rganing.
+                            Virtual laboratoriya, AI ustoz va 100+ interaktiv test.
+                        </motion.p>
+                    </div>
+
+                    {/* CTA Buttons */}
                     <motion.div
-                        animate={{ y: [0, 10, 0] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-2"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.7 }}
+                        className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
                     >
-                        <motion.div
-                            animate={{ opacity: [0, 1, 0] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                            className="w-1.5 h-1.5 bg-white rounded-full"
-                        />
+                        {/* Primary Button */}
+                        <motion.button
+                            onClick={() => navigate('/login')}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="group relative px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold text-lg rounded-2xl shadow-2xl shadow-blue-500/50 hover:shadow-blue-500/70 transition-all duration-300 overflow-hidden"
+                        >
+                            <span className="relative z-10 flex items-center gap-2">
+                                <Rocket className="w-5 h-5" />
+                                Bepul Boshlash
+                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            </span>
+                            {/* Shine Effect */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                        </motion.button>
+
+                        {/* Secondary Button */}
+                        <motion.button
+                            onClick={() => {
+                                const element = document.getElementById('features');
+                                element?.scrollIntoView({ behavior: 'smooth' });
+                            }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="px-8 py-4 bg-white/10 backdrop-blur-md border-2 border-white/30 text-white font-bold text-lg rounded-2xl hover:bg-white/20 transition-all duration-300"
+                        >
+                            <span className="flex items-center gap-2">
+                                <Brain className="w-5 h-5" />
+                                Batafsil Ma'lumot
+                            </span>
+                        </motion.button>
+                    </motion.div>
+
+                    {/* Stats - Modern Cards */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.9 }}
+                        className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-12 max-w-4xl mx-auto"
+                    >
+                        {[
+                            { value: '100+', label: 'Test Savollari', icon: Trophy },
+                            { value: '20+', label: 'Virtual Tajribalar', icon: Atom },
+                            { value: '24/7', label: 'AI Ustoz', icon: Brain },
+                            { value: '100%', label: 'Bepul', icon: Sparkles },
+                        ].map((stat, index) => (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.5, delay: 1 + index * 0.1 }}
+                                whileHover={{ scale: 1.05, y: -5 }}
+                                className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/15 transition-all duration-300"
+                            >
+                                <stat.icon className="w-8 h-8 text-cyan-400 mx-auto mb-2" />
+                                <div className="text-3xl font-bold text-white mb-1">
+                                    {stat.value}
+                                </div>
+                                <div className="text-sm text-blue-200">
+                                    {stat.label}
+                                </div>
+                            </motion.div>
+                        ))}
                     </motion.div>
                 </motion.div>
             </div>
+
+            {/* Scroll Indicator */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 1.5 }}
+                className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+            >
+                <motion.div
+                    animate={{ y: [0, 10, 0] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="flex flex-col items-center gap-2 text-white/60"
+                >
+                    <span className="text-sm">Scroll</span>
+                    <ArrowRight className="w-5 h-5 rotate-90" />
+                </motion.div>
+            </motion.div>
+
+            {/* CSS Animation for Grid */}
+            <style jsx>{`
+                @keyframes grid-move {
+                    0% {
+                        transform: translateY(0);
+                    }
+                    100% {
+                        transform: translateY(50px);
+                    }
+                }
+            `}</style>
         </section>
     );
 };
