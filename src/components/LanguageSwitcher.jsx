@@ -62,7 +62,7 @@ const LanguageSwitcher = ({ variant = 'default' }) => {
         `}
             >
                 <Globe size={18} className="flex-shrink-0" />
-                <span className="text-sm font-medium">{currentLanguage?.flag} {currentLanguage?.name}</span>
+                <span className="text-sm font-medium">{currentLanguage?.flag}</span>
                 <motion.svg
                     width="12"
                     height="12"
@@ -122,7 +122,7 @@ const LanguageSwitcher = ({ variant = 'default' }) => {
                   `}
                                 >
                                     <div className="flex items-center gap-3">
-                                        <span className="text-2xl">{lang.flag}</span>
+                                        <span className="text-lg">{lang.flag}</span>
                                         <span className="text-sm font-medium">{lang.name}</span>
                                     </div>
                                     {isActive && (

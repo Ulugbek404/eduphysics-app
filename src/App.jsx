@@ -13,6 +13,7 @@ import LoginPage from './components/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
 import DashboardPage from './pages/DashboardPage';
 import ProgressPage from './pages/ProgressPage';
+import SettingsPage from './pages/SettingsPage';
 
 // Components
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -94,6 +95,15 @@ function AppRoutes() {
                 element={
                     <ProtectedRoute>
                         <ProgressPage />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/settings"
+                element={
+                    <ProtectedRoute>
+                        <SettingsPage />
                     </ProtectedRoute>
                 }
             />

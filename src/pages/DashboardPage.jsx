@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   Book, Atom, Brain, Trophy, User, ChevronRight, Play,
   RotateCcw, Menu, X, CheckCircle, AlertCircle, BarChart2,
   Zap, Flame, Award, ArrowRight, Settings, MessageSquare,
   Info, Smartphone, Moon, Sun, Monitor, Volume2, VolumeX, Palette, Camera, Sparkles,
-  Send, Loader, Bot, Key, Search, LogOut, BookOpen
+  Send, Loader, Bot, Key, Search, LogOut, BookOpen, Clock, TrendingUp, Activity
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -13,7 +15,6 @@ import { auth } from '../firebase';
 import { getUserProgress, addUserXP, updateUserLevel, markLessonComplete, saveQuizResult } from '../services/userService';
 import { lessonsData, calculateChapterProgress } from '../data/lessonsData';
 import { testsData } from '../data/testsData';
-import SettingsModal from '../components/SettingsModal';
 import AIRecommendations from '../components/AIRecommendations';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { askAITutor } from '../services/aiService';
@@ -21,7 +22,24 @@ import BottomNav from '../components/ui/BottomNav';
 import EmptyState from '../components/ui/EmptyState';
 import PageHeader from '../components/ui/PageHeader';
 import MobileMenu from '../components/MobileMenu';
-import { ComponentLoader } from '../components/ui/Skeleton';
+
+import StatsCard from '../components/dashboard/StatsCard';
+import QuickActionCard from '../components/dashboard/QuickActionCard';
+import ActivityItem from '../components/dashboard/ActivityItem';
+import AssessmentTest from '../components/AssessmentTest';
+// Modulli laboratoriyalar (Lazy Load)
+const OhmLawLab = lazy(() => import('../components/lab/modules/OhmLawLab'));
+const NewtonsLawLab = lazy(() => import('../components/lab/modules/NewtonsLawLab'));
+
+// Loading component for lazy modules
+const ComponentLoader = () => (
+  <div className="flex items-center justify-center h-64 w-full bg-slate-800/50 rounded-2xl border border-slate-700/50">
+    <div className="flex flex-col items-center gap-4">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      <span className="text-slate-400 text-sm">Laboratoriya yuklanmoqda...</span>
+    </div>
+  </div>
+);
 
 // Lazy load katta komponentlar - Performance optimization
 const TestsModule = lazy(() => import('../components/TestsModule'));
@@ -135,6 +153,7 @@ class ErrorBoundary extends React.Component {
 function EduPhysicsAppContent() {
   const { user, loading, logout } = useAuth();
   const { t } = useLanguage();
+  const navigate = useNavigate();
 
   // BARCHA STATE HOOKS - conditional return'dan OLDIN
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -162,9 +181,13 @@ function EduPhysicsAppContent() {
   const [completedLessons, setCompletedLessons] = useState([]);
   const [notifications, setNotifications] = useState([]);
 
+  // Assessment Test State
+  const [showAssessment, setShowAssessment] = useState(false);
+  const [assessmentCompleted, setAssessmentCompleted] = useState(false);
+  const [assessmentResults, setAssessmentResults] = useState(null);
+
   // API key butunlay backend'da (Netlify Functions)
   // Frontend'da hech qanday API key saqlanmaydi
-  const [showSettings, setShowSettings] = useState(false);
 
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('eduphysics-theme') || 'dark';
@@ -277,6 +300,19 @@ function EduPhysicsAppContent() {
       setUserLevel(progress.level || 0);
       setCompletedLessons(progress.completedLessons || []);
 
+      // Check if user has completed assessment
+      const hasCompletedAssessment = localStorage.getItem(`assessment_completed_${user.uid}`);
+      if (hasCompletedAssessment) {
+        setAssessmentCompleted(true);
+        const savedResults = localStorage.getItem(`assessment_results_${user.uid}`);
+        if (savedResults) {
+          setAssessmentResults(JSON.parse(savedResults));
+        }
+      } else {
+        // Show assessment for new users
+        setShowAssessment(true);
+      }
+
       console.log('User progress loaded:', progress);
     } catch (error) {
       console.error('Error loading progress:', error);
@@ -322,6 +358,26 @@ function EduPhysicsAppContent() {
     }
   };
 
+  // Handle assessment completion
+  const handleAssessmentComplete = (results) => {
+    // Save results to localStorage
+    localStorage.setItem(`assessment_completed_${user.uid}`, 'true');
+    localStorage.setItem(`assessment_results_${user.uid}`, JSON.stringify(results));
+
+    setAssessmentResults(results);
+    setAssessmentCompleted(true);
+    setShowAssessment(false);
+    setActiveTab('dashboard'); // Return to dashboard
+
+    addNotification('✅ Test muvaffaqiyatli yakunlandi!', 'success');
+  };
+
+  // Handle assessment skip
+  const handleAssessmentSkip = () => {
+    setShowAssessment(false);
+    addNotification('Testni keyinroq topshirishingiz mumkin', 'info');
+  };
+
   // Get theme classes
   const themeClasses = getThemeClasses(theme);
 
@@ -331,17 +387,24 @@ function EduPhysicsAppContent() {
   // Render content function
   const renderContent = () => {
     switch (activeTab) {
-      case 'dashboard': return <Dashboard setActiveTab={setActiveTab} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} completedLessons={completedLessons} totalLessons={lessonsData.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0)} />;
+      case 'dashboard': return <Dashboard setActiveTab={setActiveTab} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} completedLessons={completedLessons} totalLessons={lessonsData.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0)} assessmentResults={assessmentResults} showAssessment={showAssessment} onAssessmentComplete={handleAssessmentComplete} onAssessmentSkip={handleAssessmentSkip} />;
+
+      case 'assessment': return (
+        <AssessmentTest
+          onComplete={handleAssessmentComplete}
+          onSkip={handleAssessmentSkip}
+        />
+      );
 
       case 'menu': return (
         <MobileMenu
           setActiveTab={setActiveTab}
           onMenuClick={(action) => {
-            if (action === 'settings') setShowSettings(true);
+            if (action === 'settings') navigate('/settings');
             else if (action === 'logout') logout();
             else if (action === 'ai') setActiveTab('ai-tutor');
           }}
-          setShowSettings={setShowSettings}
+          setShowSettings={() => navigate('/settings')}
           logout={logout}
           setAiModalOpen={() => setActiveTab('ai-tutor')}
         />
@@ -368,21 +431,21 @@ function EduPhysicsAppContent() {
       case 'homework': return (
         <div className="space-y-6">
           <PageHeader title="Uy Vazifasi" onBack={() => setActiveTab('menu')} />
-          <HomeworkHelper setShowSettings={setShowSettings} addNotification={addNotification} addXP={addXP} theme={theme} />
+          <HomeworkHelper setShowSettings={() => navigate('/settings')} addNotification={addNotification} addXP={addXP} theme={theme} />
         </div>
       );
 
       case 'lab': return (
         <div className="space-y-6">
           <PageHeader title="Virtual Laboratoriya" onBack={() => setActiveTab('menu')} />
-          <VirtualLab addNotification={addNotification} setShowSettings={setShowSettings} theme={theme} updateStats={updateUserStats} />
+          <VirtualLab addNotification={addNotification} setShowSettings={() => navigate('/settings')} theme={theme} updateStats={updateUserStats} />
         </div>
       );
 
       case 'quiz': return (
         <div className="space-y-6">
           <PageHeader title="AI Test Sinovlari" onBack={() => setActiveTab('menu')} />
-          <QuizModule setUserXP={setUserXP} addNotification={addNotification} setShowSettings={setShowSettings} theme={theme} updateStats={updateUserStats} />
+          <QuizModule setUserXP={setUserXP} addNotification={addNotification} setShowSettings={() => navigate('/settings')} theme={theme} updateStats={updateUserStats} />
         </div>
       );
 
@@ -419,17 +482,7 @@ function EduPhysicsAppContent() {
         ))}
       </div>
 
-      {/* Settings Modal (NEW) */}
-      <SettingsModal
-        show={showSettings}
-        onClose={() => setShowSettings(false)}
-        user={displayUser}
-        theme={theme}
-        setTheme={setTheme}
-        soundEnabled={soundEnabled}
-        setSoundEnabled={setSoundEnabled}
-        updateProfile={handleUpdateProfile}
-      />
+      {/* Settings Modal removed - now using full page at /settings */}
 
       {/* Hamburger menyu o'chirildi - icon-only sidebar doimo ko'rinadi */}
 
@@ -484,7 +537,7 @@ function EduPhysicsAppContent() {
           {/* Action Buttons - With Labels */}
           <div className="space-y-2">
             <button
-              onClick={() => setShowSettings(true)}
+              onClick={() => navigate('/settings')}
               className="w-full flex items-center gap-3 px-4 py-2.5 bg-slate-800/50 hover:bg-slate-700/70 rounded-lg transition-all duration-200 text-slate-300 hover:text-white group border border-slate-700/30 hover:border-slate-600/50"
             >
               <Settings size={18} className="flex-shrink-0 group-hover:rotate-90 transition-transform duration-300" />
@@ -675,227 +728,110 @@ function AIAssistant({ apiKey, setShowSettings, isOpen: externalIsOpen, setIsOpe
 }
 
 // 3. MUKAMMAL VIRTUAL LABORATORIYA (AI Tahlil bilan)
+// 3. MUKAMMAL VIRTUAL LABORATORIYA (Modulli)
 function VirtualLab({ addNotification, setShowSettings, updateStats }) {
-  const API_KEYS = [
-    "AIzaSyCC8uEzh1px6KKsXP8FEkh_JS_3F1ErtDQ",
-    "AIzaSyBUzgU8ARMbZX1OYGv0f_cIqQJqaWdlGVM"
-  ];
-  const [voltage, setVoltage] = useState(12);
-  const [resistance, setResistance] = useState(4);
-  const [isRunning, setIsRunning] = useState(true);
-  const [aiAnalysis, setAiAnalysis] = useState(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [activeModule, setActiveModule] = useState('home'); // home, ohm, newton
 
-  const current = isRunning ? (voltage / resistance).toFixed(2) : 0;
+  // Module Selection Screen
+  if (activeModule === 'home') {
+    return (
+      <div className="space-y-6 animate-fadeIn pb-12">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold flex items-center gap-2 text-white">
+            <Zap className="text-yellow-400" />
+            Virtual Laboratoriya
+          </h2>
+        </div>
 
-  const graphData = useMemo(() => {
-    const data = [];
-    for (let v = 0; v <= 24; v += 4) {
-      data.push({ u: v, i: (v / resistance).toFixed(1) });
-    }
-    return data;
-  }, [resistance]);
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Module 1: Ohm's Law */}
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setActiveModule('ohm')}
+            className="bg-slate-800 rounded-2xl p-6 border border-slate-700 cursor-pointer hover:border-blue-500 transition-colors group relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <Zap size={100} />
+            </div>
+            <div className="relative z-10">
+              <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-4 text-blue-400">
+                <Zap size={24} />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Elektr Toki (Ohm Qonuni)</h3>
+              <p className="text-slate-400 text-sm mb-4">
+                Tok kuchi, kuchlanish va qarshilik orasidagi bog'liqlikni o'rganing.
+              </p>
+              <div className="flex items-center gap-2 text-blue-400 font-medium text-sm">
+                Tajribani boshlash <ArrowRight size={16} />
+              </div>
+            </div>
+          </motion.div>
 
-  const handleToggle = () => {
-    setIsRunning(!isRunning);
-    if (!isRunning) addNotification("Zanjir ulandi! Tok oqmoqda.", "success");
-    else addNotification("Zanjir uzildi.", "info");
+          {/* Module 2: Newton's Law */}
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setActiveModule('newton')}
+            className="bg-slate-800 rounded-2xl p-6 border border-slate-700 cursor-pointer hover:border-green-500 transition-colors group relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <Activity size={100} />
+            </div>
+            <div className="relative z-10">
+              <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-4 text-green-400">
+                <Activity size={24} />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Mexanika (Nyuton Qonuni)</h3>
+              <p className="text-slate-400 text-sm mb-4">
+                Kuch, massa va tezlanish. Harakat qonunlarini interaktiv o'rganing.
+              </p>
+              <div className="flex items-center gap-2 text-green-400 font-medium text-sm">
+                Tajribani boshlash <ArrowRight size={16} />
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Module 3: Coming Soon - Optics */}
+          <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700/50 opacity-60">
+            <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mb-4 text-purple-400">
+              <Sparkles size={24} />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Optika</h3>
+            <p className="text-slate-400 text-sm mb-4">
+              Yorug'lik, linzalar va ko'zgular. Tez kunda...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  // ✨ AI TAHLIL FUNKSIYASI ✨
-  const handleAnalyze = async () => {
-    if (!isRunning) {
-      addNotification("Tahlil qilish uchun zanjirni ulang!", "error");
-      return;
-    }
-
-    setIsAnalyzing(true);
-    setAiAnalysis(null);
-
-    const prompt = `Men 9 - sinf fizika laboratoriyasida tajriba o'tkazyapman. 
-NATIJALAR:
-- Kuchlanish(U): ${voltage} Volt
-  - Qarshilik(R): ${resistance} Om
-    - Tok kuchi(I): ${current} Amper.
-
-      VAZIFA:
-    Ushbu natijani Om qonuniga(I = U / R) asosan qisqa, ilmiy va tushunarli tahlil qilib ber.Nega tok kuchi aynan shunday chiqdi ? Agar qarshilikni oshirsak nima bo'ladi? Javobni o'zbek tilida ber.`;
-
-    try {
-      const apiKey = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: MODEL_NAME });
-
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const analysisText = response.text();
-
-      if (!analysisText) {
-        throw new Error("AI javob bo'sh qaytardi.");
-      }
-
-      setAiAnalysis(analysisText);
-      if (updateStats) updateStats({ labCompleted: true });
-    } catch (error) {
-      console.error(error);
-      addNotification("AI tahlilida xatolik bo'ldi.", "error");
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
   return (
-    <div className="space-y-6 animate-fadeIn pb-12">
-      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          <Zap className="text-yellow-400" />
-          Virtual Laboratoriya
-        </h2>
-        <div className="flex items-center space-x-3 bg-blue-900/20 px-4 py-2 rounded-xl border border-blue-500/20 backdrop-blur-sm">
-          <span className="text-slate-400 font-mono text-sm">Formula:</span>
-          <span className="text-white font-bold font-mono text-lg">I = U / R</span>
-        </div>
-      </div>
+    <div className="space-y-4">
+      <button
+        onClick={() => setActiveModule('home')}
+        className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-2"
+      >
+        <ArrowRight className="rotate-180" size={20} />
+        Barcha tajribalar
+      </button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Simulyatsiya Oynasi */}
-        <div className="lg:col-span-8 space-y-4">
-          <div className="bg-slate-800 rounded-3xl border border-slate-700 p-1 shadow-2xl">
-            <div className="bg-slate-900 rounded-[20px] p-6 h-full relative overflow-hidden flex flex-col">
+      {activeModule === 'ohm' && (
+        <Suspense fallback={<ComponentLoader />}>
+          <OhmLawLab addNotification={addNotification} updateStats={updateStats} />
+        </Suspense>
+      )}
 
-              {/* Sxema */}
-              <div className="flex-1 flex items-center justify-center min-h-[300px] relative">
-                {isRunning && (
-                  <div className="absolute inset-0 pointer-events-none opacity-20">
-                    <div className="w-full h-full border-4 border-dashed border-blue-400 rounded-xl animate-pulse-slow"></div>
-                  </div>
-                )}
-
-                <div className="relative w-80 h-48 border-4 border-slate-600 rounded-lg flex items-center justify-center">
-                  {/* Battery */}
-                  <div className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900 p-2">
-                    <div className={`w - 10 h - 16 border - 2 ${isRunning ? 'border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.4)]' : 'border-slate-500'} rounded bg - slate - 800 flex flex - col items - center justify - center transition - all`}>
-                      <span className="text-yellow-500 font-bold text-xs">{voltage}V</span>
-                    </div>
-                  </div>
-                  {/* Resistor */}
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 bg-slate-900 p-2">
-                    <div className="w-24 h-8 bg-stripes-gray border-2 border-red-500 rounded flex items-center justify-center shadow-md relative overflow-hidden">
-                      <div className="absolute inset-0 bg-stripes opacity-20"></div>
-                      <span className="relative z-10 bg-slate-900/80 px-2 rounded text-xs font-bold text-white">{resistance}Ω</span>
-                    </div>
-                  </div>
-                  {/* Load */}
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900 p-2">
-                    <div
-                      className="transition-all duration-500"
-                      style={{
-                        filter: isRunning ? `drop - shadow(0 0 ${current * 5}px #FEF08A)` : 'none',
-                        opacity: isRunning ? 1 : 0.5
-                      }}
-                    >
-                      <Atom size={40} className={isRunning ? "text-yellow-400 animate-spin-slow" : "text-slate-600"} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Ampermetr */}
-                <div className="absolute top-4 right-4 bg-slate-800/80 backdrop-blur border border-blue-500/30 p-3 rounded-xl shadow-xl">
-                  <div className="text-[10px] text-slate-400 uppercase font-bold mb-1">Tok kuchi</div>
-                  <div className="text-2xl font-mono font-bold text-blue-400">{current} A</div>
-                </div>
-              </div>
-
-              {/* Graph */}
-              <div className="mt-6 h-32 w-full bg-slate-800/50 rounded-xl border border-slate-700/50 p-4 flex items-end justify-between relative">
-                {graphData.map((point, idx) => (
-                  <div key={idx} className="flex flex-col items-center gap-1 group relative" style={{ width: '15%' }}>
-                    <div
-                      className="w-full bg-blue-600/50 rounded-t transition-all duration-500 hover:bg-blue-500"
-                      style={{ height: `${(point.i / 6) * 100} px`, maxHeight: '80px' }}
-                    ></div>
-                    <span className="text-[10px] text-slate-400">{point.u}V</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* AI Analysis Result */}
-          {aiAnalysis && (
-            <div className="bg-gradient-to-r from-indigo-900/50 to-purple-900/50 p-6 rounded-2xl border border-indigo-500/30 animate-slideInLeft">
-              <div className="flex items-start gap-3">
-                <Sparkles className="text-yellow-400 mt-1 flex-shrink-0" size={20} />
-                <div>
-                  <h3 className="font-bold text-indigo-200 mb-2">AI Tahlil Natijasi:</h3>
-                  <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-line">{aiAnalysis}</p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Controls */}
-        <div className="lg:col-span-4 space-y-4">
-          <ControlPanel label="Kuchlanish (U)" value={voltage} unit="V" color="text-yellow-400" accent="accent-yellow-500" min={0} max={24} onChange={setVoltage} />
-          <ControlPanel label="Qarshilik (R)" value={resistance} unit="Ω" color="text-red-400" accent="accent-red-500" min={1} max={50} onChange={setResistance} />
-
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-slate-700 p-6">
-            <div className="flex justify-between items-end mb-2">
-              <span className="text-slate-400 text-sm">Natija (I):</span>
-              <span className={`text - 4xl font - bold font - mono ${isRunning ? 'text-white' : 'text-slate-600'} `}>{current} A</span>
-            </div>
-            <div className="h-1 w-full bg-slate-700 rounded-full overflow-hidden">
-              <div className="h-full bg-blue-500 transition-all duration-300" style={{ width: `${Math.min(current * 10, 100)}% ` }}></div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={handleToggle}
-              className={`col - span - 2 py - 4 rounded - xl font - bold text - lg shadow - lg transform transition - all active: scale - 95 flex items - center justify - center gap - 2 ${isRunning
-                ? 'bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20'
-                : 'bg-green-600 text-white hover:bg-green-500 shadow-green-600/30'
-                } `}
-            >
-              {isRunning ? <><X /> Zanjirni Uzish</> : <><Play /> Zanjirni Ulash</>}
-            </button>
-
-            <button
-              onClick={handleAnalyze}
-              disabled={isAnalyzing || !isRunning}
-              className="col-span-2 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2 transition-all active:scale-95"
-            >
-              {isAnalyzing ? <Loader className="animate-spin" size={20} /> : <Sparkles size={20} />}
-              <span>AI Tahlil Qilish</span>
-            </button>
-          </div>
-        </div>
-      </div>
+      {activeModule === 'newton' && (
+        <Suspense fallback={<ComponentLoader />}>
+          <NewtonsLawLab addNotification={addNotification} updateStats={updateStats} />
+        </Suspense>
+      )}
     </div>
   );
 }
 
-function ControlPanel({ label, value, unit, color, accent, min, max, onChange }) {
-  return (
-    <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6">
-      <div className="flex justify-between mb-4">
-        <span className={`font - bold ${color} `}>{label}</span>
-        <span className="font-mono font-bold text-white bg-slate-900 px-3 py-1 rounded-lg border border-slate-700">{value} {unit}</span>
-      </div>
-      <input
-        type="range" min={min} max={max} step="1"
-        value={value}
-        onChange={(e) => onChange(parseInt(e.target.value))}
-        className={`w - full h - 2 bg - slate - 700 rounded - lg appearance - none cursor - pointer ${accent} `}
-      />
-      <div className="flex justify-between mt-2 text-xs text-slate-500 font-mono">
-        <span>{min}</span>
-        <span>{max}</span>
-      </div>
-    </div>
-  )
-}
 
 
 
@@ -1561,31 +1497,279 @@ function StatRow({ label, value, color = "text-white" }) {
 
 
 // --- DASHBOARD COMPONENT ---
-function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLessons = [], totalLessons = 24 }) {
+function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLessons = [], totalLessons = 24, assessmentResults, showAssessment, onAssessmentComplete, onAssessmentSkip }) {
+  // Calculate today's stats
+  const todayXP = 150; // This should come from actual data
+  const todayLessons = 2;
+  const todayTime = 7200; // seconds
+  const currentStreak = 5;
+
+  // Format time
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    if (hours > 0) return `${hours}s ${minutes}d`;
+    return `${minutes}d`;
+  };
+
+  // Get greeting based on time
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Xayrli tong";
+    if (hour < 18) return "Xayrli kun";
+    return "Xayrli kech";
+  };
+
+  // Recent activities (mock data - should come from backend)
+  const recentActivities = [
+    { icon: CheckCircle, title: 'Darsni tugatdingiz', description: 'Nyuton qonunlari', time: '2 soat oldin', xp: 50, color: 'green' },
+    { icon: Trophy, title: 'Testni tugatdingiz', description: 'Kinematika - 85%', time: '5 soat oldin', xp: 100, color: 'yellow' },
+    { icon: Zap, title: 'Laboratoriya', description: 'Om qonuni tajribasi', time: '1 kun oldin', xp: 75, color: 'purple' },
+  ];
 
   return (
-    <div className="space-y-8">
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 sm:p-12 shadow-2xl">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-black opacity-10 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
-        <div className="relative z-10 max-w-2xl">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-sm font-medium border border-white/10">v2.5 Beta</span>
-            <span className="flex items-center gap-1 text-yellow-300 text-sm font-bold"><Zap size={14} /> Premium</span>
+    <div className="space-y-8 pb-8">
+      {/* Welcome Header */}
+      <div className="bg-gradient-to-r from-slate-800/50 to-slate-800/30 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
+        <h2 className="text-3xl font-bold text-white mb-2">
+          {getGreeting()}! 👋
+        </h2>
+        <p className="text-slate-400">
+          Bugun {todayLessons} ta dars tugatdingiz - ajoyib ish!
+        </p>
+      </div>
+
+      {/* Assessment Test Card (if not completed) */}
+      {showAssessment && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-gradient-to-br from-purple-600/20 to-blue-600/20 border-2 border-purple-500/40 rounded-2xl p-6 md:p-8"
+        >
+          <div className="flex flex-col md:flex-row items-start gap-4">
+            <div className="p-4 bg-gradient-to-br from-purple-500 to-blue-600 rounded-2xl flex-shrink-0">
+              <Brain size={32} className="text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-2xl font-bold text-white mb-2">
+                🎯 Bilim Darajangizni Aniqlang!
+              </h3>
+              <p className="text-slate-300 mb-4">
+                15 ta savol orqali fizika bo'yicha bilimingizni baholaymiz va sizga mos o'quv rejasini tayyorlaymiz.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                <div className="flex items-center gap-2 text-sm text-slate-300">
+                  <CheckCircle className="text-green-400" size={18} />
+                  <span>15 ta savol - barcha mavzulardan</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-300">
+                  <Clock className="text-blue-400" size={18} />
+                  <span>~10 daqiqa - vaqt cheklanmagan</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-300">
+                  <TrendingUp className="text-purple-400" size={18} />
+                  <span>Shaxsiy o'quv rejasi</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-300">
+                  <Sparkles className="text-yellow-400" size={18} />
+                  <span>AI tavsiyalar</span>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => setActiveTab('assessment')}
+                  className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 rounded-xl font-bold transition-all shadow-lg shadow-purple-600/20 flex items-center gap-2"
+                >
+                  <Brain size={20} />
+                  Testni Boshlash
+                </button>
+                <button
+                  onClick={onAssessmentSkip}
+                  className="px-6 py-3 bg-slate-700 hover:bg-slate-600 rounded-xl font-medium transition-colors"
+                >
+                  Keyinroq
+                </button>
+              </div>
+            </div>
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4 leading-tight">Fizika olamiga <br />xush kelibsiz!</h1>
-          <p className="text-blue-100 text-lg mb-8 max-w-lg">9-sinf fizika kursini interaktiv usulda o'rganing. Darslar, testlar va virtual laboratoriya sizni kutmoqda.</p>
-          <div className="flex flex-wrap gap-4">
-            <button onClick={() => setActiveTab('lessons')} className="px-6 py-3 bg-white text-blue-600 rounded-xl font-bold hover:bg-blue-50 transition-colors shadow-lg flex items-center gap-2"><Book size={20} /> Darslarni Boshlash</button>
-            <button onClick={() => setActiveTab('quiz')} className="px-6 py-3 bg-blue-700/50 backdrop-blur-md text-white rounded-xl font-bold hover:bg-blue-700/70 transition-colors border border-white/20 flex items-center gap-2"><Brain size={20} /> AI Test</button>
+        </motion.div>
+      )}
+
+      {/* Assessment Results (if completed) */}
+      {assessmentResults && (
+        <div className="bg-gradient-to-br from-purple-600/10 to-blue-600/10 border border-purple-500/20 rounded-2xl p-6">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-purple-500/10 rounded-xl">
+              <Award className="text-purple-400" size={24} />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-white mb-2">
+                Sizning bilim darajangiz: {assessmentResults.level === 'advanced' ? '⭐⭐⭐ Yuqori' : assessmentResults.level === 'intermediate' ? '⭐⭐ O\'rta' : '⭐ Boshlang\'ich'}
+              </h3>
+              <p className="text-slate-300 text-sm mb-3">
+                Test natijasi: {assessmentResults.overallScore}% ({assessmentResults.totalCorrect}/{assessmentResults.totalQuestions} to'g'ri)
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(assessmentResults.topicScores).map(([topic, score]) => (
+                  <span
+                    key={topic}
+                    className={`
+                      px-3 py-1 rounded-full text-xs font-medium
+                      ${score.percentage >= 80 ? 'bg-green-500/10 text-green-400 border border-green-500/30' : ''}
+                      ${score.percentage >= 50 && score.percentage < 80 ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30' : ''}
+                      ${score.percentage < 50 ? 'bg-red-500/10 text-red-400 border border-red-500/30' : ''}
+                    `}
+                  >
+                    {topic}: {score.percentage}%
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Today's Statistics */}
+      <div>
+        <h3 className="text-xl font-bold text-white mb-4">Bugungi Statistika</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard
+            icon={Zap}
+            label="Bugun qo'shildi"
+            value={`${todayXP}`}
+            subtitle="XP"
+            trend={`+${todayXP}`}
+            color="blue"
+          />
+          <StatsCard
+            icon={CheckCircle}
+            label="Tugatilgan"
+            value={todayLessons}
+            subtitle="dars"
+            color="green"
+          />
+          <StatsCard
+            icon={BarChart2}
+            label="O'qish vaqti"
+            value={formatTime(todayTime)}
+            subtitle="bugun"
+            trend="+2s"
+            color="orange"
+          />
+          <StatsCard
+            icon={Flame}
+            label="Seriya"
+            value={`${currentStreak} kun`}
+            subtitle="ketma-ket"
+            color="yellow"
+          />
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div>
+        <h3 className="text-xl font-bold text-white mb-4">Tezkor Harakatlar</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <QuickActionCard
+            icon={Book}
+            title="Darsni Davom Ettirish"
+            description="Oxirgi to'xtatilgan joydan davom eting"
+            color="blue"
+            badge="Energiya"
+            onClick={() => setActiveTab('lessons')}
+          />
+          <QuickActionCard
+            icon={Brain}
+            title="AI Test"
+            description="Sun'iy intellekt bilan test yeching"
+            color="purple"
+            onClick={() => setActiveTab('quiz')}
+          />
+          <QuickActionCard
+            icon={Zap}
+            title="Virtual Laboratoriya"
+            description="Tajribalar o'tkazing"
+            color="yellow"
+            onClick={() => setActiveTab('lab')}
+          />
+          <QuickActionCard
+            icon={MessageSquare}
+            title="AI Ustoz"
+            description="Savollaringizga javob oling"
+            color="indigo"
+            onClick={() => setActiveTab('ai-tutor')}
+          />
+          <QuickActionCard
+            icon={BookOpen}
+            title="Uy Vazifasi"
+            description="Masalalarni yeching"
+            color="green"
+            onClick={() => setActiveTab('homework')}
+          />
+          <QuickActionCard
+            icon={Trophy}
+            title="Testlar"
+            description="Bilimingizni sinab ko'ring"
+            color="orange"
+            onClick={() => setActiveTab('tests')}
+          />
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      <div>
+        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <BarChart2 className="text-blue-400" />
+          So'nggi Faoliyat
+        </h3>
+        <div className="space-y-3">
+          {recentActivities.map((activity, index) => (
+            <ActivityItem
+              key={index}
+              icon={activity.icon}
+              title={activity.title}
+              description={activity.description}
+              time={activity.time}
+              xp={activity.xp}
+              color={activity.color}
+              index={index}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Next Steps */}
+      <div>
+        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <ArrowRight className="text-purple-400" />
+          Keyingi Qadam
+        </h3>
+        <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 border border-blue-500/20 rounded-2xl p-6">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-blue-500/10 rounded-xl">
+              <Sparkles className="text-blue-400" size={24} />
+            </div>
+            <div className="flex-1">
+              <h4 className="text-lg font-bold text-white mb-2">
+                AI Tavsiya: "Energiya saqlanish qonuni"ni boshlang
+              </h4>
+              <p className="text-slate-400 text-sm mb-4">
+                Sizning darajangizga mos keladi va oldingi mavzular bilan bog'liq
+              </p>
+              <button
+                onClick={() => setActiveTab('lessons')}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-xl font-medium text-white transition-colors flex items-center gap-2"
+              >
+                Boshlash <ChevronRight size={18} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* AI Recommendations */}
       <div>
-        <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
+        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
           <Sparkles className="text-purple-500" />
           AI Shaxsiy Tavsiyalar
         </h3>

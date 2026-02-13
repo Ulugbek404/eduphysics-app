@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Atom, Menu, X, LogIn, UserPlus } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import LanguageSwitcher from '../LanguageSwitcher';
 
 const Navbar = () => {

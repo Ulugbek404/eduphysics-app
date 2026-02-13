@@ -11,7 +11,7 @@ const LanguageContext = createContext();
 export const LANGUAGES = [
     { code: 'uz', name: "O'zbekcha", flag: '🇺🇿' },
     { code: 'ru', name: 'Русский', flag: '🇷🇺' },
-    { code: 'en', name: 'English', flag: '🇬🇧' }
+    { code: 'en', name: 'English', flag: '🇺🇸' }
 ];
 
 // Translation data
