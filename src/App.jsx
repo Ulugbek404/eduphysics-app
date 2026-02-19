@@ -15,6 +15,12 @@ import DashboardPage from './pages/DashboardPage';
 import ProgressPage from './pages/ProgressPage';
 import SettingsPage from './pages/SettingsPage';
 
+// Darsliklar Pages
+import CoursesPage from './pages/CoursesPage';
+import ChaptersPage from './pages/ChaptersPage';
+import LessonsListPage from './pages/LessonsListPage';
+import LessonPage from './pages/LessonPage';
+
 // Components
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { Loader } from 'lucide-react';
@@ -98,6 +104,12 @@ function AppRoutes() {
                     </ProtectedRoute>
                 }
             />
+
+            {/* Darsliklar Routes */}
+            <Route path="/darsliklar" element={<ProtectedRoute><CoursesPage /></ProtectedRoute>} />
+            <Route path="/darsliklar/:gradeId" element={<ProtectedRoute><ChaptersPage /></ProtectedRoute>} />
+            <Route path="/darsliklar/:gradeId/:chapterId" element={<ProtectedRoute><LessonsListPage /></ProtectedRoute>} />
+            <Route path="/darsliklar/:gradeId/:chapterId/:lessonId" element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
 
             <Route
                 path="/settings"

@@ -505,6 +505,10 @@ function EduPhysicsAppContent() {
         {/* Navigation - With Labels */}
         <nav className="mt-4 px-3 space-y-1.5 flex-1 overflow-y-auto custom-scrollbar">
           <SidebarItem icon={<BarChart2 />} label={t('dashboard.main')} id="dashboard" active={activeTab} set={setActiveTab} />
+          {/* Darsliklar Link - Navigates to new page */}
+          <div onClick={() => navigate('/darsliklar')}>
+            <SidebarItem icon={<BookOpen />} label="Darsliklar" id="darsliklar" active={activeTab} set={() => { }} />
+          </div>
           <SidebarItem icon={<Book />} label={t('dashboard.lessons')} id="lessons" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<Trophy />} label={t('dashboard.tests')} id="tests" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<BookOpen />} label={t('dashboard.homework')} id="homework" active={activeTab} set={setActiveTab} />
