@@ -2,7 +2,9 @@
 import { useState, useEffect } from 'react';
 import { getChapter, getLesson } from '../data/gradesData';
 
-export function useLessons(chapterId, completedLessons = []) {
+const EMPTY_ARRAY = [];
+
+export function useLessons(chapterId, completedLessons = EMPTY_ARRAY) {
     const [lessons, setLessons] = useState([]);
 
     useEffect(() => {

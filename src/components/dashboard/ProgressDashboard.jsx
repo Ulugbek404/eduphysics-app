@@ -4,6 +4,7 @@ import { useProgress } from '../../contexts/ProgressContext';
 import ProgressOverview from './ProgressOverview';
 import StatsCards from './StatsCards';
 import { BarChart3, Calendar, Trophy } from 'lucide-react';
+import ActivityHeatmap from '../progress/ActivityHeatmap';
 
 /**
  * Progress Dashboard Component
@@ -85,14 +86,7 @@ const ProgressDashboard = () => {
                 )}
 
                 {activeTab === 'activity' && (
-                    <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-                        <h3 className="text-lg font-bold text-white mb-4">
-                            Faollik Kalendari
-                        </h3>
-                        <div className="h-64 flex items-center justify-center text-slate-500">
-                            Activity heatmap - keyingi bosqichda qo'shiladi
-                        </div>
-                    </div>
+                    <ActivityHeatmap />
                 )}
 
                 {activeTab === 'achievements' && (

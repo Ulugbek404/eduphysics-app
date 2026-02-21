@@ -4,6 +4,8 @@ import { HelmetProvider } from 'react-helmet-async';
 import { useAuth } from './contexts/AuthContext';
 import { ProgressProvider } from './contexts/ProgressContext';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { XPProvider } from './contexts/XPContext';
+import { MissionsProvider } from './contexts/MissionsContext';
 
 // Pages
 import LandingPage from './pages/LandingPage';
@@ -14,12 +16,16 @@ import NotFoundPage from './pages/NotFoundPage';
 import DashboardPage from './pages/DashboardPage';
 import ProgressPage from './pages/ProgressPage';
 import SettingsPage from './pages/SettingsPage';
+import MissionsPage from './pages/MissionsPage';
 
 // Darsliklar Pages
 import CoursesPage from './pages/CoursesPage';
 import ChaptersPage from './pages/ChaptersPage';
 import LessonsListPage from './pages/LessonsListPage';
 import LessonPage from './pages/LessonPage';
+import KutubxonaPage from './pages/KutubxonaPage';
+import LaboratoriyaPage from './pages/LaboratoriyaPage';
+import OhmQonuni from './pages/OhmQonuni';
 
 // Components
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -28,7 +34,7 @@ import { Loader } from 'lucide-react';
 // Loading Screen
 function LoadingScreen() {
     return (
-        <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center">
             <div className="text-center space-y-4">
                 <Loader className="w-12 h-12 text-blue-500 animate-spin mx-auto" />
                 <p className="text-slate-400 text-lg">Yuklanmoqda...</p>
@@ -46,7 +52,11 @@ function App() {
             <LanguageProvider>
                 <Router>
                     <ProgressProvider>
-                        <AppRoutes />
+                        <XPProvider>
+                            <MissionsProvider>
+                                <AppRoutes />
+                            </MissionsProvider>
+                        </XPProvider>
                     </ProgressProvider>
                 </Router>
             </LanguageProvider>
@@ -110,6 +120,16 @@ function AppRoutes() {
             <Route path="/darsliklar/:gradeId" element={<ProtectedRoute><ChaptersPage /></ProtectedRoute>} />
             <Route path="/darsliklar/:gradeId/:chapterId" element={<ProtectedRoute><LessonsListPage /></ProtectedRoute>} />
             <Route path="/darsliklar/:gradeId/:chapterId/:lessonId" element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
+
+            {/* Kutubxona Route */}
+            <Route path="/kutubxona" element={<ProtectedRoute><KutubxonaPage /></ProtectedRoute>} />
+
+            {/* Laboratoriya Routes */}
+            <Route path="/laboratoriya" element={<ProtectedRoute><LaboratoriyaPage /></ProtectedRoute>} />
+            <Route path="/laboratoriya/ohm" element={<ProtectedRoute><OhmQonuni /></ProtectedRoute>} />
+
+            {/* Missiyalar Route */}
+            <Route path="/missiyalar" element={<ProtectedRoute><MissionsPage /></ProtectedRoute>} />
 
             <Route
                 path="/settings"

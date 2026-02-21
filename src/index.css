@@ -56,7 +56,7 @@
   --color-info-dark: #0891B2;
 
   /* Neutral Colors - Dark Theme */
-  --color-bg-primary: #0F172A;
+  --color-bg-primary: #0B1120;
   --color-bg-secondary: #1E293B;
   --color-bg-tertiary: #334155;
   --color-bg-elevated: #475569;
@@ -230,6 +230,8 @@ html {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
+  min-height: 100%;
+  background-color: var(--color-bg-primary);
 }
 
 body {

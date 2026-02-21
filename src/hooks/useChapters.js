@@ -2,7 +2,9 @@
 import { useState, useEffect } from 'react';
 import { chapters, calculateChapterProgress } from '../data/gradesData';
 
-export function useChapters(gradeId, completedLessons = []) {
+const EMPTY_ARRAY = [];
+
+export function useChapters(gradeId, completedLessons = EMPTY_ARRAY) {
     const [filteredChapters, setFilteredChapters] = useState([]);
 
     useEffect(() => {

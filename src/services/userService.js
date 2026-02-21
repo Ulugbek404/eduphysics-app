@@ -1,5 +1,6 @@
-import { doc, getDoc, setDoc, updateDoc, increment, arrayUnion, serverTimestamp } from 'firebase/firestore';
+import { doc, collection, getDoc, setDoc, updateDoc, increment, arrayUnion, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
+
 
 /**
  * User progress olish yoki yaratish
@@ -197,5 +198,58 @@ export async function updateUserData(userId, updates) {
     } catch (error) {
         console.error('Error updating user data:', error);
         throw error;
+    }
+}/**
+ * Leaderboard ni yangilash — addXP() dan keyin chaqiriladi
+ * @param {string} uid - User ID
+ * @param {object} userData - { displayName, totalXP, weeklyXP, monthlyXP, dailyXP, level, region, avatarColor }
+ */
+export async function updateLeaderboard(uid, userData) {
+    try {
+        const { displayName, totalXP, weeklyXP = 0, monthlyXP = 0, dailyXP = 0, level = 1, region = '', avatarColor = '' } = userData;
+        const payload = {
+            uid,
+            displayName: displayName || 'Foydalanuvchi',
+            totalXP: totalXP || 0,
+            weeklyXP: weeklyXP || 0,
+            monthlyXP: monthlyXP || 0,
+            dailyXP: dailyXP || 0,
+            level,
+            region,
+            avatarColor,
+            updatedAt: serverTimestamp(),
+        };
+
+        // Global leaderboard
+        const globalRef = doc(db, 'leaderboard', 'global', 'users', uid);
+        await setDoc(globalRef, payload, { merge: true });
+
+        // Region specific (only if region set)
+        if (region) {
+            const regionRef = doc(db, 'leaderboard', region, 'users', uid);
+            await setDoc(regionRef, payload, { merge: true });
+        }
+
+        // Mark last rank update on user doc
+        const userRef = doc(db, 'users', uid);
+        await updateDoc(userRef, { lastRankUpdate: serverTimestamp() });
+
+    } catch (error) {
+        console.error('updateLeaderboard error:', error);
+    }
+}
+
+/**
+ * Foydalanuvchi viloyatini yangilash
+ * @param {string} uid - User ID
+ * @param {string} region - Viloyat nomi
+ */
+export async function updateUserRegion(uid, region) {
+    try {
+        const userRef = doc(db, 'users', uid);
+        await updateDoc(userRef, { region });
+        console.log(`User ${uid} region updated to: ${region}`);
+    } catch (error) {
+        console.error('updateUserRegion error:', error);
     }
 }

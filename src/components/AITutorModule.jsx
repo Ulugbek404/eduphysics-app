@@ -75,7 +75,6 @@ export default function AITutorModule({ setActiveTab }) {
             {/* Header */}
             <PageHeader
                 title="AI Fizik Ustoz"
-                onBack={() => setActiveTab('menu')}
                 rightElement={
                     <div className="bg-purple-600/20 p-2 rounded-full">
                         <Sparkles size={20} className="text-purple-400 animate-pulse" />

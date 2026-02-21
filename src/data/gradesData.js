@@ -1,5 +1,6 @@
 
 import { Book, CheckCircle, Lock, Play, Pause, RotateCcw } from 'lucide-react';
+import { molekulyarLessons } from './molekulyarFizikaData';
 
 // GRADES DATA
 export const grades = [
@@ -205,12 +206,21 @@ Moddiy nuqta deb berilgan sharoitda o‘lchamlarini hisobga olmasa bo‘ladigan 
   }
 ];
 
+
 // Add lessons to chapters
 chapters[0].lessons = mechanicsLessons;
+// Add full Molekulyar fizika lessons (14 dars)
+chapters[1].lessons = molekulyarLessons;
+chapters[1].total_tests = 83;
+chapters[1].total_labs = 4;
+chapters[1].estimated_hours = 30;
 // Add dummy lessons for other chapters
-chapters[1].lessons = [{ id: '9-l-20', title: 'Molekula', description: 'Molekulyar tuzilish', duration_minutes: 10 }];
-chapters[2].lessons = [{ id: '9-l-30', title: 'Elektr zaryadi', description: 'Zaryad tushunchasi', duration_minutes: 15 }];
-chapters[3].lessons = [{ id: '9-l-40', title: 'Tebranishlar', description: 'Mexanik tebranish', duration_minutes: 12 }];
+chapters[2].lessons = [
+  { id: '9-l-40', chapter_id: '9-ch-03', title: 'Elektr zaryadi', description: 'Zaryad tushunchasi', order_number: 1, duration_minutes: 15, test_count: 5, difficulty: 'easy', has_lab: false }
+];
+chapters[3].lessons = [
+  { id: '9-l-50', chapter_id: '9-ch-04', title: 'Tebranishlar', description: 'Mexanik tebranish', order_number: 1, duration_minutes: 12, test_count: 4, difficulty: 'easy', has_lab: false }
+];
 
 
 // HELPER FUNCTIONS

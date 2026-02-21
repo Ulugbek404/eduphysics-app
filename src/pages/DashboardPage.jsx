@@ -6,12 +6,13 @@ import {
   RotateCcw, Menu, X, CheckCircle, AlertCircle, BarChart2,
   Zap, Flame, Award, ArrowRight, Settings, MessageSquare,
   Info, Smartphone, Moon, Sun, Monitor, Volume2, VolumeX, Palette, Camera, Sparkles,
-  Send, Loader, Bot, Key, Search, LogOut, BookOpen, Clock, TrendingUp, Activity
+  Send, Loader, Bot, Key, Search, LogOut, BookOpen, Clock, TrendingUp, Activity, Library, Target
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { updateProfile } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
+import { doc, collection, onSnapshot, query, where, orderBy, limit } from 'firebase/firestore';
 import { getUserProgress, addUserXP, updateUserLevel, markLessonComplete, saveQuizResult } from '../services/userService';
 import { lessonsData, calculateChapterProgress } from '../data/lessonsData';
 import { testsData } from '../data/testsData';
@@ -27,6 +28,7 @@ import StatsCard from '../components/dashboard/StatsCard';
 import QuickActionCard from '../components/dashboard/QuickActionCard';
 import ActivityItem from '../components/dashboard/ActivityItem';
 import AssessmentTest from '../components/AssessmentTest';
+import { useXP } from '../contexts/XPContext';
 // Modulli laboratoriyalar (Lazy Load)
 const OhmLawLab = lazy(() => import('../components/lab/modules/OhmLawLab'));
 const NewtonsLawLab = lazy(() => import('../components/lab/modules/NewtonsLawLab'));
@@ -53,7 +55,7 @@ const MODEL_NAME = "gemini-2.5-flash";
 // --- LOADING SCREEN ---
 function LoadingScreen() {
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center">
       <div className="text-center space-y-4">
         <div className="relative">
           <div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-50 animate-pulse"></div>
@@ -71,7 +73,7 @@ function LoadingScreen() {
 function getThemeClasses(theme) {
   const themes = {
     dark: {
-      bg: 'bg-gradient-to-br from-slate-900 to-black',
+      bg: 'bg-transparent',
       card: 'bg-slate-800',
       cardHover: 'hover:bg-slate-700',
       border: 'border-slate-700',
@@ -125,7 +127,7 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-10 text-white">
+        <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-10 text-white">
           <div className="bg-red-900/50 p-8 rounded-2xl border border-red-500 max-w-2xl w-full">
             <h1 className="text-3xl font-bold mb-4 flex items-center gap-3">
               <AlertCircle size={32} className="text-red-400" />
@@ -505,14 +507,24 @@ function EduPhysicsAppContent() {
         {/* Navigation - With Labels */}
         <nav className="mt-4 px-3 space-y-1.5 flex-1 overflow-y-auto custom-scrollbar">
           <SidebarItem icon={<BarChart2 />} label={t('dashboard.main')} id="dashboard" active={activeTab} set={setActiveTab} />
-          {/* Darsliklar Link - Navigates to new page */}
+          {/* Darsliklar Link - Navigates to sinf tanlash page */}
           <div onClick={() => navigate('/darsliklar')}>
             <SidebarItem icon={<BookOpen />} label="Darsliklar" id="darsliklar" active={activeTab} set={() => { }} />
           </div>
-          <SidebarItem icon={<Book />} label={t('dashboard.lessons')} id="lessons" active={activeTab} set={setActiveTab} />
+          {/* Kutubxona Link */}
+          <div onClick={() => navigate('/kutubxona')}>
+            <SidebarItem icon={<Library />} label="Kutubxona" id="kutubxona" active={activeTab} set={() => { }} />
+          </div>
+          {/* Missiyalar Link */}
+          <div onClick={() => navigate('/missiyalar')}>
+            <SidebarItem icon={<Target />} label="Missiyalar" id="missiyalar" active={activeTab} set={() => { }} />
+          </div>
+          {/* Laboratoriya Link */}
+          <div onClick={() => navigate('/laboratoriya')}>
+            <SidebarItem icon={<Zap />} label={t('dashboard.lab')} id="lab" active={activeTab} set={() => { }} />
+          </div>
           <SidebarItem icon={<Trophy />} label={t('dashboard.tests')} id="tests" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<BookOpen />} label={t('dashboard.homework')} id="homework" active={activeTab} set={setActiveTab} />
-          <SidebarItem icon={<Zap />} label={t('dashboard.lab')} id="lab" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<Brain />} label={t('dashboard.aiTutor')} id="quiz" active={activeTab} set={setActiveTab} />
           <SidebarItem icon={<User />} label={t('dashboard.profile')} id="profile" active={activeTab} set={setActiveTab} />
         </nav>
@@ -1502,19 +1514,58 @@ function StatRow({ label, value, color = "text-white" }) {
 
 // --- DASHBOARD COMPONENT ---
 function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLessons = [], totalLessons = 24, assessmentResults, showAssessment, onAssessmentComplete, onAssessmentSkip }) {
-  // Calculate today's stats
-  const todayXP = 150; // This should come from actual data
-  const todayLessons = 2;
-  const todayTime = 7200; // seconds
-  const currentStreak = 5;
+  const { user } = useAuth();
+  const { totalXP } = useXP();
+
+  // Real data from Firebase/props
+  const [todayXP, setTodayXP] = useState(0);
+  const [currentStreak, setStreak] = useState(0);
+  const [todayLessons, setTodayLessons] = useState(0);
+
+  // Fetch today's XP from xpLogs and streak from users collection
+  useEffect(() => {
+    if (!user?.uid) return;
+    // Streak from user doc
+    const userRef = doc(db, 'users', user.uid);
+    const unsub = onSnapshot(userRef, (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        setStreak(data.streak || 0);
+        // Count completedLessons added today
+        const today = new Date().toDateString();
+        const todayCount = (data.completedLessons || []).filter(l => {
+          // If stored as {id, date} object
+          if (l && typeof l === 'object' && l.date) {
+            return new Date(l.date).toDateString() === today;
+          }
+          return false;
+        }).length;
+        setTodayLessons(todayCount || completedLessons.length);
+      }
+    });
+
+    // Today's XP from xpLogs
+    const logsRef = collection(db, 'xpLogs', user.uid, 'logs');
+    const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+    const q = query(logsRef, where('timestamp', '>=', todayStart));
+    const unsubLogs = onSnapshot(q, (snap) => {
+      const sum = snap.docs.reduce((acc, d) => acc + (d.data().amount || 0), 0);
+      setTodayXP(sum);
+    });
+
+    return () => { unsub(); unsubLogs(); };
+  }, [user?.uid, completedLessons.length]);
+
+  const todayTime = userStats?.timeSpent || 0; // seconds
 
   // Format time
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     if (hours > 0) return `${hours}s ${minutes}d`;
-    return `${minutes}d`;
+    return `${minutes}d ${seconds % 60}s`;
   };
+
 
   // Get greeting based on time
   const getGreeting = () => {
@@ -1524,12 +1575,44 @@ function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLesson
     return "Xayrli kech";
   };
 
-  // Recent activities (mock data - should come from backend)
-  const recentActivities = [
-    { icon: CheckCircle, title: 'Darsni tugatdingiz', description: 'Nyuton qonunlari', time: '2 soat oldin', xp: 50, color: 'green' },
-    { icon: Trophy, title: 'Testni tugatdingiz', description: 'Kinematika - 85%', time: '5 soat oldin', xp: 100, color: 'yellow' },
-    { icon: Zap, title: 'Laboratoriya', description: 'Om qonuni tajribasi', time: '1 kun oldin', xp: 75, color: 'purple' },
-  ];
+  // Recent activities — real-time from xpLogs Firestore
+  const [recentActivities, setRecentActivities] = useState([]);
+
+  useEffect(() => {
+    if (!user?.uid) return;
+    const logsRef = collection(db, 'xpLogs', user.uid, 'logs');
+    const q = query(logsRef, orderBy('timestamp', 'desc'), limit(8));
+    const unsub = onSnapshot(q, (snap) => {
+      const REASON_META = {
+        LESSON_COMPLETE: { title: "Darsni tugatdingiz", icon: CheckCircle, color: 'green' },
+        TEST_COMPLETE: { title: "Testni tugatdingiz", icon: Trophy, color: 'yellow' },
+        LAB_COMPLETE: { title: "Laboratoriya", icon: Zap, color: 'purple' },
+        DAILY_LOGIN: { title: "Kunlik kirish", icon: Activity, color: 'blue' },
+        PERFECT_SCORE: { title: "Mukammal natija!", icon: Award, color: 'orange' },
+        MISSION_DAILY: { title: "Kunlik missiya", icon: Target, color: 'indigo' },
+        MISSION_WEEKLY: { title: "Haftalik missiya", icon: TrendingUp, color: 'indigo' },
+        ACHIEVEMENT: { title: "Yutuq ochildi!", icon: Award, color: 'orange' },
+        AI_MESSAGE: { title: "AI Ustoz suhbati", icon: Brain, color: 'blue' },
+        mission_complete: { title: "Missiya bajarildi", icon: CheckCircle, color: 'green' },
+      };
+      const items = snap.docs.map((d) => {
+        const data = d.data();
+        const meta = REASON_META[data.reason] || { title: data.reason || 'Faoliyat', icon: Zap, color: 'blue' };
+        const ts = data.timestamp?.toDate?.() || new Date();
+        const diffMs = Date.now() - ts;
+        const diffMin = Math.floor(diffMs / 60000);
+        const diffHour = Math.floor(diffMs / 3600000);
+        const diffDay = Math.floor(diffMs / 86400000);
+        const timeStr = diffMin < 1 ? 'Hozir'
+          : diffMin < 60 ? `${diffMin} daqiqa oldin`
+            : diffHour < 24 ? `${diffHour} soat oldin`
+              : `${diffDay} kun oldin`;
+        return { icon: meta.icon, title: meta.title, description: `+${data.amount} XP`, time: timeStr, xp: data.amount, color: meta.color };
+      });
+      setRecentActivities(items);
+    });
+    return unsub;
+  }, [user?.uid]);
 
   return (
     <div className="space-y-8 pb-8">
