@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
@@ -18,24 +18,21 @@ let googleProvider = null;
 let db = null;
 
 try {
-    // Validatsiya: Asosiy kalitlar borligini tekshirish
     if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-        throw new Error("Firebase API kalitlari topilmadi. .env faylini tekshiring.");
+        throw new Error('Firebase API kalitlari topilmadi. .env faylini tekshiring.');
     }
 
-    // Firebase'ni ishga tushirish
-    app = initializeApp(firebaseConfig);
+    // ✅ Double-init oldini olish — getApps() bilan tekshir
+    app = getApps().length === 0
+        ? initializeApp(firebaseConfig)
+        : getApp();
 
-    // Authentication
     auth = getAuth(app);
     googleProvider = new GoogleAuthProvider();
-
-    // Firestore Database
     db = getFirestore(app);
 
-    console.log("Firebase muvaffaqiyatli ulandi.");
 } catch (error) {
-    console.error("Firebase ishga tushishida xatolik:", error);
+    console.error('Firebase ishga tushishida xatolik:', error);
 }
 
 export { auth, googleProvider, db };

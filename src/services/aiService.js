@@ -1,184 +1,134 @@
 /**
- * AI Service Module
- * 
- * Netlify Functions bilan bog'lanish uchun service layer.
- * LangChain-powered AI funksiyalarni frontend'dan chaqirish.
+ * aiService.js — Gemini API ga to'g'ridan-to'g'ri ulangan AI funksiyalar
+ * Netlify Functions o'chirildi, geminiClient orqali ishlaydi
  */
+import { generateChat, generateJSON, generateContent } from './geminiClient';
 
-// API base URL (development va production uchun)
-const API_BASE_URL = import.meta.env.DEV
-    ? 'http://localhost:8888/.netlify/functions'
-    : 'https://ulugbekfizika.netlify.app/.netlify/functions';
+const TUTOR_SYSTEM = `Sen NurFizika platformasining AI fizika ustozisan. 
+9-sinf o'quvchilariga o'zbek tilida, tushunarli va qisqa javob ber. 
+Formulalarni ko'rsatganda LaTeX format ishlatma, oddiy yoz. 
+Har doim do'stona va rag'batlantiruvchi bo'l.`;
 
+// ─── 1. AI Tutor ───────────────────────────────────────────────────────────
 /**
- * AI Tutor - Fizika savollariga javob beradi
- * @param {string} question - O'quvchi savoli
- * @param {Array} chatHistory - Oldingi suhbat tarixi
- * @returns {Promise<Object>} AI javobi
+ * Real-time fizika suhbati
+ * @param {string} question - Savol
+ * @param {Array} chatHistory - [{role, text}]
+ * @param {string} topic - Mavzu (ixtiyoriy)
  */
-export async function askAITutor(question, chatHistory = []) {
+export async function askAITutor(question, chatHistory = [], topic = '') {
     try {
-        const response = await fetch(`${API_BASE_URL}/ai-tutor`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                question,
-                chatHistory: chatHistory.map(msg => ({
-                    role: msg.role,
-                    content: msg.text
-                }))
-            })
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'AI Tutor xatolik');
-        }
-
-        const data = await response.json();
-        return {
-            success: true,
-            answer: data.answer,
-            timestamp: data.timestamp,
-            model: data.model
-        };
-
+        const topicNote = topic ? `\n[Mavzu: ${topic}]` : '';
+        const answer = await generateChat(
+            question + topicNote,
+            chatHistory,
+            TUTOR_SYSTEM
+        );
+        return { success: true, answer };
     } catch (error) {
-        console.error('AI Tutor Error:', error);
-        return {
-            success: false,
-            error: error.message || 'Xatolik yuz berdi'
-        };
+        return { success: false, error: error.message || 'Xatolik yuz berdi' };
     }
 }
 
+// ─── 2. Progress Analyzer ──────────────────────────────────────────────────
 /**
- * Adaptiv Test Generator - Qiyinlik darajasi avtomatik sozlanadi
- * @param {Object} params - Test parametrlari
- * @returns {Promise<Object>} Test savollari
- */
-export async function generateAdaptiveQuiz(params) {
-    const {
-        topic,
-        difficulty = 'medium',
-        questionCount = 5,
-        userLevel = 1,
-        previousScore = 0
-    } = params;
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/adaptive-quiz`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                topic,
-                difficulty,
-                questionCount,
-                userLevel,
-                previousScore
-            })
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Test yaratishda xatolik');
-        }
-
-        const data = await response.json();
-        return {
-            success: true,
-            questions: data.questions,
-            metadata: data.metadata
-        };
-
-    } catch (error) {
-        console.error('Adaptive Quiz Error:', error);
-        return {
-            success: false,
-            error: error.message || 'Xatolik yuz berdi'
-        };
-    }
-}
-
-/**
- * Progress Analyzer - O'quvchi progressini tahlil qiladi
- * @param {Object} userData - O'quvchi ma'lumotlari
- * @returns {Promise<Object>} Tahlil va tavsiyalar
+ * O'quvchi progressini tahlil qiladi
+ * @param {object} userData - { totalXP, currentLevel, completedTopics, testScores, streakDays }
  */
 export async function analyzeProgress(userData) {
     const {
+        totalXP = 0,
+        currentLevel = 1,
+        completedTopics = [],
+        testScores = {},
+        streakDays = 0,
+        // legacy support
         userStats,
-        completedLessons = [],
-        testResults = [],
-        userLevel = 1
+        completedLessons,
+        userLevel,
     } = userData;
 
+    const xp = totalXP || userStats?.xp || 0;
+    const level = currentLevel || userLevel || 1;
+    const topics = completedTopics.length ? completedTopics : (completedLessons || []);
+    const streak = streakDays || userStats?.streak || 0;
+
+    const prompt = `
+O'quvchi ma'lumotlari:
+- Daraja: ${level}
+- Umumiy XP: ${xp}
+- Streak: ${streak} kun
+- Tugatilgan mavzular: ${topics.join(', ') || 'hali yo\'q'}
+- Test natijalari: ${JSON.stringify(testScores) || 'mavjud emas'}
+
+Quyidagi JSON formatida o'zbek tilida tahlil ber:
+{
+  "strengths": ["kuchli tomon 1", "kuchli tomon 2"],
+  "weaknesses": ["zaif tomon 1", "zaif tomon 2"],
+  "recommendation": "keyingi nima o'qisin (1 gap)",
+  "motivationalMsg": "rag'batlantiruvchi xabar (1 gap)",
+  "overallAssessment": "umumiy baho (2-3 gap)",
+  "nextSteps": ["qadam 1", "qadam 2", "qadam 3"],
+  "recommendations": [
+    {"title": "...", "description": "...", "priority": "high|medium|low"}
+  ]
+}`;
+
     try {
-        const response = await fetch(`${API_BASE_URL}/progress-analyzer`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                userStats,
-                completedLessons,
-                testResults,
-                userLevel
-            })
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Tahlil qilishda xatolik');
-        }
-
-        const data = await response.json();
-        return {
-            success: true,
-            analysis: data.analysis,
-            metadata: data.metadata
-        };
-
+        const data = await generateJSON(prompt, TUTOR_SYSTEM, null);
+        if (!data) return { success: false, error: 'Tahlil olinmadi' };
+        return { success: true, analysis: data };
     } catch (error) {
-        console.error('Progress Analyzer Error:', error);
-        return {
-            success: false,
-            error: error.message || 'Xatolik yuz berdi'
-        };
+        return { success: false, error: error.message || 'Tahlil xatolik' };
     }
 }
 
+// ─── 3. Adaptive Quiz Generator ───────────────────────────────────────────
 /**
- * Test Connection - API ishlayotganini tekshirish
- * @returns {Promise<boolean>}
+ * Darajaga mos test savollari generatsiya
+ * @param {string} topic - Mavzu
+ * @param {string} difficulty - "easy" | "medium" | "hard"
+ * @param {string[]} previousErrors - Oldingi xato mavzular
  */
+export async function generateAdaptiveQuiz(topic, difficulty = 'medium', previousErrors = []) {
+    const diffMap = { easy: 'Oson', medium: "O'rta", hard: 'Qiyin' };
+    const errNote = previousErrors.length
+        ? `\nO'quvchi avval bu mavzularda xato qilgan: ${previousErrors.join(', ')}`
+        : '';
+
+    const prompt = `
+9-sinf fizika uchun "${topic}" mavzusida ${diffMap[difficulty]} darajada 5 ta test savol yarat.${errNote}
+
+JSON massiv formatida javob ber:
+[
+  {
+    "question": "savol matni",
+    "options": ["A) ...", "B) ...", "C) ...", "D) ..."],
+    "correct": 0,
+    "explanation": "to'g'ri javob tushuntirishi"
+  }
+]
+Barcha javoblar o'zbek tilida bo'lsin.`;
+
+    try {
+        const questions = await generateJSON(prompt, TUTOR_SYSTEM, []);
+        if (!Array.isArray(questions) || !questions.length) {
+            return { success: false, error: 'Savollar olinmadi' };
+        }
+        return { success: true, questions };
+    } catch (error) {
+        return { success: false, error: error.message || 'Quiz xatolik' };
+    }
+}
+
+// ─── Legacy export (Netlify-based — endi ishlatilmaydi) ───────────────────
 export async function testAPIConnection() {
     try {
-        const response = await fetch(`${API_BASE_URL}/ai-tutor`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                question: 'Test'
-            })
-        });
-
-        return response.ok;
-    } catch (error) {
-        console.error('API Connection Test Failed:', error);
+        const res = await generateContent('Salom');
+        return !!res;
+    } catch {
         return false;
     }
 }
 
-// Export all functions
-export default {
-    askAITutor,
-    generateAdaptiveQuiz,
-    analyzeProgress,
-    testAPIConnection
-};
+export default { askAITutor, analyzeProgress, generateAdaptiveQuiz, testAPIConnection };

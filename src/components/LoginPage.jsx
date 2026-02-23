@@ -1,16 +1,20 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Atom, Sparkles, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { Atom, Sparkles, Mail, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription } from './ui/Card';
 import { Input } from './ui/Input';
 
 export default function LoginPage() {
-    const { loginWithGoogle, loginWithEmail, signUpWithEmail, resetPassword, error } = useAuth();
+    const navigate = useNavigate();
+    const { loginWithGoogle, loginWithEmail, signUpWithEmailAndRole, resetPassword, error } = useAuth();
     const [activeTab, setActiveTab] = useState('signin'); // 'signin' | 'signup'
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showForgotPassword, setShowForgotPassword] = useState(false);
+    const [isTeacher, setIsTeacher] = useState(false);
+    const [teacherCode, setTeacherCode] = useState('');
 
     // Form states
     const [email, setEmail] = useState('');
@@ -25,6 +29,7 @@ export default function LoginPage() {
         setMessage('');
         try {
             await loginWithGoogle();
+            // Google login — App.jsx redirect hal qiladi
         } catch (err) {
             console.error('Login failed:', err);
         } finally {
@@ -41,13 +46,17 @@ export default function LoginPage() {
         setIsLoading(true);
         setMessage('');
         try {
-            await loginWithEmail(email, password);
+            const result = await loginWithEmail(email, password);
+            const role = result?.role || 'student';
+            navigate(role === 'teacher' ? '/teacher' : '/dashboard', { replace: true });
         } catch (err) {
             setMessage('Email yoki parol noto\'g\'ri');
         } finally {
             setIsLoading(false);
         }
     };
+
+    const TEACHER_CODE = 'NURFIZIKA2026';
 
     const handleEmailSignUp = async (e) => {
         e.preventDefault();
@@ -63,10 +72,17 @@ export default function LoginPage() {
             setMessage('Parol kamida 6 ta belgidan iborat bo\'lishi kerak');
             return;
         }
+        if (isTeacher && teacherCode !== TEACHER_CODE) {
+            setMessage('Ustoz kodi noto\'g\'ri! Iltimos administratorga murojaat qiling.');
+            return;
+        }
         setIsLoading(true);
         setMessage('');
+        const role = isTeacher ? 'teacher' : 'student';
         try {
-            await signUpWithEmail(email, password, displayName);
+            const result = await signUpWithEmailAndRole(email, password, displayName, role);
+            const finalRole = result?.role || role;
+            navigate(finalRole === 'teacher' ? '/teacher' : '/dashboard', { replace: true });
         } catch (err) {
             setMessage(err.message.includes('email-already-in-use')
                 ? 'Bu email allaqachon ro\'yxatdan o\'tgan'
@@ -120,14 +136,14 @@ export default function LoginPage() {
     );
 
     return (
-        <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-slate-950">
+        <div className="h-screen overflow-y-auto bg-slate-950">
             {/* Dynamic Background */}
-            <div className="absolute inset-0 pointer-events-none">
+            <div className="fixed inset-0 pointer-events-none">
                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/20 rounded-full blur-[120px] animate-pulse" />
                 <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[120px] animate-pulse delay-1000" />
             </div>
 
-            <div className="relative z-10 w-full max-w-md space-y-6">
+            <div className="relative z-10 w-full max-w-md space-y-6 mx-auto px-4 py-8 pb-16">
                 {/* Logo Section */}
                 <div className="text-center space-y-2 animate-fadeIn">
                     <div className="inline-flex relative mb-4">
@@ -279,13 +295,40 @@ export default function LoginPage() {
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                 />
+
+                                {/* Teacher Toggle */}
+                                <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-indigo-500/40 transition-all duration-200">
+                                    <input
+                                        type="checkbox"
+                                        checked={isTeacher}
+                                        onChange={e => setIsTeacher(e.target.checked)}
+                                        className="w-4 h-4 accent-indigo-500 rounded"
+                                    />
+                                    <span className="text-slate-300 text-sm">👨‍🏫 Men o'qituvchiman</span>
+                                </label>
+
+                                {/* Teacher Code Input — animated */}
+                                <div className={`overflow-hidden transition-all duration-300 ${isTeacher ? 'max-h-24 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                    <div className="space-y-1">
+                                        <label className="text-slate-400 text-sm block">Ustoz kodi *</label>
+                                        <input
+                                            type="password"
+                                            placeholder="Maxsus ustoz kodini kiriting"
+                                            value={teacherCode}
+                                            onChange={e => setTeacherCode(e.target.value)}
+                                            className="w-full bg-slate-800 border border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-white text-sm outline-none transition-colors duration-200"
+                                        />
+                                        <p className="text-slate-500 text-xs">* Kod maktab administratoridan olinadi</p>
+                                    </div>
+                                </div>
+
                                 <Button
                                     type="submit"
                                     className="w-full"
                                     size="lg"
                                     isLoading={isLoading}
                                 >
-                                    Ro'yxatdan o'tish
+                                    {isTeacher ? '👨‍🏫 Ustoz sifatida ro\'yxatdan o\'tish' : 'Ro\'yxatdan o\'tish'}
                                 </Button>
                             </form>
                         )}

@@ -61,13 +61,19 @@ export function XPProvider({ children }) {
     useEffect(() => {
         if (!user?.uid) return;
         const ref = doc(db, 'users', user.uid);
-        const unsub = onSnapshot(ref, (snap) => {
-            if (snap.exists()) {
-                const xp = snap.data().xp || 0;
-                setTotalXP(xp);
-                setLevel(calcLevel(xp));
+        const unsub = onSnapshot(
+            ref,
+            (snap) => {
+                if (snap.exists()) {
+                    const xp = snap.data().xp || 0;
+                    setTotalXP(xp);
+                    setLevel(calcLevel(xp));
+                }
+            },
+            (error) => {
+                console.warn('XP listener error (non-fatal):', error?.code || error?.message);
             }
-        });
+        );
         return unsub;
     }, [user?.uid]);
 

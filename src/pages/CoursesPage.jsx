@@ -215,7 +215,7 @@ export default function CoursesPage() {
                                 Level {levelData.level}: {levelData.title}
                             </h3>
                             <p className="text-xs text-slate-500 mb-3">
-                                {userData.xp} XP to'plandi
+                                {totalXP} XP to'plandi
                             </p>
 
                             {/* XP Progress */}

@@ -1,65 +1,98 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { Bot, Send, User, Sparkles } from 'lucide-react';
-import PageHeader from './ui/PageHeader';
+import { Bot, Send, User, Sparkles, Trash2, RefreshCw } from 'lucide-react';
+import { askAITutor } from '../services/aiService';
 
-const MODEL_NAME = "gemini-2.5-flash";
-const API_KEYS = [
-    "AIzaSyCC8uEzh1px6KKsXP8FEkh_JS_3F1ErtDQ",
-    "AIzaSyBUzgU8ARMbZX1OYGv0f_cIqQJqaWdlGVM"
-];
+// ─── Typing indicator ──────────────────────────────────────────────────────
+function TypingDots() {
+    return (
+        <div className="flex items-center gap-1.5 px-4 py-3">
+            <Bot size={16} className="text-indigo-400 flex-shrink-0" />
+            <span className="text-slate-400 text-sm">AI o'ylayapti</span>
+            <div className="flex gap-1 ml-1">
+                {[0, 1, 2].map(i => (
+                    <div key={i}
+                        className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"
+                        style={{ animationDelay: `${i * 0.15}s` }}
+                    />
+                ))}
+            </div>
+        </div>
+    );
+}
 
-export default function AITutorModule({ setActiveTab }) {
+// ─── Message bubble ────────────────────────────────────────────────────────
+function MessageBubble({ msg }) {
+    const isUser = msg.role === 'user';
+    return (
+        <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3`}>
+            {!isUser && (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center flex-shrink-0 mr-2 mt-1">
+                    <Bot size={16} className="text-white" />
+                </div>
+            )}
+            <div className={`max-w-[82%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-md ${isUser
+                ? 'bg-indigo-600 text-white rounded-br-none'
+                : 'bg-slate-800 text-slate-100 rounded-bl-none border border-slate-700/60'
+                }`}>
+                {msg.text.split('\n').map((line, i) => (
+                    <p key={i} className={line ? 'mb-1 last:mb-0' : 'h-2'}>{line}</p>
+                ))}
+            </div>
+            {isUser && (
+                <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0 ml-2 mt-1">
+                    <User size={16} className="text-slate-300" />
+                </div>
+            )}
+        </div>
+    );
+}
+
+// ─── Main Component ────────────────────────────────────────────────────────
+export default function AITutorModule({ topic = '' }) {
+    const greeting = topic
+        ? `Salom! Men NurFizika AI ustoziman. ⚛️\n"${topic}" mavzusidan savollaringiz bo'lsa bemalol so'rang!`
+        : "Salom! Men NurFizika AI ustoziman. ⚛️\nFizikadan har qanday savol bering — qadamba-qadam tushuntiraman!";
+
     const [messages, setMessages] = useState([
-        { role: 'ai', text: "Salom! Men AI Fizik Ustozman. Menga dars bo'yicha har qanday savol berishingiz mumkin. ⚛️" }
+        {
+            role: 'ai',
+            text: greeting
+        }
     ]);
-    const [input, setInput] = useState("");
+    const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
     const messagesEndRef = useRef(null);
-
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
+    const inputRef = useRef(null);
 
     useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages, isLoading]);
 
     const handleSend = async () => {
-        if (!input.trim()) return;
+        if (!input.trim() || isLoading) return;
+        const userText = input.trim();
+        setInput('');
+        setError(null);
 
-        const userMsg = input;
-        setInput("");
-        setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+        setMessages(prev => [...prev, { role: 'user', text: userText }]);
         setIsLoading(true);
 
         try {
-            // Randomly select an API key
-            const apiKey = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
-            const genAI = new GoogleGenerativeAI(apiKey);
-            const model = genAI.getGenerativeModel({
-                model: MODEL_NAME,
-                systemInstruction: "Sen 9-sinf o'quvchilari uchun 'EduPhysics' ilovasida ishlaydigan do'stona va bilimdon fizik ustozsan. Javoblarni o'zbek tilida, sodda, qiziqarli misollar bilan va ilmiy asoslangan holda ber. O'quvchini ilhomlantir. Formulalar ishlatsang, ularni tushuntirib ber."
-            });
-
-            const result = await model.generateContent(userMsg);
-            const response = await result.response;
-            const text = response.text();
-
-            setMessages(prev => [...prev, { role: 'ai', text: text }]);
-        } catch (error) {
-            console.error("AI Error:", error);
-
-            let errorMessage = "Xatolik yuz berdi. ";
-            if (error.message.includes("429")) {
-                errorMessage += "Juda ko'p so'rovlar (Limit). Iltimos, 10 soniya kuting.";
+            const result = await askAITutor(userText, messages, topic);
+            if (result.success) {
+                setMessages(prev => [...prev, { role: 'ai', text: result.answer }]);
             } else {
-                errorMessage += "Internetni tekshiring va qaytadan urining.";
+                throw new Error(result.error);
             }
-
-            setMessages(prev => [...prev, { role: 'ai', text: errorMessage }]);
+        } catch (err) {
+            const msg = err.message?.includes('429')
+                ? 'So\'rovlar juda ko\'p! 10 soniya kuting va qayta urining. 🔄'
+                : 'Xatolik yuz berdi. Internet aloqasini tekshiring.';
+            setError(msg);
         } finally {
             setIsLoading(false);
+            inputRef.current?.focus();
         }
     };
 
@@ -70,89 +103,92 @@ export default function AITutorModule({ setActiveTab }) {
         }
     };
 
+    const clearChat = () => {
+        setMessages([{
+            role: 'ai',
+            text: "Suhbat tozalandi! Yangi savol bering. ⚛️"
+        }]);
+        setError(null);
+    };
+
     return (
-        <div className="h-[calc(100vh-140px)] flex flex-col">
+        <div className="flex flex-col h-[calc(100vh-160px)] min-h-[500px]">
             {/* Header */}
-            <PageHeader
-                title="AI Fizik Ustoz"
-                rightElement={
-                    <div className="bg-purple-600/20 p-2 rounded-full">
-                        <Sparkles size={20} className="text-purple-400 animate-pulse" />
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                        <Bot size={20} className="text-white" />
                     </div>
-                }
-            />
-
-            {/* Chat Container */}
-            <div className="flex-1 bg-slate-800 rounded-3xl border border-slate-700 overflow-hidden flex flex-col shadow-2xl relative">
-
-                {/* Messages Area */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-900/50 hover:scroll-auto custom-scrollbar">
-                    {messages.length === 0 && (
-                        <div className="h-full flex flex-col items-center justify-center text-slate-500 opacity-50">
-                            <Bot size={64} className="mb-4" />
-                            <p>Savolingizni yozing...</p>
+                    <div>
+                        <h2 className="text-white font-bold text-base">AI Fizik Ustoz</h2>
+                        <div className="flex items-center gap-1.5">
+                            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                            <span className="text-slate-400 text-xs">Onlayn · Gemini 2.5 Flash</span>
                         </div>
-                    )}
+                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="text-slate-500 text-xs hidden sm:block">{messages.length - 1} xabar</span>
+                    <button onClick={clearChat} title="Suhbatni tozalash"
+                        className="p-2 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-800 transition-all">
+                        <Trash2 size={16} />
+                    </button>
+                </div>
+            </div>
 
-                    {messages.map((msg, idx) => (
-                        <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-slideUp`}>
-                            <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed shadow-lg flex items-start gap-3 ${msg.role === 'user'
-                                ? 'bg-blue-600 text-white rounded-br-none'
-                                : 'bg-slate-700 text-slate-200 rounded-bl-none border border-slate-600'
-                                }`}>
-                                {msg.role === 'ai' && <Bot size={18} className="mt-1 flex-shrink-0" />}
-
-                                <div className="markdown-body">
-                                    {/* Oddiy text render (keyinchalik markdown qilsa bo'ladi) */}
-                                    {msg.text.split('\n').map((line, i) => (
-                                        <p key={i} className="mb-1 last:mb-0">{line}</p>
-                                    ))}
-                                </div>
-
-                                {msg.role === 'user' && <User size={18} className="mt-1 flex-shrink-0 opacity-70" />}
-                            </div>
-                        </div>
-                    ))}
+            {/* Chat area */}
+            <div className="flex-1 bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl overflow-hidden flex flex-col shadow-xl">
+                <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                    {messages.map((msg, idx) => <MessageBubble key={idx} msg={msg} />)}
 
                     {isLoading && (
-                        <div className="flex justify-start animate-pulse">
-                            <div className="bg-slate-700 p-4 rounded-2xl rounded-bl-none flex items-center space-x-2">
-                                <Bot size={18} />
-                                <div className="flex space-x-1">
-                                    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
-                                    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-100"></div>
-                                    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-200"></div>
-                                </div>
+                        <div className="flex justify-start mb-3">
+                            <div className="bg-slate-800 border border-slate-700/60 rounded-2xl rounded-bl-none">
+                                <TypingDots />
                             </div>
                         </div>
                     )}
+
+                    {error && (
+                        <div className="flex items-center gap-2 mx-2 mb-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                            <span className="flex-1">{error}</span>
+                            <button onClick={handleSend} className="flex items-center gap-1 text-xs text-red-300 hover:text-white transition-colors">
+                                <RefreshCw size={12} /> Qayta
+                            </button>
+                        </div>
+                    )}
+
                     <div ref={messagesEndRef} />
                 </div>
 
-                {/* Input Area */}
-                <div className="p-4 bg-slate-800 border-t border-slate-700">
-                    <div className="relative flex items-center">
-                        <input
-                            type="text"
+                {/* Input */}
+                <div className="p-4 border-t border-slate-800 bg-slate-900/80">
+                    <div className="flex items-end gap-2">
+                        <textarea
+                            ref={inputRef}
                             value={input}
-                            onChange={(e) => setInput(e.target.value)}
+                            onChange={e => setInput(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            placeholder="Fizikadan savol bering..."
-                            className="w-full bg-slate-900 text-white rounded-xl pl-4 pr-12 py-3.5 border border-slate-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none transition-all placeholder:text-slate-500"
+                            placeholder="Fizikadan savol bering... (Enter — yuborish)"
+                            rows={1}
+                            className="flex-1 bg-slate-800 text-white text-sm rounded-xl px-4 py-3 border border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none transition-all placeholder:text-slate-500 resize-none max-h-32"
+                            style={{ height: 'auto', overflowY: 'auto' }}
+                            onInput={e => {
+                                e.target.style.height = 'auto';
+                                e.target.style.height = Math.min(e.target.scrollHeight, 128) + 'px';
+                            }}
                         />
                         <button
                             onClick={handleSend}
                             disabled={isLoading || !input.trim()}
-                            className="absolute right-2 p-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg active:scale-95"
+                            className="p-3 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl text-white hover:from-indigo-500 hover:to-violet-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
                         >
                             <Send size={18} />
                         </button>
                     </div>
-                    <div className="text-center mt-2">
-                        <p className="text-[10px] text-slate-500">
-                            AI xato qilishi mumkin. Javoblarni tekshiring.
-                        </p>
-                    </div>
+                    <p className="text-center text-slate-600 text-[10px] mt-2">
+                        AI xato qilishi mumkin. Muhim ma'lumotlarni tekshiring.
+                    </p>
                 </div>
             </div>
         </div>

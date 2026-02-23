@@ -17,6 +17,7 @@ import DashboardPage from './pages/DashboardPage';
 import ProgressPage from './pages/ProgressPage';
 import SettingsPage from './pages/SettingsPage';
 import MissionsPage from './pages/MissionsPage';
+import TeacherDashboard from './pages/TeacherDashboard';
 
 // Darsliklar Pages
 import CoursesPage from './pages/CoursesPage';
@@ -27,8 +28,9 @@ import KutubxonaPage from './pages/KutubxonaPage';
 import LaboratoriyaPage from './pages/LaboratoriyaPage';
 import OhmQonuni from './pages/OhmQonuni';
 
-// Components
+// Route Guards
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import TeacherRoute from './components/auth/TeacherRoute';
 import { Loader } from 'lucide-react';
 
 // Loading Screen
@@ -43,10 +45,8 @@ function LoadingScreen() {
     );
 }
 
-
-// Main App Component
+// Main App
 function App() {
-    console.log('App component rendered'); // DEBUG
     return (
         <HelmetProvider>
             <LanguageProvider>
@@ -66,90 +66,48 @@ function App() {
 
 // Routes Component
 function AppRoutes() {
-    const { user, loading } = useAuth();
+    const { user, loading, isTeacher } = useAuth();
 
-    console.log('AppRoutes - User:', user, 'Loading:', loading); // DEBUG
+    if (loading) return <LoadingScreen />;
 
-    if (loading) {
-        console.log('Showing loading screen'); // DEBUG
-        return <LoadingScreen />;
-    }
-
-    console.log('Rendering routes, user is:', user ? 'logged in' : 'not logged in'); // DEBUG
+    // Rol asosida bosh sahifa redirect
+    const homeRedirect = isTeacher ? '/teacher' : '/dashboard';
 
     return (
         <Routes>
-            {/* Public Routes */}
-            <Route
-                path="/"
-                element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />}
-            />
+            {/* Public */}
+            <Route path="/" element={user ? <Navigate to={homeRedirect} replace /> : <LandingPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/login" element={user ? <Navigate to={homeRedirect} replace /> : <LoginPage />} />
+            <Route path="/register" element={user ? <Navigate to={homeRedirect} replace /> : <LoginPage />} />
 
+            {/* ── O'QITUVCHI PANEL ── */}
             <Route
-                path="/about"
-                element={<AboutPage />}
-            />
-
-            <Route
-                path="/contact"
-                element={<ContactPage />}
-            />
-
-            <Route
-                path="/login"
-                element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />}
-            />
-
-            <Route
-                path="/register"
-                element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />}
-            />
-
-            {/* Protected Routes */}
-            <Route
-                path="/progress"
+                path="/teacher/*"
                 element={
                     <ProtectedRoute>
-                        <ProgressPage />
+                        <TeacherRoute>
+                            <TeacherDashboard />
+                        </TeacherRoute>
                     </ProtectedRoute>
                 }
             />
 
-            {/* Darsliklar Routes */}
+            {/* Protected — Student Routes */}
+            <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
             <Route path="/darsliklar" element={<ProtectedRoute><CoursesPage /></ProtectedRoute>} />
             <Route path="/darsliklar/:gradeId" element={<ProtectedRoute><ChaptersPage /></ProtectedRoute>} />
             <Route path="/darsliklar/:gradeId/:chapterId" element={<ProtectedRoute><LessonsListPage /></ProtectedRoute>} />
             <Route path="/darsliklar/:gradeId/:chapterId/:lessonId" element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
-
-            {/* Kutubxona Route */}
             <Route path="/kutubxona" element={<ProtectedRoute><KutubxonaPage /></ProtectedRoute>} />
-
-            {/* Laboratoriya Routes */}
             <Route path="/laboratoriya" element={<ProtectedRoute><LaboratoriyaPage /></ProtectedRoute>} />
             <Route path="/laboratoriya/ohm" element={<ProtectedRoute><OhmQonuni /></ProtectedRoute>} />
-
-            {/* Missiyalar Route */}
             <Route path="/missiyalar" element={<ProtectedRoute><MissionsPage /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+            <Route path="/dashboard/*" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
 
-            <Route
-                path="/settings"
-                element={
-                    <ProtectedRoute>
-                        <SettingsPage />
-                    </ProtectedRoute>
-                }
-            />
-
-            <Route
-                path="/dashboard/*"
-                element={
-                    <ProtectedRoute>
-                        <DashboardPage />
-                    </ProtectedRoute>
-                }
-            />
-
-            {/* 404 Page */}
+            {/* 404 */}
             <Route path="*" element={<NotFoundPage />} />
         </Routes>
     );

@@ -19,10 +19,8 @@ import { testsData } from '../data/testsData';
 import AIRecommendations from '../components/AIRecommendations';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { askAITutor } from '../services/aiService';
-import BottomNav from '../components/ui/BottomNav';
 import EmptyState from '../components/ui/EmptyState';
 import PageHeader from '../components/ui/PageHeader';
-import MobileMenu from '../components/MobileMenu';
 
 import StatsCard from '../components/dashboard/StatsCard';
 import QuickActionCard from '../components/dashboard/QuickActionCard';
@@ -160,24 +158,6 @@ function EduPhysicsAppContent() {
   // BARCHA STATE HOOKS - conditional return'dan OLDIN
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  // DEBUGGING: Check active tab
-  useEffect(() => {
-    console.log("Current activeTab:", activeTab);
-  }, [activeTab]);
-
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  // Sidebar ochilganda body scroll'ni to'xtatish
-  useEffect(() => {
-    if (sidebarOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [sidebarOpen]);
   const [userXP, setUserXP] = useState(0);
   const [userLevel, setUserLevel] = useState(1);
   const [completedLessons, setCompletedLessons] = useState([]);
@@ -491,8 +471,8 @@ function EduPhysicsAppContent() {
       {/* Overlay o'chirildi - icon-only sidebar doimo ko'rinadi */}
 
 
-      {/* Yon panel (Sidebar) - Expanded with Labels - Hidden on Mobile */}
-      <aside className="hidden md:flex fixed inset-y-0 left-0 z-40 w-64 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 backdrop-blur-xl border-r border-slate-700/50 flex-col transition-all duration-300 shadow-2xl">
+      {/* Yon panel (Sidebar) - Doim ko'rinadi */}
+      <aside className="flex fixed inset-y-0 left-0 z-40 w-64 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 backdrop-blur-xl border-r border-slate-700/50 flex-col transition-all duration-300 shadow-2xl">
         {/* Logo & Brand */}
         <div className="p-6 flex items-center gap-3 border-b border-slate-700/50">
           <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2.5 rounded-xl shadow-lg shadow-blue-500/30">
@@ -576,8 +556,7 @@ function EduPhysicsAppContent() {
       <main className={`
         flex-1 overflow-y-auto ${themeClasses.bg} 
         relative scroll-smooth transition-all duration-300 
-        md:ml-64 md:pb-0 pb-20
-        landscape:md:pb-0
+        ml-64
       `}>
         {/* Background Decorations */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -594,18 +573,12 @@ function EduPhysicsAppContent() {
           md:px-8 md:py-8
           lg:px-10 lg:py-10
           max-w-[1600px] mx-auto
-          pb-24 md:pb-8
+          pb-8
         ">
           {renderContent()}
         </div>
       </main>
 
-
-      {/* 📱 BOTTOM NAVIGATION (Mobile Only) */}
-      <BottomNav
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-      />
     </div>
   );
 }
@@ -1101,8 +1074,9 @@ function LessonsModule({ completedLessons, completeLesson }) {
 // 4. MUKAMMAL AI TEST TUZUVCHI (Quiz)
 function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }) {
   const API_KEYS = [
-    "AIzaSyCC8uEzh1px6KKsXP8FEkh_JS_3F1ErtDQ",
-    "AIzaSyBUzgU8ARMbZX1OYGv0f_cIqQJqaWdlGVM"
+    import.meta.env.VITE_GEMINI_API_KEY_1 || "AIzaSyBy1_ST87s7uMpMWvM9Iq06eTVM8imBaao",
+    import.meta.env.VITE_GEMINI_API_KEY_2 || "AIzaSyB5McpyvgDYOu3GodFsw025i1UYvEB1Jqo",
+    import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyAkl2vISoMfAf1Rb0LGVvHFPJegcnQVygI",
   ];
   // Boshlang'ich (default) savollar
   const defaultQuestions = [

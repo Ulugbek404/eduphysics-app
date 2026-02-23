@@ -6,7 +6,7 @@ import { db } from '../firebase';
 import { useAuth } from './AuthContext';
 import { useXP, pushXPToast } from './XPContext';
 
-// ─── Mission Definitions ─────────────────────────────────────────────────────
+// ─── Mission Definitions ──────────────────────────────────────────────────────
 export const DAILY_MISSIONS_TEMPLATE = [
     { id: 'daily_lesson', title: "Bitta dars tugalla", icon: 'BookOpen', target: 1, xp: 50, trigger: 'LESSON_COMPLETE' },
     { id: 'daily_test', title: "Test ishlat", icon: 'ClipboardList', target: 1, xp: 40, trigger: 'TEST_COMPLETE' },
@@ -32,67 +32,114 @@ const todayStr = () => new Date().toISOString().slice(0, 10);
 const weekStart = () => {
     const d = new Date();
     const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Mon
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
     return new Date(d.setDate(diff)).toISOString().slice(0, 10);
 };
-const freshTasks = (template) =>
-    template.map(t => ({ ...t, current: 0, completed: false }));
+const freshTasks = (template) => template.map(t => ({ ...t, current: 0, completed: false }));
 
-// ─── Context ─────────────────────────────────────────────────────────────────
+// ─── Context ──────────────────────────────────────────────────────────────────
 const MissionsContext = createContext(null);
 
 export function MissionsProvider({ children }) {
     const { user } = useAuth();
     const { addXP, registerMissionsChecker } = useXP();
+
     const [dailyMissions, setDailyMissions] = useState(freshTasks(DAILY_MISSIONS_TEMPLATE));
     const [weeklyMissions, setWeeklyMissions] = useState(freshTasks(WEEKLY_MISSIONS_TEMPLATE));
     const [achievements, setAchievements] = useState(ACHIEVEMENTS_TEMPLATE.map(a => ({ ...a, earned: false })));
     const [userStats, setUserStats] = useState({ totalLessons: 0, totalLabs: 0, streakDays: 0 });
+
     const addXPRef = useRef(addXP);
     useEffect(() => { addXPRef.current = addXP; }, [addXP]);
 
-    // ── Load / listen missions from Firestore ──────────────────────────────
+    // ── Initialize missions, then start real-time listener ─────────────────
+    // KEY FIX: We use getDoc for initial setup (writes), then onSnapshot for
+    // real-time updates ONLY. This prevents write-inside-listener recursion
+    // which caused FIRESTORE INTERNAL ASSERTION FAILED (b815).
     useEffect(() => {
         if (!user?.uid) return;
-        const ref = doc(db, 'missions', user.uid);
-        const unsub = onSnapshot(ref, async (snap) => {
-            if (!snap.exists()) {
-                // First time: init with fresh data
-                const initial = {
-                    daily: { date: todayStr(), tasks: freshTasks(DAILY_MISSIONS_TEMPLATE) },
-                    weekly: { weekStart: weekStart(), tasks: freshTasks(WEEKLY_MISSIONS_TEMPLATE) },
-                    achievements: ACHIEVEMENTS_TEMPLATE.map(a => ({ ...a, earned: false })),
-                    stats: { totalLessons: 0, totalLabs: 0, streakDays: 0 },
-                };
-                await setDoc(ref, initial);
-                setDailyMissions(initial.daily.tasks);
-                setWeeklyMissions(initial.weekly.tasks);
-                setAchievements(initial.achievements);
-                return;
+        let mounted = true;
+        let unsubscribe = null;
+
+        const startListener = (ref) => {
+            unsubscribe = onSnapshot(
+                ref,
+                (docSnap) => {
+                    if (!mounted || !docSnap.exists()) return;
+                    const data = docSnap.data();
+                    setDailyMissions(data.daily?.tasks || freshTasks(DAILY_MISSIONS_TEMPLATE));
+                    setWeeklyMissions(data.weekly?.tasks || freshTasks(WEEKLY_MISSIONS_TEMPLATE));
+                    setAchievements(data.achievements || ACHIEVEMENTS_TEMPLATE.map(a => ({ ...a, earned: false })));
+                    setUserStats(data.stats || { totalLessons: 0, totalLabs: 0, streakDays: 0 });
+                },
+                (error) => {
+                    // Don't crash — just log. Transient network errors are normal.
+                    console.warn('Missions listener error (non-fatal):', error?.code || error?.message);
+                }
+            );
+        };
+
+        const initMissions = async () => {
+            const ref = doc(db, 'missions', user.uid);
+            try {
+                const snap = await getDoc(ref);
+                if (!mounted) return;
+
+                if (!snap.exists()) {
+                    // First time: create document, then start listening
+                    const initial = {
+                        daily: { date: todayStr(), tasks: freshTasks(DAILY_MISSIONS_TEMPLATE) },
+                        weekly: { weekStart: weekStart(), tasks: freshTasks(WEEKLY_MISSIONS_TEMPLATE) },
+                        achievements: ACHIEVEMENTS_TEMPLATE.map(a => ({ ...a, earned: false })),
+                        stats: { totalLessons: 0, totalLabs: 0, streakDays: 0 },
+                    };
+                    await setDoc(ref, initial);
+                    if (!mounted) return;
+
+                    // Set state from the initial data we just wrote
+                    setDailyMissions(initial.daily.tasks);
+                    setWeeklyMissions(initial.weekly.tasks);
+                    setAchievements(initial.achievements);
+
+                } else {
+                    // Check for daily / weekly resets — write updates BEFORE listening
+                    const data = snap.data();
+                    const updates = {};
+
+                    let daily = data.daily || { date: todayStr(), tasks: freshTasks(DAILY_MISSIONS_TEMPLATE) };
+                    if (daily.date !== todayStr()) {
+                        daily = { date: todayStr(), tasks: freshTasks(DAILY_MISSIONS_TEMPLATE) };
+                        updates.daily = daily;
+                    }
+
+                    let weekly = data.weekly || { weekStart: weekStart(), tasks: freshTasks(WEEKLY_MISSIONS_TEMPLATE) };
+                    if (weekly.weekStart !== weekStart()) {
+                        weekly = { weekStart: weekStart(), tasks: freshTasks(WEEKLY_MISSIONS_TEMPLATE) };
+                        updates.weekly = weekly;
+                    }
+
+                    if (Object.keys(updates).length > 0) {
+                        await updateDoc(ref, updates);
+                        if (!mounted) return;
+                    }
+                }
+
+                // ✅ ONLY start the real-time listener AFTER all writes are done
+                startListener(ref);
+
+            } catch (err) {
+                if (mounted) {
+                    console.error('Missions init error:', err);
+                }
             }
+        };
 
-            const data = snap.data();
+        initMissions();
 
-            // Daily reset check
-            let daily = data.daily || { date: todayStr(), tasks: freshTasks(DAILY_MISSIONS_TEMPLATE) };
-            if (daily.date !== todayStr()) {
-                daily = { date: todayStr(), tasks: freshTasks(DAILY_MISSIONS_TEMPLATE) };
-                await updateDoc(ref, { daily });
-            }
-
-            // Weekly reset check
-            let weekly = data.weekly || { weekStart: weekStart(), tasks: freshTasks(WEEKLY_MISSIONS_TEMPLATE) };
-            if (weekly.weekStart !== weekStart()) {
-                weekly = { weekStart: weekStart(), tasks: freshTasks(WEEKLY_MISSIONS_TEMPLATE) };
-                await updateDoc(ref, { weekly });
-            }
-
-            setDailyMissions(daily.tasks || freshTasks(DAILY_MISSIONS_TEMPLATE));
-            setWeeklyMissions(weekly.tasks || freshTasks(WEEKLY_MISSIONS_TEMPLATE));
-            setAchievements(data.achievements || ACHIEVEMENTS_TEMPLATE.map(a => ({ ...a, earned: false })));
-            setUserStats(data.stats || { totalLessons: 0, totalLabs: 0, streakDays: 0 });
-        });
-        return unsub;
+        return () => {
+            mounted = false;
+            if (unsubscribe) unsubscribe();
+        };
     }, [user?.uid]);
 
     // ── checkMissions — called by addXP ───────────────────────────────────
@@ -106,12 +153,10 @@ export function MissionsProvider({ children }) {
         const updates = {};
         let newStats = { ...(data.stats || userStats) };
 
-        // Update stat counters
         if (trigger === 'LESSON_COMPLETE') newStats.totalLessons = (newStats.totalLessons || 0) + 1;
         if (trigger === 'LAB_COMPLETE') newStats.totalLabs = (newStats.totalLabs || 0) + 1;
         if (trigger === 'DAILY_LOGIN') newStats.streakDays = (newStats.streakDays || 0) + 1;
 
-        // ── Daily missions ──
         const newDaily = (data.daily?.tasks || freshTasks(DAILY_MISSIONS_TEMPLATE)).map(task => {
             if (task.completed || task.trigger !== trigger) return task;
             const updated = { ...task, current: Math.min(task.current + 1, task.target) };
@@ -126,7 +171,6 @@ export function MissionsProvider({ children }) {
         });
         updates['daily.tasks'] = newDaily;
 
-        // ── Weekly missions ──
         const newWeekly = (data.weekly?.tasks || freshTasks(WEEKLY_MISSIONS_TEMPLATE)).map(task => {
             if (task.completed || task.trigger !== trigger) return task;
             const updated = { ...task, current: Math.min(task.current + 1, task.target) };
@@ -141,16 +185,12 @@ export function MissionsProvider({ children }) {
         });
         updates['weekly.tasks'] = newWeekly;
 
-        // ── Achievements ──
         const newAchievements = (data.achievements || ACHIEVEMENTS_TEMPLATE.map(a => ({ ...a, earned: false }))).map(ach => {
-            if (ach.earned) return ach;
-            if (ach.trigger !== trigger) return ach;
-
+            if (ach.earned || ach.trigger !== trigger) return ach;
             let condMet = true;
             if (ach.conditionKey === 'totalLessons') condMet = newStats.totalLessons >= ach.conditionVal;
             if (ach.conditionKey === 'totalLabs') condMet = newStats.totalLabs >= ach.conditionVal;
             if (ach.conditionKey === 'streakDays') condMet = newStats.streakDays >= ach.conditionVal;
-
             if (condMet) {
                 setTimeout(() => {
                     addXPRef.current(ach.xp, 'ACHIEVEMENT');
@@ -163,15 +203,13 @@ export function MissionsProvider({ children }) {
         updates['achievements'] = newAchievements;
         updates['stats'] = newStats;
 
-        await updateDoc(ref, updates);
+        await updateDoc(ref, updates).catch(err => console.error('checkMissions write error:', err));
     }, [user?.uid, userStats]);
 
-    // Register checker with XPContext
     useEffect(() => {
         registerMissionsChecker(checkMissions);
     }, [checkMissions, registerMissionsChecker]);
 
-    // updateStats — called from pages after completing actions
     const updateStats = useCallback(async (statUpdates) => {
         if (!user?.uid) return;
         const ref = doc(db, 'missions', user.uid);

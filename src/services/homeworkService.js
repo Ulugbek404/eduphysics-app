@@ -1,290 +1,143 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const MODEL_NAME = "gemini-2.5-flash";
+// ✅ .env dagi kalit nomlariga mos
 const API_KEYS = [
-    "AIzaSyCC8uEzh1px6KKsXP8FEkh_JS_3F1ErtDQ",
-    "AIzaSyBUzgU8ARMbZX1OYGv0f_cIqQJqaWdlGVM"
-];
+    import.meta.env.VITE_GEMINI_API_KEY,
+    import.meta.env.VITE_GEMINI_API_KEY_1,
+    import.meta.env.VITE_GEMINI_API_KEY_2,
+].filter(Boolean);
 
-const getGenAI = () => {
-    const apiKey = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
-    return new GoogleGenerativeAI(apiKey);
+const MODEL_NAME = "gemini-2.5-flash";
+let currentKeyIndex = 0;
+
+const safeParseJSON = (text) => {
+    const codeMatch = text.match(/```(?:json)?\n?([\s\S]*?)\n?```/);
+    const raw = codeMatch ? codeMatch[1] : text;
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return null;
+    try { return JSON.parse(jsonMatch[0]); } catch { return null; }
+};
+
+const generateWithFallback = async (prompt) => {
+    for (let attempt = 0; attempt < API_KEYS.length; attempt++) {
+        try {
+            const key = API_KEYS[currentKeyIndex % API_KEYS.length];
+            const genAI = new GoogleGenerativeAI(key);
+            const model = genAI.getGenerativeModel({
+                model: MODEL_NAME,
+                generationConfig: { temperature: 0.7, maxOutputTokens: 4096 }
+            });
+            const result = await model.generateContent(prompt);
+            return result.response.text();
+        } catch (error) {
+            currentKeyIndex = (currentKeyIndex + 1) % API_KEYS.length;
+            if (attempt === API_KEYS.length - 1) throw error;
+        }
+    }
 };
 
 export async function solveProblem(problemText, topic = '') {
     try {
-        const genAI = getGenAI();
-        const model = genAI.getGenerativeModel({ model: MODEL_NAME });
-
-        const prompt = `
-Fizika masalasini yech:
+        const prompt = `Sen 9-sinf fizika o'qituvchisisan. Masalani O'ZBEK tilida yech.
 MASALA: ${problemText}
-MAVZU: ${topic}
+MAVZU: ${topic || 'Fizika'}
 
-TALABLAR:
-1. Berilganlarni yoz
-2. Formulalarni yoz
-3. Hisoblashlarni ko'rsat
-4. Javobni aniq yoz
-5. O'zbek tilida
-6. JSON formatida javob ber
-
-FORMAT:
+FAQAT quyidagi JSON formatida javob ber, boshqa hech narsa yozma:
 {
   "steps": [
-    {
-      "number": 1,
-      "title": "Berilganlar",
-      "explanation": "...",
-      "formula": "...",
-      "calculation": "...",
-      "result": "..."
-    }
+    {"number": 1, "title": "Berilganlar", "explanation": "...", "formula": "", "calculation": "", "result": ""},
+    {"number": 2, "title": "Yechish", "explanation": "...", "formula": "...", "calculation": "...", "result": "..."}
   ],
-  "finalAnswer": "...",
+  "finalAnswer": "Javob: ...",
   "topic": "${topic}"
-}
-`;
-
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
-
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        let data;
-        if (jsonMatch) {
-            try {
-                data = JSON.parse(jsonMatch[0]);
-            } catch (e) {
-                data = parseTextSolution(text);
-            }
-        } else {
-            data = parseTextSolution(text);
-        }
-
-        return {
-            success: true,
-            data: data,
-            rawText: text
-        };
+}`;
+        const text = await generateWithFallback(prompt);
+        const data = safeParseJSON(text) || parseTextSolution(text);
+        return { success: true, data };
     } catch (error) {
-        console.error('Problem solving error:', error);
-        throw error;
+        return { success: false, error: "AI bilan ulanishda xato: " + error.message, data: null };
     }
 }
 
 export async function checkSolution(apiKeyIgnored, problemText, studentSolution) {
-    // API Key parametrini ignore qilamiz, o'zimiznikini ishlatamiz
     try {
-        const genAI = getGenAI();
-        const model = genAI.getGenerativeModel({ model: MODEL_NAME });
-
-        const prompt = `
-Sen 9-sinf fizika o'qituvchisisan. O'quvchining yechimini tahlil qil:
-
+        const prompt = `Sen 9-sinf fizika o'qituvchisisan. O'quvchi yechimini O'ZBEK tilida tekshir.
 MASALA: ${problemText}
+O'QUVCHI YECHIMI: ${studentSolution}
 
-O'QUVCHI YECHIMI:
-${studentSolution}
-
-VAZIFA:
-1. Yechimni tekshir
-2. Xatolarni top va tushuntir
-3. To'g'ri yechim yo'lini ko'rsat
-4. Ijobiy feedback ber
-5. Yaxshilash uchun maslahat ber
-
-FORMAT (JSON formatida javob ber):
+FAQAT quyidagi JSON formatida javob ber:
 {
-  "status": "correct|incorrect|partial",
-  "score": 0-100,
-  "errors": [
-    {
-      "type": "Xato turi",
-      "description": "Xato tavsifi",
-      "suggestion": "Tuzatish maslahati"
-    }
-  ],
-  "correctSolution": {
-    "steps": [],
-    "finalAnswer": "..."
-  },
-  "feedback": "Umumiy feedback",
-  "suggestions": ["Maslahat 1", "Maslahat 2"]
+  "status": "correct",
+  "score": 85,
+  "feedback": "Umumiy izoh...",
+  "errors": [{"type": "Xato turi", "description": "...", "suggestion": "..."}],
+  "correctSolution": {"steps": [], "finalAnswer": "To'g'ri javob..."},
+  "suggestions": ["Maslahat 1"]
 }
-`;
-
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
-
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-            return {
-                success: true,
-                data: JSON.parse(jsonMatch[0]),
-                rawText: text
-            };
-        } else {
-            return {
-                success: true,
-                data: parseTextFeedback(text),
-                rawText: text
-            };
-        }
+status: "correct" yoki "incorrect" yoki "partial"`;
+        const text = await generateWithFallback(prompt);
+        const data = safeParseJSON(text) || parseTextFeedback(text);
+        return { success: true, data };
     } catch (error) {
-        console.error('Solution checking error:', error);
-        throw error;
+        return { success: false, error: "AI bilan ulanishda xato: " + error.message, data: null };
     }
 }
 
 export async function generatePracticeProblem(apiKeyIgnored, topic, difficulty = 'medium') {
     try {
-        const genAI = getGenAI();
-        const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+        const difficultyMap = { easy: "Oson", medium: "O'rta", hard: "Qiyin" };
+        const prompt = `Sen 9-sinf fizika o'qituvchisisan. "${topic}" mavzusida ${difficultyMap[difficulty]} darajadagi masala yarat. O'ZBEK tilida.
 
-        const difficultyMap = {
-            easy: 'Oson',
-            medium: "O'rta",
-            hard: 'Qiyin'
-        };
-
-        const prompt = `
-9-sinf fizika uchun "${topic}" mavzusida ${difficultyMap[difficulty]} darajadagi amaliyot masalasi yarat.
-
-TALABLAR:
-1. Real hayotga yaqin masala bo'lsin
-2. Aniq raqamlar bilan
-3. Yechimi bo'lsin
-4. O'zbek tilida
-
-FORMAT (JSON formatida javob ber):
+FAQAT quyidagi JSON formatida javob ber:
 {
-  "problem": "Masala matni",
-  "given": ["Ma'lumot 1", "Ma'lumot 2"],
-  "find": "Nima topish kerak",
-  "solution": {
-    "steps": [],
-    "finalAnswer": "..."
-  },
+  "problem": "Masala matni...",
+  "given": ["m = 5 kg", "F = 10 N"],
+  "find": "Tezlanishni toping",
+  "solution": {"steps": [], "finalAnswer": "a = 2 m/s²"},
   "topic": "${topic}",
   "difficulty": "${difficulty}",
   "hints": ["Maslahat 1", "Maslahat 2"]
-}
-`;
-
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
-
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-            return {
-                success: true,
-                data: JSON.parse(jsonMatch[0]),
-                rawText: text
-            };
-        } else {
-            return {
-                success: true,
-                data: parseTextProblem(text),
-                rawText: text
-            };
-        }
+}`;
+        const text = await generateWithFallback(prompt);
+        const data = safeParseJSON(text) || parseTextProblem(text);
+        return { success: true, data };
     } catch (error) {
-        console.error('Problem generation error:', error);
-        throw error;
+        return { success: false, error: "AI bilan ulanishda xato: " + error.message, data: null };
     }
 }
 
 export async function explainConcept(apiKeyIgnored, question, context = '') {
     try {
-        const genAI = getGenAI();
-        const model = genAI.getGenerativeModel({ model: MODEL_NAME });
-
-        const prompt = `
-Sen 9-sinf o'quvchisi uchun fizika tushuntirayotgan do'stona o'qituvchisan.
-
+        const prompt = `Sen 9-sinf o'quvchisiga fizika tushuntirayotgan do'stona o'qituvchisan. O'ZBEK tilida tushuntir.
 SAVOL: ${question}
 ${context ? `KONTEKST: ${context}` : ''}
 
-TALABLAR:
-1. Oddiy, tushunarli tilda tushuntir
-2. Kundalik hayotdan misollar kel
-3. Analogiyalar ishlatib tushuntir
-4. Qisqa va aniq bo'lsin
-5. Agar kerak bo'lsa, formula ko'rsat (LaTeX formatida)
-6. O'zbek tilida
-
-FORMAT (JSON formatida javob ber):
+FAQAT quyidagi JSON formatida javob ber:
 {
-  "explanation": "Asosiy tushuntirish",
+  "explanation": "Tushunarli tushuntirish...",
   "examples": ["Misol 1", "Misol 2"],
-  "analogy": "Analogiya",
-  "formula": "$formula$",
-  "relatedConcepts": ["Bog'liq tushuncha 1", "Bog'liq tushuncha 2"],
-  "tips": ["Maslahat 1", "Maslahat 2"]
-}
-`;
-
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
-
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-            return {
-                success: true,
-                data: JSON.parse(jsonMatch[0]),
-                rawText: text
-            };
-        } else {
-            return {
-                success: true,
-                data: { explanation: text },
-                rawText: text
-            };
-        }
+  "analogy": "Kundalik hayotdan analogiya...",
+  "formula": "F = ma (agar kerak bo'lsa)",
+  "relatedConcepts": ["Bog'liq mavzu"],
+  "tips": ["Maslahat"]
+}`;
+        const text = await generateWithFallback(prompt);
+        const data = safeParseJSON(text) || { explanation: text };
+        return { success: true, data };
     } catch (error) {
-        console.error('Concept explanation error:', error);
-        throw error;
+        return { success: false, error: "AI bilan ulanishda xato: " + error.message, data: null };
     }
 }
 
 function parseTextSolution(text) {
     return {
-        steps: [{
-            number: 1,
-            title: "Yechim",
-            explanation: text,
-            formula: "",
-            calculation: "",
-            result: ""
-        }],
-        finalAnswer: "Yuqoridagi yechimga qarang",
-        topic: ""
+        steps: [{ number: 1, title: "Yechim", explanation: text, formula: "", calculation: "", result: "" }],
+        finalAnswer: "Yuqoridagi yechimga qarang", topic: ""
     };
 }
-
 function parseTextFeedback(text) {
-    return {
-        status: "partial",
-        score: 50,
-        errors: [],
-        correctSolution: { steps: [], finalAnswer: "" },
-        feedback: text,
-        suggestions: []
-    };
+    return { status: "partial", score: 50, errors: [], correctSolution: { steps: [], finalAnswer: "" }, feedback: text, suggestions: [] };
 }
-
 function parseTextProblem(text) {
-    return {
-        problem: text,
-        given: [],
-        find: "",
-        solution: { steps: [], finalAnswer: "" },
-        topic: "",
-        difficulty: "medium",
-        hints: []
-    };
+    return { problem: text, given: [], find: "", solution: { steps: [], finalAnswer: "" }, topic: "", difficulty: "medium", hints: [] };
 }

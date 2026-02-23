@@ -354,7 +354,9 @@ export default function LessonPage() {
                     {/* AI USTOZ TAB */}
                     {activeTab === 'ai-ustoz' && (
                         <div className="h-[600px] border border-slate-700 rounded-xl overflow-hidden">
-                            <AITutorModule setActiveTab={() => { }} />
+                            <AITutorModule
+                                topic={`${chapter.name} — ${lesson.title}`}
+                            />
                         </div>
                     )}
                 </div>

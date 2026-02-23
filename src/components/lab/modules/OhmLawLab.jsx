@@ -13,7 +13,7 @@ export default function OhmLawLab({ addNotification, updateStats, theme }) {
         "AIzaSyCC8uEzh1px6KKsXP8FEkh_JS_3F1ErtDQ",
         "AIzaSyBUzgU8ARMbZX1OYGv0f_cIqQJqaWdlGVM"
     ];
-    const MODEL_NAME = "gemini-1.5-flash";
+    const MODEL_NAME = "gemini-2.5-flash";
 
     const [voltage, setVoltage] = useState(12);
     const [resistance, setResistance] = useState(4);
@@ -224,3 +224,4 @@ export default function OhmLawLab({ addNotification, updateStats, theme }) {
         </div>
     );
 }
+

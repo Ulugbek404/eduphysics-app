@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { auth, googleProvider } from '../firebase';
+import { auth, googleProvider, db } from '../firebase';
 import {
     signInWithPopup,
     signOut,
@@ -11,31 +11,59 @@ import {
     sendPasswordResetEmail,
     updateProfile
 } from 'firebase/auth';
+import {
+    doc, getDoc, setDoc, serverTimestamp
+} from 'firebase/firestore';
 
 const AuthContext = createContext();
 
+const hasCachedFirebaseAuth = () => {
+    try {
+        return Object.keys(localStorage).some(k => k.startsWith('firebase:authUser'));
+    } catch { return false; }
+};
+
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [userData, setUserData] = useState(null);
+    const [loading, setLoading] = useState(hasCachedFirebaseAuth);
     const [error, setError] = useState(null);
+
+    // Firestore'dan foydalanuvchi ma'lumotlarini olish
+    const fetchUserData = async (uid) => {
+        try {
+            const snap = await getDoc(doc(db, 'users', uid));
+            if (snap.exists()) {
+                setUserData(snap.data());
+                return snap.data();
+            } else {
+                setUserData(null);
+                return null;
+            }
+        } catch (err) {
+            console.warn('fetchUserData error:', err);
+            setUserData(null);
+            return null;
+        }
+    };
 
     useEffect(() => {
         if (!auth) {
-            setError("Firebase konfiguratsiyasi xatosi: .env fayli yoki API kalitlari noto'g'ri. Iltimos, administratorga murojaat qiling.");
+            setError("Firebase konfiguratsiyasi xatosi.");
             setLoading(false);
             return;
         }
 
-        // Persistence sozlash - foydalanuvchi login qolsin
         setPersistence(auth, browserLocalPersistence).catch(console.error);
 
-        // Auth state o'zgarishini kuzatish
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             setUser(currentUser);
-            setLoading(false);
             if (currentUser) {
-                console.log('User logged in:', currentUser.displayName);
+                await fetchUserData(currentUser.uid);
+            } else {
+                setUserData(null);
             }
+            setLoading(false);
         }, (err) => {
             console.error('Auth state error:', err);
             setError(err.message);
@@ -50,7 +78,23 @@ export function AuthProvider({ children }) {
         try {
             setError(null);
             const result = await signInWithPopup(auth, googleProvider);
-            console.log('Login successful:', result.user.displayName);
+            // Google bilan kiruvchi ham Firestore ga yoziladi (agar mavjud bo'lmasa)
+            const snap = await getDoc(doc(db, 'users', result.user.uid));
+            if (!snap.exists()) {
+                await setDoc(doc(db, 'users', result.user.uid), {
+                    uid: result.user.uid,
+                    email: result.user.email,
+                    displayName: result.user.displayName || '',
+                    role: 'student',
+                    region: '',
+                    currentLevel: 1,
+                    totalXP: 0,
+                    streakDays: 0,
+                    activeDates: [],
+                    createdAt: serverTimestamp(),
+                });
+            }
+            await fetchUserData(result.user.uid);
             return result.user;
         } catch (err) {
             console.error('Login error:', err);
@@ -59,15 +103,30 @@ export function AuthProvider({ children }) {
         }
     };
 
-    // Email bilan ro'yxatdan o'tish
-    const signUpWithEmail = async (email, password, displayName) => {
+    // Email + rol bilan ro'yxatdan o'tish (ustoz yoki o'quvchi)
+    const signUpWithEmailAndRole = async (email, password, displayName, role = 'student') => {
         try {
             setError(null);
             const result = await createUserWithEmailAndPassword(auth, email, password);
-            // Display name qo'shish
             await updateProfile(result.user, { displayName });
-            console.log('Sign up successful:', displayName);
-            return result.user;
+
+            // Firestore ga yoz
+            await setDoc(doc(db, 'users', result.user.uid), {
+                uid: result.user.uid,
+                email,
+                displayName,
+                role,
+                region: '',
+                currentLevel: 1,
+                totalXP: 0,
+                streakDays: 0,
+                activeDates: [],
+                createdAt: serverTimestamp(),
+            });
+
+            await fetchUserData(result.user.uid);
+            // role ni qaytaramiz — LoginPage yo'nalishni aniqlash uchun
+            return { user: result.user, role };
         } catch (err) {
             console.error('Sign up error:', err);
             setError(err.message);
@@ -75,13 +134,18 @@ export function AuthProvider({ children }) {
         }
     };
 
+    // Eski signUpWithEmail — mos kelish uchun saqlanadi (role='student')
+    const signUpWithEmail = (email, password, displayName) =>
+        signUpWithEmailAndRole(email, password, displayName, 'student');
+
     // Email bilan kirish
     const loginWithEmail = async (email, password) => {
         try {
             setError(null);
             const result = await signInWithEmailAndPassword(auth, email, password);
-            console.log('Email login successful:', result.user.email);
-            return result.user;
+            const data = await fetchUserData(result.user.uid);
+            // role ni qaytaramiz — LoginPage yo'nalishni aniqlash uchun
+            return { user: result.user, role: data?.role || 'student' };
         } catch (err) {
             console.error('Email login error:', err);
             setError(err.message);
@@ -94,7 +158,6 @@ export function AuthProvider({ children }) {
         try {
             setError(null);
             await sendPasswordResetEmail(auth, email);
-            console.log('Password reset email sent to:', email);
         } catch (err) {
             console.error('Password reset error:', err);
             setError(err.message);
@@ -106,22 +169,31 @@ export function AuthProvider({ children }) {
     const logout = async () => {
         try {
             await signOut(auth);
-            console.log('Logout successful');
+            setUserData(null);
         } catch (err) {
             console.error('Logout error:', err);
             setError(err.message);
         }
     };
 
+    // Rol yordamchilari
+    const isTeacher = userData?.role === 'teacher';
+    const isStudent = userData?.role === 'student' || !userData?.role;
+
     const value = {
         user,
+        userData,
         loading,
         error,
+        isTeacher,
+        isStudent,
         loginWithGoogle,
         signUpWithEmail,
+        signUpWithEmailAndRole,
         loginWithEmail,
         resetPassword,
-        logout
+        logout,
+        fetchUserData,
     };
 
     return (
@@ -131,12 +203,9 @@ export function AuthProvider({ children }) {
     );
 }
 
-// Custom hook - AuthContext'ni ishlatish uchun
 export function useAuth() {
     const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth must be used within AuthProvider');
-    }
+    if (!context) throw new Error('useAuth must be used within AuthProvider');
     return context;
 }
 
