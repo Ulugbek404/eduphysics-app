@@ -747,7 +747,7 @@ function VirtualLab({ addNotification, setShowSettings, updateStats }) {
               <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-4 text-blue-400">
                 <Zap size={24} />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Elektr Toki (Ohm Qonuni)</h3>
+              <h3 className="text-xl font-bold text-white mb-2">Elektr Toki (Om Qonuni)</h3>
               <p className="text-slate-400 text-sm mb-4">
                 Tok kuchi, kuchlanish va qarshilik orasidagi bog'liqlikni o'rganing.
               </p>

@@ -27,6 +27,7 @@ import LessonPage from './pages/LessonPage';
 import KutubxonaPage from './pages/KutubxonaPage';
 import LaboratoriyaPage from './pages/LaboratoriyaPage';
 import OhmQonuni from './pages/OhmQonuni';
+import MolekulyarFizika from './pages/MolekulyarFizika';
 
 // Route Guards
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -103,6 +104,7 @@ function AppRoutes() {
             <Route path="/kutubxona" element={<ProtectedRoute><KutubxonaPage /></ProtectedRoute>} />
             <Route path="/laboratoriya" element={<ProtectedRoute><LaboratoriyaPage /></ProtectedRoute>} />
             <Route path="/laboratoriya/ohm" element={<ProtectedRoute><OhmQonuni /></ProtectedRoute>} />
+            <Route path="/laboratoriya/gaz" element={<ProtectedRoute><MolekulyarFizika /></ProtectedRoute>} />
             <Route path="/missiyalar" element={<ProtectedRoute><MissionsPage /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
             <Route path="/dashboard/*" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />

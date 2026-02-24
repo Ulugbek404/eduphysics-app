@@ -96,7 +96,7 @@ export default function OhmLawLab({ addNotification, updateStats, theme }) {
             <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                 <h2 className="text-2xl font-bold flex items-center gap-2">
                     <Zap className="text-yellow-400" />
-                    Ohm Qonuni: I = U / R
+                    Om Qonuni: I = U / R
                 </h2>
                 <div className="flex items-center space-x-3 bg-blue-900/20 px-4 py-2 rounded-xl border border-blue-500/20 backdrop-blur-sm">
                     <span className="text-slate-400 font-mono text-sm">Formula:</span>

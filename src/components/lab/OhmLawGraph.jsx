@@ -198,7 +198,7 @@ export default function OhmLawGraph({ voltage, resistance, current }) {
                 <div className="flex gap-2">
                     <div className="flex items-center gap-2 text-sm">
                         <div className="w-4 h-0.5 bg-blue-500"></div>
-                        <span className="text-slate-400">Ohm qonuni</span>
+                        <span className="text-slate-400">Om qonuni</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                         <div className="w-2 h-2 rounded-full bg-red-500"></div>

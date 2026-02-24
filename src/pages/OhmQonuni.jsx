@@ -17,7 +17,7 @@ function NazariyaTab() {
         >
             {/* Formula card */}
             <div className="rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-950/60 to-slate-900/80 p-6 text-center">
-                <p className="text-slate-400 text-sm mb-3">Ohm Qonuni formulasi</p>
+                <p className="text-slate-400 text-sm mb-3">Om Qonuni formulasi</p>
                 <div className="inline-flex items-center gap-4 bg-slate-900/80 border border-slate-700 rounded-2xl px-8 py-4">
                     <span className="text-4xl font-bold font-mono text-blue-400">I</span>
                     <span className="text-3xl font-bold text-slate-500">=</span>
@@ -29,15 +29,15 @@ function NazariyaTab() {
                 <div className="flex justify-center gap-8 mt-4 text-sm">
                     <span><span className="text-blue-400 font-bold">I</span> — Tok kuchi (Amper, A)</span>
                     <span><span className="text-yellow-400 font-bold">U</span> — Kuchlanish (Volt, V)</span>
-                    <span><span className="text-red-400 font-bold">R</span> — Qarshilik (Ohm, Ω)</span>
+                    <span><span className="text-red-400 font-bold">R</span> — Qarshilik (Om, Ω)</span>
                 </div>
             </div>
 
             {/* Explanation */}
             <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 space-y-3 text-slate-300 text-sm leading-relaxed">
-                <h3 className="text-white font-bold text-lg">📖 Ohm Qonuni haqida</h3>
+                <h3 className="text-white font-bold text-lg">📖 Om Qonuni haqida</h3>
                 <p>Georg Simon Ohm (1789–1854) tomonidan kashf etilgan bu qonun elektr zanjirining asosini tashkil etadi.</p>
-                <p>Ohm qonuniga ko'ra, <span className="text-yellow-300 font-semibold">o'tkazgichdagi tok kuchi</span> uning uchlaridagi <span className="text-blue-300 font-semibold">kuchlanishga to'g'ri proporsional</span>, <span className="text-red-300 font-semibold">qarshilikka teskari proporsional</span> bo'ladi.</p>
+                <p>Om Qonuniga ko'ra, <span className="text-yellow-300 font-semibold">o'tkazgichdagi tok kuchi</span> uning uchlaridagi <span className="text-blue-300 font-semibold">kuchlanishga to'g'ri proporsional</span>, <span className="text-red-300 font-semibold">qarshilikka teskari proporsional</span> bo'ladi.</p>
                 <p className="text-slate-400">Misol: Agar kuchlanish <strong className="text-white">12 V</strong> va qarshilik <strong className="text-white">4 Ω</strong> bo'lsa, tok kuchi: <strong className="text-blue-400">I = 12 / 4 = 3 A</strong></p>
             </div>
 
@@ -328,7 +328,7 @@ function TajribaTab() {
 // ══════════════════════════════════════════════════════════
 const quizQuestions = [
     {
-        q: "Ohm qonuniga ko'ra, kuchlanish 2 baravar oshsa, tok kuchi qanday o'zgaradi?",
+        q: "Om Qonuniga ko'ra, kuchlanish 2 baravar oshsa, tok kuchi qanday o'zgaradi?",
         options: ["2 baravar kamayadi", "O'zgarmaydi", "2 baravar oshadi", "4 baravar oshadi"],
         correct: 2,
     },
@@ -338,7 +338,7 @@ const quizQuestions = [
         correct: 2,
     },
     {
-        q: "Ohm qonunini kashf etgan olim kim?",
+        q: "Om Qonunini kashf etgan olim kim?",
         options: ["Albert Eynshteyn", "Nikola Tesla", "Georg Simon Ohm", "Michael Faraday"],
         correct: 2,
     },
@@ -514,10 +514,10 @@ export default function OhmQonuni() {
                         <div className="flex items-center gap-2 text-slate-500 text-xs mb-0.5">
                             <span>Laboratoriya</span>
                             <span>/</span>
-                            <span className="text-indigo-400">Ohm Qonuni</span>
+                            <span className="text-indigo-400">Om Qonuni</span>
                         </div>
                         <h1 className="text-xl font-bold text-white flex items-center gap-2">
-                            ⚡ Ohm Qonuni Laboratoriyasi
+                            ⚡ Om Qonuni Laboratoriyasi
                         </h1>
                     </div>
                     <div className="ml-auto flex items-center gap-2">

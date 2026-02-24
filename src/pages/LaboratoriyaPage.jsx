@@ -9,7 +9,7 @@ import {
 // ─── Lab ma'lumotlari ─────────────────────────────────────────────────────────
 const labsData = [
     {
-        id: 'ohm', title: "Ohm Qonuni", chapter: "Elektr",
+        id: 'ohm', title: "Om Qonuni", chapter: "Elektr",
         difficulty: "Oson", duration: "~10 daqiqa", xp: 50,
         description: "Tok kuchi, kuchlanish va qarshilik o'rtasidagi bog'liqlikni interaktiv tajriba orqali o'rganing.",
         gradient: "from-blue-600 to-cyan-500",
@@ -87,7 +87,7 @@ function CircleRing({ value, max, size = 64, stroke = 6, color = "#6366f1" }) {
 
 // ─── Lab Card ─────────────────────────────────────────────────────────────────
 function LabCard({ lab, completed, index, onStart }) {
-    const isAvailable = lab.id === 'ohm'; // faqat ohm hozircha
+    const isAvailable = lab.id === 'ohm' || lab.id === 'gaz';
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -158,8 +158,8 @@ function LabCard({ lab, completed, index, onStart }) {
                         onClick={() => isAvailable && onStart(lab.route)}
                         disabled={!isAvailable}
                         className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${isAvailable
-                                ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-                                : 'bg-slate-700/50 text-slate-600 cursor-not-allowed'
+                            ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                            : 'bg-slate-700/50 text-slate-600 cursor-not-allowed'
                             }`}
                     >
                         {isAvailable ? (
@@ -264,8 +264,8 @@ export default function LaboratoriyaPage() {
                             key={ch}
                             onClick={() => setActiveChapter(ch)}
                             className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap border transition-all duration-200 ${activeChapter === ch
-                                    ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-                                    : 'bg-slate-800/60 border-slate-700/50 text-slate-400 hover:text-white hover:border-slate-600'
+                                ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                                : 'bg-slate-800/60 border-slate-700/50 text-slate-400 hover:text-white hover:border-slate-600'
                                 }`}
                         >
                             {ch}
