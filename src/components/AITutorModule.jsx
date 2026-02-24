@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Bot, Send, User, Sparkles, Trash2, RefreshCw } from 'lucide-react';
-import { askAITutor } from '../services/aiService';
+import { useGeminiAI } from '../hooks/useGeminiAI';
 
 // ─── Typing indicator ──────────────────────────────────────────────────────
 function TypingDots() {
@@ -53,63 +53,51 @@ export default function AITutorModule({ topic = '' }) {
         ? `Salom! Men NurFizika AI ustoziman. ⚛️\n"${topic}" mavzusidan savollaringiz bo'lsa bemalol so'rang!`
         : "Salom! Men NurFizika AI ustoziman. ⚛️\nFizikadan har qanday savol bering — qadamba-qadam tushuntiraman!";
 
-    const [messages, setMessages] = useState([
-        {
-            role: 'ai',
-            text: greeting
-        }
-    ]);
+    const [messages, setMessages] = useState([{ role: 'ai', text: greeting }]);
     const [input, setInput] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const [localError, setLocalError] = useState(null);
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
 
+    // useGeminiAI — AI mantiq hook ichida, re-renderdan ta'sirlanmaydi
+    const { isLoading, sendMessage } = useGeminiAI();
+
+    // Scroll — faqat messages yoki isLoading o'zgarganda
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages, isLoading]);
+    }, [messages, isLoading]); // ← to'g'ri dependency array
 
-    const handleSend = async () => {
+    // handleSend — useCallback bilan o'ralgan, faqat zarur o'zgarishda yangilanadi
+    const handleSend = useCallback(async () => {
         if (!input.trim() || isLoading) return;
         const userText = input.trim();
         setInput('');
-        setError(null);
+        setLocalError(null);
 
         setMessages(prev => [...prev, { role: 'user', text: userText }]);
-        setIsLoading(true);
 
-        try {
-            const result = await askAITutor(userText, messages, topic);
-            if (result.success) {
-                setMessages(prev => [...prev, { role: 'ai', text: result.answer }]);
-            } else {
-                throw new Error(result.error);
-            }
-        } catch (err) {
-            const msg = err.message?.includes('429')
-                ? 'So\'rovlar juda ko\'p! 10 soniya kuting va qayta urining. 🔄'
-                : 'Xatolik yuz berdi. Internet aloqasini tekshiring.';
-            setError(msg);
-        } finally {
-            setIsLoading(false);
-            inputRef.current?.focus();
+        // sendMessage hook ichida useCallback([], []) — HECH QACHON qayta yaratilmaydi
+        const answer = await sendMessage(userText, messages, topic);
+        if (answer) {
+            setMessages(prev => [...prev, { role: 'ai', text: answer }]);
+        } else {
+            setLocalError("Xatolik yuz berdi. Qayta urining.");
         }
-    };
 
-    const handleKeyDown = (e) => {
+        inputRef.current?.focus();
+    }, [input, isLoading, messages, topic, sendMessage]); // ← minimal deps
+
+    const handleKeyDown = useCallback((e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSend();
         }
-    };
+    }, [handleSend]);
 
-    const clearChat = () => {
-        setMessages([{
-            role: 'ai',
-            text: "Suhbat tozalandi! Yangi savol bering. ⚛️"
-        }]);
-        setError(null);
-    };
+    const clearChat = useCallback(() => {
+        setMessages([{ role: 'ai', text: "Suhbat tozalandi! Yangi savol bering. ⚛️" }]);
+        setLocalError(null);
+    }, []);
 
     return (
         <div className="flex flex-col h-[calc(100vh-160px)] min-h-[500px]">
@@ -149,9 +137,9 @@ export default function AITutorModule({ topic = '' }) {
                         </div>
                     )}
 
-                    {error && (
+                    {localError && (
                         <div className="flex items-center gap-2 mx-2 mb-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-                            <span className="flex-1">{error}</span>
+                            <span className="flex-1">{localError}</span>
                             <button onClick={handleSend} className="flex items-center gap-1 text-xs text-red-300 hover:text-white transition-colors">
                                 <RefreshCw size={12} /> Qayta
                             </button>

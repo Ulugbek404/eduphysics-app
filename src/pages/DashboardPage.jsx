@@ -17,8 +17,8 @@ import { getUserProgress, addUserXP, updateUserLevel, markLessonComplete, saveQu
 import { lessonsData, calculateChapterProgress } from '../data/lessonsData';
 import { testsData } from '../data/testsData';
 import AIRecommendations from '../components/AIRecommendations';
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { askAITutor } from '../services/aiService';
+import { useGeminiAI } from '../hooks/useGeminiAI';
 import EmptyState from '../components/ui/EmptyState';
 import PageHeader from '../components/ui/PageHeader';
 
@@ -47,8 +47,6 @@ const AITutorModule = lazy(() => import('../components/AITutorModule'));
 const HomeworkHelper = lazy(() => import('../components/homework/HomeworkHelper'));
 const PDFViewer = lazy(() => import('../components/PDFViewer'));
 
-// --- AI Model Config ---
-const MODEL_NAME = "gemini-2.5-flash";
 
 // --- LOADING SCREEN ---
 function LoadingScreen() {
@@ -1093,64 +1091,28 @@ function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }
 
   // AI Generator States
   const [topic, setTopic] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
   const [mode, setMode] = useState('menu'); // 'menu' | 'quiz'
+  // useGeminiAI hook — barcha AI mantiq shu yerda, re-renderdan ta'sirlanmaydi
+  const { isLoading: isGenerating, generateQuiz: aiGenerateQuiz } = useGeminiAI();
 
-  // AI orqali test tuzish funksiyasi
-  const generateQuiz = async () => {
+  // AI quiz — faqat UI logikasi bu yerda, AI mantiq hook ichida
+  const generateQuiz = useCallback(async () => {
     if (!topic.trim()) {
       addNotification("Iltimos, test mavzusini yozing!", "warning");
       return;
     }
-
-    setIsGenerating(true);
-
-    // JSON formatda javob olish uchun aniq prompt
-    const prompt = `Fizika bo'yicha "${topic}" mavzusida 5 ta qiziqarli test savoli tuz.
-      Javobni faqat va faqat quyidagi JSON formatda qaytar(boshqa hech qanday matnsiz):
-[
-  {
-    "q": "Savol matni",
-    "options": ["A javob", "B javob", "C javob", "D javob"],
-    "ans": to'g'ri_javob_indeksi_raqamda_0_dan_3_gacha
-  }
-]
-      Savollar 9 - sinf darajasida, o'zbek tilida bo'lsin.`;
-
-    try {
-      const apiKey = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: MODEL_NAME });
-
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
-
-      if (!text) {
-        throw new Error("AI javob bo'sh qaytardi.");
-      }
-
-      // JSONni tozalash (ba'zan AI ```json ... ``` deb qaytaradi)
-      const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
-      const newQuestions = JSON.parse(cleanJson);
-
-      if (Array.isArray(newQuestions) && newQuestions.length > 0) {
-        setQuestions(newQuestions);
-        setMode('quiz');
-        setCurrentQ(0);
-        setScore(0);
-        setShowResult(false);
-        addNotification("Test muvaffaqiyatli tuzildi!", "success");
-      } else {
-        throw new Error("Noto'g'ri format");
-      }
-    } catch (error) {
-      console.error("Quiz Gen Error:", error);
+    const newQuestions = await aiGenerateQuiz(topic);
+    if (newQuestions) {
+      setQuestions(newQuestions);
+      setMode('quiz');
+      setCurrentQ(0);
+      setScore(0);
+      setShowResult(false);
+      addNotification("Test muvaffaqiyatli tuzildi!", "success");
+    } else {
       addNotification("Test tuzishda xatolik. Qaytadan urinib ko'ring.", "error");
-    } finally {
-      setIsGenerating(false);
     }
-  };
+  }, [topic, aiGenerateQuiz, addNotification]);
 
   const handleAnswer = (index) => {
     setSelectedOption(index);
@@ -1216,7 +1178,7 @@ function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }
           </div>
 
           <div className="flex flex-wrap gap-2 mb-8">
-            {["Kinematika", "Dinamika", "Tok qonunlari", "Yorug'lik", "Kvant fizikasi"].map(tag => (
+            {["Kinematika", "Dinamika", "Molekulyar fizika", "Tok qonunlari", "Yorug'lik", "Kvant fizikasi"].map(tag => (
               <button
                 key={tag}
                 onClick={() => setTopic(tag)}
