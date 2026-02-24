@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { doc, onSnapshot, updateDoc, increment, collection, addDoc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { doc, onSnapshot, updateDoc, increment, collection, addDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from './AuthContext';
 
@@ -39,6 +39,9 @@ export function XPProvider({ children }) {
     const [toasts, setToasts] = useState([]);
     const [checkMissionsFn, setCheckMissionsFn] = useState(null);
 
+    // Foydalanuvchi ma'lumotlarini cache — getDoc ni kamaytirish uchun
+    const userMetaRef = useRef({ displayName: '', region: '' });
+
     // Register the missions checker (MissionsContext will inject this)
     const registerMissionsChecker = useCallback((fn) => {
         setCheckMissionsFn(() => fn);
@@ -65,9 +68,15 @@ export function XPProvider({ children }) {
             ref,
             (snap) => {
                 if (snap.exists()) {
-                    const xp = snap.data().xp || 0;
+                    const data = snap.data();
+                    const xp = data.xp || 0;
                     setTotalXP(xp);
                     setLevel(calcLevel(xp));
+                    // Region va displayName ni cache qilib saqlaymiz
+                    userMetaRef.current = {
+                        displayName: data.displayName || user.displayName || '',
+                        region: data.region || '',
+                    };
                 }
             },
             (error) => {
@@ -75,13 +84,13 @@ export function XPProvider({ children }) {
             }
         );
         return unsub;
-    }, [user?.uid]);
+    }, [user?.uid, user?.displayName]);
 
     // addXP — yagona XP qo'shish funksiyasi
     const addXP = useCallback(async (amount, reason = 'misc') => {
         if (!user?.uid || amount <= 0) return;
         try {
-            // 1. Firestore ga yoz (single source of truth)
+            // 1. Firestore ga yoz
             const userRef = doc(db, 'users', user.uid);
             await updateDoc(userRef, { xp: increment(amount) });
 
@@ -89,28 +98,24 @@ export function XPProvider({ children }) {
             const logsRef = collection(db, 'xpLogs', user.uid, 'logs');
             await addDoc(logsRef, { amount, reason, timestamp: serverTimestamp() });
 
-            // 3. Leaderboard yangilash (inline, circular import yo'q)
-            const snap = await getDoc(userRef);
-            if (snap.exists()) {
-                const d = snap.data();
-                const newXP = (d.xp || 0) + amount;
-                const payload = {
-                    uid: user.uid,
-                    displayName: user.displayName || d.displayName || 'Foydalanuvchi',
-                    totalXP: newXP,
-                    weeklyXP: (d.weeklyXP || 0) + amount,
-                    monthlyXP: (d.monthlyXP || 0) + amount,
-                    dailyXP: (d.dailyXP || 0) + amount,
-                    level: calcLevel(newXP),
-                    region: d.region || '',
-                    updatedAt: serverTimestamp(),
-                };
-                const globalRef = doc(db, 'leaderboard', 'global', 'users', user.uid);
-                await setDoc(globalRef, payload, { merge: true });
-                if (d.region) {
-                    const regionRef = doc(db, 'leaderboard', d.region, 'users', user.uid);
-                    await setDoc(regionRef, payload, { merge: true });
-                }
+            // 3. Leaderboard yangilash — increment() bilan, getDoc shart emas!
+            const { displayName, region } = userMetaRef.current;
+            const payload = {
+                uid: user.uid,
+                displayName: user.displayName || displayName || 'Foydalanuvchi',
+                totalXP: increment(amount),
+                weeklyXP: increment(amount),
+                monthlyXP: increment(amount),
+                dailyXP: increment(amount),
+                level: calcLevel(totalXP + amount),
+                region: region,
+                updatedAt: serverTimestamp(),
+            };
+            const globalRef = doc(db, 'leaderboard', 'global', 'users', user.uid);
+            await setDoc(globalRef, payload, { merge: true });
+            if (region) {
+                const regionRef = doc(db, 'leaderboard', region, 'users', user.uid);
+                await setDoc(regionRef, payload, { merge: true });
             }
 
             // 4. Missiyalarni tekshir
@@ -121,7 +126,7 @@ export function XPProvider({ children }) {
         } catch (err) {
             console.error('addXP error:', err);
         }
-    }, [user?.uid, checkMissionsFn, pushToast]);
+    }, [user?.uid, user?.displayName, totalXP, checkMissionsFn, pushToast]);
 
     return (
         <XPContext.Provider value={{ totalXP, level, addXP, registerMissionsChecker }}>
