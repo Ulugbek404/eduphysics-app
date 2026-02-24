@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, useRef, lazy, Suspense, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -606,34 +606,14 @@ function AIAssistant({ apiKey, setShowSettings, isOpen: externalIsOpen, setIsOpe
     setIsLoading(true);
 
     try {
-      // Development mode: to'g'ridan-to'g'ri Gemini API ishlatamiz
-      // Production mode: Netlify Functions ishlatiladi
-
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({
-        model: MODEL_NAME,
-        systemInstruction: "Sen 9-sinf o'quvchilari uchun 'EduPhysics' ilovasida ishlaydigan do'stona va bilimdon fizik ustozsan. Javoblarni o'zbek tilida, sodda, qiziqarli misollar bilan va ilmiy asoslangan holda ber. O'quvchini ilhomlantir. Formulalar ishlatsang, ularni tushuntirib ber."
-      });
-
-      const result = await model.generateContent(userMsg);
-      const response = await result.response;
-      const text = response.text();
-
-      setMessages(prev => [...prev, { role: 'ai', text: text }]);
+      const { generateChat } = await import('../services/geminiClient');
+      const text = await generateChat(userMsg, messages);
+      setMessages(prev => [...prev, { role: 'ai', text }]);
     } catch (error) {
       console.error("AI Error:", error);
-
-      let errorMessage = "Xatolik yuz berdi. ";
-      if (error.message.includes("404")) {
-        errorMessage += "Model topilmadi. Iltimos, internet ulanishini tekshiring.";
-      } else if (error.message.includes("403") || error.message.includes("401")) {
-        errorMessage += "API kalit noto'g'ri yoki muddati tugagan. Sozlamalarni tekshiring.";
-      } else if (error.message.includes("429")) {
-        errorMessage += "Juda ko'p so'rovlar. Iltimos, bir oz kuting.";
-      } else {
-        errorMessage += "Qaytadan urinib ko'ring.";
-      }
-
+      const errorMessage = error.message?.includes('429')
+        ? "Juda ko'p so'rovlar. Bir oz kuting. 🔄"
+        : "Xatolik yuz berdi. Qaytadan urining.";
       setMessages(prev => [...prev, { role: 'ai', text: errorMessage }]);
     } finally {
       setIsLoading(false);
