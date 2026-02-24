@@ -9,10 +9,10 @@ const MODEL_NAME = 'gemini-2.5-flash';
 
 // .env dan API kalitlarini ol, yo'q bo'lsa homeworkService kalitlaridan foydalaniladi
 const API_KEYS = [
-    import.meta.env.VITE_GEMINI_API_KEY_1 || 'AIzaSyBy1_ST87s7uMpMWvM9Iq06eTVM8imBaao',
-    import.meta.env.VITE_GEMINI_API_KEY_2 || 'AIzaSyB5McpyvgDYOu3GodFsw025i1UYvEB1Jqo',
-    import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyAkl2vISoMfAf1Rb0LGVvHFPJegcnQVygI',
-].filter(Boolean);
+    import.meta.env.VITE_GEMINI_API_KEY,
+    import.meta.env.VITE_GEMINI_API_KEY_1,
+    import.meta.env.VITE_GEMINI_API_KEY_2,
+].filter(Boolean); // faqat .env dan keladi — kod ichida HECH QACHON yozma
 
 let currentKeyIndex = 0;
 
