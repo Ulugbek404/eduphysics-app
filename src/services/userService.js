@@ -1,255 +1,243 @@
-import { doc, collection, getDoc, setDoc, updateDoc, increment, arrayUnion, serverTimestamp } from 'firebase/firestore';
+/**
+ * NurFizika — userService.js
+ * Barcha Firestore operatsiyalari cache orqali
+ */
+import {
+    doc, collection, getDoc, setDoc, updateDoc,
+    increment, arrayUnion, serverTimestamp, getDocs,
+    query, orderBy, limit, addDoc
+} from 'firebase/firestore';
 import { db } from '../firebase';
+import { cachedFetch, clearCache, clearUserCache, setCache, TTL } from '../utils/cache';
 
+// ─── User Ma'lumotlari ────────────────────────────────────────────────────────
 
 /**
- * User progress olish yoki yaratish
- * @param {string} userId - User ID
- * @param {object} userInfo - User ma'lumotlari (displayName, email, photoURL)
- * @returns {Promise<object>} User progress data
+ * User progress olish yoki yaratish — CACHE BILAN
  */
 export async function getUserProgress(userId, userInfo = {}) {
-    try {
-        const docRef = doc(db, 'users', userId);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            // Mavjud progress qaytarish
-            return docSnap.data();
-        } else {
-            // Yangi user uchun default progress yaratish
-            const defaultData = {
-                displayName: userInfo.displayName || 'User',
-                email: userInfo.email || '',
-                photoURL: userInfo.photoURL || '',
-                xp: 0,
-                level: 1,
-                streak: 0,
-                completedLessons: [],
-                quizResults: [],
-                achievements: [],
-                createdAt: serverTimestamp(),
-                lastLoginAt: serverTimestamp()
-            };
-
-            await setDoc(docRef, defaultData);
-            console.log('New user progress created:', userId);
-            return defaultData;
-        }
-    } catch (error) {
-        console.error('Error getting user progress:', error);
-        throw error;
-    }
+    return cachedFetch(
+        `user_${userId}`,
+        async () => {
+            try {
+                const docRef = doc(db, 'users', userId);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    return docSnap.data();
+                } else {
+                    const defaultData = {
+                        displayName: userInfo.displayName || 'User',
+                        email: userInfo.email || '',
+                        photoURL: userInfo.photoURL || '',
+                        xp: 0,
+                        level: 1,
+                        streak: 0,
+                        completedLessons: [],
+                        quizResults: [],
+                        achievements: [],
+                        createdAt: serverTimestamp(),
+                        lastLoginAt: serverTimestamp(),
+                    };
+                    await setDoc(docRef, defaultData);
+                    return defaultData;
+                }
+            } catch (error) {
+                console.error('getUserProgress error:', error);
+                throw error;
+            }
+        },
+        TTL.USER_DATA
+    );
 }
 
+// ─── XP Qo'shish ─────────────────────────────────────────────────────────────
+
 /**
- * XP qo'shish
- * @param {string} userId - User ID
- * @param {number} xpAmount - Qo'shiladigan XP miqdori
+ * XP qo'shish — cache tozalanadi
  */
 export async function addUserXP(userId, xpAmount) {
     try {
         const docRef = doc(db, 'users', userId);
         await updateDoc(docRef, {
             xp: increment(xpAmount),
-            lastLoginAt: serverTimestamp()
+            lastLoginAt: serverTimestamp(),
         });
-        console.log(`Added ${xpAmount} XP to user ${userId}`);
+        clearCache(`user_${userId}`); // Yangi XP ko'rinishi uchun
     } catch (error) {
-        console.error('Error adding XP:', error);
+        console.error('addUserXP error:', error);
         throw error;
     }
 }
 
-/**
- * Level yangilash
- * @param {string} userId - User ID
- * @param {number} newLevel - Yangi level
- */
-export async function updateUserLevel(userId, newLevel) {
-    try {
-        const docRef = doc(db, 'users', userId);
-        await updateDoc(docRef, {
-            level: newLevel
-        });
-        console.log(`User ${userId} level updated to ${newLevel}`);
-    } catch (error) {
-        console.error('Error updating level:', error);
-        throw error;
-    }
-}
+// ─── Darsni Tugatish ─────────────────────────────────────────────────────────
 
 /**
- * Darsni tugatish
- * @param {string} userId - User ID
- * @param {string} lessonId - Dars ID
+ * Darsni tugallash — cache tozalanadi
  */
 export async function markLessonComplete(userId, lessonId) {
     try {
         const docRef = doc(db, 'users', userId);
         await updateDoc(docRef, {
-            completedLessons: arrayUnion(lessonId)
+            completedLessons: arrayUnion(lessonId),
         });
-        console.log(`Lesson ${lessonId} marked complete for user ${userId}`);
+        clearCache(`user_${userId}`); // Progress yangilangani uchun
     } catch (error) {
-        console.error('Error marking lesson complete:', error);
+        console.error('markLessonComplete error:', error);
         throw error;
     }
 }
 
-/**
- * Quiz natijasini saqlash
- * @param {string} userId - User ID
- * @param {object} quizData - Quiz ma'lumotlari {quizId, score, totalQuestions, topic}
- */
+// ─── Quiz Natijasini Saqlash ──────────────────────────────────────────────────
+
 export async function saveQuizResult(userId, quizData) {
     try {
         const docRef = doc(db, 'users', userId);
-        const result = {
-            ...quizData,
-            completedAt: serverTimestamp()
-        };
-
         await updateDoc(docRef, {
-            quizResults: arrayUnion(result)
+            quizResults: arrayUnion({ ...quizData, completedAt: serverTimestamp() }),
         });
-        console.log(`Quiz result saved for user ${userId}:`, quizData);
+        clearCache(`user_${userId}`);
     } catch (error) {
-        console.error('Error saving quiz result:', error);
+        console.error('saveQuizResult error:', error);
         throw error;
     }
 }
 
-/**
- * Achievement qo'shish
- * @param {string} userId - User ID
- * @param {string} achievementId - Achievement ID
- */
+// ─── Achievement ──────────────────────────────────────────────────────────────
+
 export async function addAchievement(userId, achievementId) {
     try {
         const docRef = doc(db, 'users', userId);
         await updateDoc(docRef, {
-            achievements: arrayUnion(achievementId)
+            achievements: arrayUnion(achievementId),
         });
-        console.log(`Achievement ${achievementId} added for user ${userId}`);
+        clearCache(`user_${userId}`);
     } catch (error) {
-        console.error('Error adding achievement:', error);
+        console.error('addAchievement error:', error);
         throw error;
     }
 }
 
-/**
- * Streak yangilash (kunlik kirish)
- * @param {string} userId - User ID
- */
+// ─── Streak Yangilash ─────────────────────────────────────────────────────────
+
 export async function updateStreak(userId) {
     try {
         const docRef = doc(db, 'users', userId);
         const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) return;
 
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            const lastLogin = data.lastLoginAt?.toDate();
-            const now = new Date();
+        const data = docSnap.data();
+        const lastLogin = data.lastLoginAt?.toDate();
+        const now = new Date();
+        const oneDayMs = 24 * 60 * 60 * 1000;
+        const timeDiff = now - lastLogin;
 
-            // Oxirgi kirishdan 1 kun o'tganmi?
-            const oneDayMs = 24 * 60 * 60 * 1000;
-            const timeDiff = now - lastLogin;
+        let newStreak = data.streak || 0;
+        if (timeDiff < oneDayMs) return; // Bugun allaqachon kirgan
+        else if (timeDiff < 2 * oneDayMs) newStreak += 1;
+        else newStreak = 1;
 
-            let newStreak = data.streak || 0;
-
-            if (timeDiff < oneDayMs) {
-                // Bugun allaqachon kirgan
-                return;
-            } else if (timeDiff < 2 * oneDayMs) {
-                // Kecha kirgan - streak davom etadi
-                newStreak += 1;
-            } else {
-                // 1 kundan ko'p vaqt o'tgan - streak yangilanadi
-                newStreak = 1;
-            }
-
-            await updateDoc(docRef, {
-                streak: newStreak,
-                lastLoginAt: serverTimestamp()
-            });
-
-            console.log(`Streak updated to ${newStreak} for user ${userId}`);
-        }
+        await updateDoc(docRef, {
+            streak: newStreak,
+            lastLoginAt: serverTimestamp(),
+        });
+        clearCache(`user_${userId}`);
     } catch (error) {
-        console.error('Error updating streak:', error);
+        console.error('updateStreak error:', error);
         throw error;
     }
 }
 
-/**
- * User ma'lumotlarini yangilash
- * @param {string} userId - User ID
- * @param {object} updates - Yangilanadigan ma'lumotlar
- */
+// ─── User Ma'lumotlarini Yangilash ───────────────────────────────────────────
+
 export async function updateUserData(userId, updates) {
     try {
         const docRef = doc(db, 'users', userId);
-        await updateDoc(docRef, {
-            ...updates,
-            lastLoginAt: serverTimestamp()
-        });
-        console.log(`User data updated for ${userId}`);
+        await updateDoc(docRef, { ...updates, lastLoginAt: serverTimestamp() });
+        clearCache(`user_${userId}`);
     } catch (error) {
-        console.error('Error updating user data:', error);
+        console.error('updateUserData error:', error);
         throw error;
     }
-}/**
- * Leaderboard ni yangilash — addXP() dan keyin chaqiriladi
- * @param {string} uid - User ID
- * @param {object} userData - { displayName, totalXP, weeklyXP, monthlyXP, dailyXP, level, region, avatarColor }
- */
+}
+
+// ─── Level Yangilash ──────────────────────────────────────────────────────────
+
+export async function updateUserLevel(userId, newLevel) {
+    try {
+        await updateDoc(doc(db, 'users', userId), { level: newLevel });
+        clearCache(`user_${userId}`);
+    } catch (error) {
+        console.error('updateUserLevel error:', error);
+        throw error;
+    }
+}
+
+// ─── Region Yangilash ─────────────────────────────────────────────────────────
+
+export async function updateUserRegion(uid, region) {
+    try {
+        await updateDoc(doc(db, 'users', uid), { region });
+        clearCache(`user_${uid}`);
+    } catch (error) {
+        console.error('updateUserRegion error:', error);
+    }
+}
+
+// ─── Leaderboard Yangilash ────────────────────────────────────────────────────
+
 export async function updateLeaderboard(uid, userData) {
     try {
-        const { displayName, totalXP, weeklyXP = 0, monthlyXP = 0, dailyXP = 0, level = 1, region = '', avatarColor = '' } = userData;
+        const { displayName, totalXP, weeklyXP = 0, monthlyXP = 0,
+            dailyXP = 0, level = 1, region = '', avatarColor = '' } = userData;
         const payload = {
             uid,
             displayName: displayName || 'Foydalanuvchi',
             totalXP: totalXP || 0,
-            weeklyXP: weeklyXP || 0,
-            monthlyXP: monthlyXP || 0,
-            dailyXP: dailyXP || 0,
-            level,
-            region,
-            avatarColor,
+            weeklyXP, monthlyXP, dailyXP,
+            level, region, avatarColor,
             updatedAt: serverTimestamp(),
         };
 
-        // Global leaderboard
-        const globalRef = doc(db, 'leaderboard', 'global', 'users', uid);
-        await setDoc(globalRef, payload, { merge: true });
-
-        // Region specific (only if region set)
+        await setDoc(doc(db, 'leaderboard', 'global', 'users', uid), payload, { merge: true });
         if (region) {
-            const regionRef = doc(db, 'leaderboard', region, 'users', uid);
-            await setDoc(regionRef, payload, { merge: true });
+            await setDoc(doc(db, 'leaderboard', region, 'users', uid), payload, { merge: true });
         }
 
-        // Mark last rank update on user doc
-        const userRef = doc(db, 'users', uid);
-        await updateDoc(userRef, { lastRankUpdate: serverTimestamp() });
-
+        // Leaderboard cache tozalanadi — yangi ma'lumot ko'rinishi uchun
+        clearCache('leaderboard_global_weekly');
+        clearCache('leaderboard_global_monthly');
+        clearCache('leaderboard_global_all');
+        if (region) {
+            clearCache(`leaderboard_${region}_weekly`);
+        }
     } catch (error) {
         console.error('updateLeaderboard error:', error);
     }
 }
 
-/**
- * Foydalanuvchi viloyatini yangilash
- * @param {string} uid - User ID
- * @param {string} region - Viloyat nomi
- */
-export async function updateUserRegion(uid, region) {
-    try {
-        const userRef = doc(db, 'users', uid);
-        await updateDoc(userRef, { region });
-        console.log(`User ${uid} region updated to: ${region}`);
-    } catch (error) {
-        console.error('updateUserRegion error:', error);
-    }
+// ─── Leaderboard Olish — CACHE BILAN ─────────────────────────────────────────
+
+export async function getLeaderboard(type = 'global', timeFilter = 'weekly') {
+    const cacheKey = `leaderboard_${type}_${timeFilter}`;
+    return cachedFetch(
+        cacheKey,
+        async () => {
+            const orderField = timeFilter === 'weekly' ? 'weeklyXP'
+                : timeFilter === 'monthly' ? 'monthlyXP' : 'totalXP';
+            const q = query(
+                collection(db, 'leaderboard', type, 'users'),
+                orderBy(orderField, 'desc'),
+                limit(50)
+            );
+            const snap = await getDocs(q);
+            return snap.docs.map(d => d.data());
+        },
+        TTL.LEADERBOARD
+    );
+}
+
+// ─── Logout — barcha user cache tozalanadi ────────────────────────────────────
+
+export function onUserLogout(uid) {
+    clearUserCache(uid);
 }

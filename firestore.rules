@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper funksiyalar ──────────────────────────────────────────────────
+    function isLoggedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function isTeacher() {
+      return isLoggedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "teacher";
+    }
+
+    // ─── USERS ───────────────────────────────────────────────────────────────
+    // O'zi yoki ustoz o'qiydi; faqat o'zi yozadi; hech kim o'chira olmaydi
+    match /users/{userId} {
+      allow read:   if isLoggedIn() && (isOwner(userId) || isTeacher());
+      allow create: if isLoggedIn() && isOwner(userId);
+      allow update: if isLoggedIn() && isOwner(userId);
+      allow delete: if false;
+    }
+
+    // ─── MISSIONS ────────────────────────────────────────────────────────────
+    match /missions/{userId} {
+      allow read:  if isLoggedIn() && isOwner(userId);
+      allow write: if isLoggedIn() && isOwner(userId);
+    }
+
+    // ─── XP LOGS ─────────────────────────────────────────────────────────────
+    match /xpLogs/{userId}/logs/{logId} {
+      allow read:   if isLoggedIn() && (isOwner(userId) || isTeacher());
+      allow create: if isLoggedIn() && isOwner(userId);
+      allow update, delete: if false;
+    }
+
+    // ─── LEADERBOARD ─────────────────────────────────────────────────────────
+    // Barcha o'qiydi; faqat o'zi yozadi
+    match /leaderboard/{document=**} {
+      allow read:  if isLoggedIn();
+      allow write: if isLoggedIn() && isOwner(request.resource.data.uid);
+    }
+
+    // ─── ASSIGNMENTS ─────────────────────────────────────────────────────────
+    // Barcha o'qiydi; faqat ustoz yozadi
+    match /assignments/{assignmentId} {
+      allow read:   if isLoggedIn();
+      allow create: if isLoggedIn() && isTeacher();
+      allow update: if isLoggedIn() && isTeacher();
+      allow delete: if isLoggedIn() && isTeacher();
+    }
+
+    // ─── NOTIFICATIONS ───────────────────────────────────────────────────────
+    // Egasi o'qiydi; ustoz yozadi; egasi faqat read=true qilishi mumkin
+    match /notifications/{userId}/messages/{messageId} {
+      allow read:   if isLoggedIn() && isOwner(userId);
+      allow create: if isLoggedIn() && isTeacher();
+      allow update: if isLoggedIn() && isOwner(userId);
+      allow delete: if false;
+    }
+
+    // ─── PROGRESS ────────────────────────────────────────────────────────────
+    match /progress/{userId} {
+      allow read:  if isLoggedIn() && (isOwner(userId) || isTeacher());
+      allow write: if isLoggedIn() && isOwner(userId);
+    }
+
+  }
+}

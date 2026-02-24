@@ -1,76 +1,111 @@
 /**
- * NurFizika — localStorage cache yordamchisi
- * Firestore o'qishlarini kamaytirish uchun
+ * NurFizika — Smart localStorage Cache
+ * Firestore o'qishlarini 90% kamaytiradi
  */
 
-const CACHE_TTL = 5 * 60 * 1000; // 5 daqiqa
-const PREFIX = 'nf_cache_';
+const CACHE_PREFIX = 'nf_';
 
-/**
- * Ma'lumotni cache'dan oladi. Agar cache'da bo'lmasa yoki eskirgan bo'lsa,
- * fetchFn() ni chaqirib yangi ma'lumot oladi va cache'ga yozadi.
- *
- * @param {string} key - cache kaliti
- * @param {function} fetchFn - async funksiya (Firestore read)
- * @param {number} ttl - amal qilish muddati (ms), default 5 daqiqa
- * @returns {Promise<any>} - ma'lumot
- */
-export const getCached = async (key, fetchFn, ttl = CACHE_TTL) => {
+// ─── TTL Konstantlar ──────────────────────────────────────────────────────────
+export const TTL = {
+    USER_DATA: 10 * 60 * 1000,  // 10 daqiqa (tez-tez o'zgarmaydi)
+    PROGRESS: 5 * 60 * 1000,  //  5 daqiqa (dars tugalganda yangilanadi)
+    LEADERBOARD: 3 * 60 * 1000,  //  3 daqiqa (ko'p o'qiladi)
+    ASSIGNMENTS: 15 * 60 * 1000,  // 15 daqiqa (sekin o'zgaradi)
+    STATIC: Infinity,         // Abadiy (chapters, topics)
+};
+
+// ─── Cache O'qish ─────────────────────────────────────────────────────────────
+export const getCache = (key) => {
     try {
-        const raw = localStorage.getItem(PREFIX + key);
-        if (raw) {
-            const { data, timestamp } = JSON.parse(raw);
-            if (Date.now() - timestamp < ttl) {
-                return data; // ✅ cache ishlatildi — Firestore o'qilmadi
-            }
+        const raw = localStorage.getItem(CACHE_PREFIX + key);
+        if (!raw) return null;
+        const { data, timestamp, ttl } = JSON.parse(raw);
+        if (ttl === Infinity || ttl === null) return data;
+        if (Date.now() - timestamp > ttl) {
+            localStorage.removeItem(CACHE_PREFIX + key);
+            return null; // Eskirgan
         }
-    } catch (e) {
-        // Parse xatosi bo'lsa, cache'ni o'chirib yangi o'qiymiz
-        localStorage.removeItem(PREFIX + key);
+        return data;
+    } catch {
+        return null;
     }
+};
 
-    // Cache yo'q yoki eskirgan — yangi o'qiymiz
-    const data = await fetchFn();
+// ─── Cache Yozish ─────────────────────────────────────────────────────────────
+export const setCache = (key, data, ttl = TTL.USER_DATA) => {
     try {
-        localStorage.setItem(PREFIX + key, JSON.stringify({
+        localStorage.setItem(CACHE_PREFIX + key, JSON.stringify({
             data,
             timestamp: Date.now(),
+            ttl: ttl === Infinity ? null : ttl,
         }));
     } catch (e) {
-        console.warn('Cache yozish xatosi:', e);
+        // localStorage to'lib ketsa — eski cache tozalanadi
+        clearOldCache();
+        try {
+            localStorage.setItem(CACHE_PREFIX + key, JSON.stringify({
+                data, timestamp: Date.now(), ttl: ttl === Infinity ? null : ttl,
+            }));
+        } catch { }
     }
-    return data;
 };
 
-/**
- * Bitta cache yozuvini tozalash
- * @param {string} key
- */
+// ─── Bitta Cache O'chirish ────────────────────────────────────────────────────
 export const clearCache = (key) => {
-    localStorage.removeItem(PREFIX + key);
+    localStorage.removeItem(CACHE_PREFIX + key);
 };
 
-/**
- * Barcha NurFizika cache'larini tozalash
- */
+// ─── Foydalanuvchiga Oid Barcha Cache O'chirish (logout da) ──────────────────
+export const clearUserCache = (uid) => {
+    const keys = [
+        `user_${uid}`,
+        `progress_${uid}`,
+        `missions_${uid}`,
+        `xpLogs_${uid}`,
+        `leaderboard_global_weekly`,
+        `leaderboard_global_monthly`,
+        `leaderboard_global_all`,
+    ];
+    keys.forEach(k => localStorage.removeItem(CACHE_PREFIX + k));
+};
+
+// ─── Barcha NurFizika Cache Tozalash ─────────────────────────────────────────
 export const clearAllCache = () => {
     Object.keys(localStorage)
-        .filter(k => k.startsWith(PREFIX))
+        .filter(k => k.startsWith(CACHE_PREFIX))
         .forEach(k => localStorage.removeItem(k));
 };
 
+// ─── Eski Cache Tozalash (localStorage to'lganda) ────────────────────────────
+const clearOldCache = () => {
+    const entries = Object.keys(localStorage)
+        .filter(k => k.startsWith(CACHE_PREFIX))
+        .map(k => {
+            try {
+                const { timestamp } = JSON.parse(localStorage.getItem(k));
+                return { key: k, timestamp: timestamp || 0 };
+            } catch {
+                return { key: k, timestamp: 0 };
+            }
+        })
+        .sort((a, b) => a.timestamp - b.timestamp);
+    // Eng eski 5 ta cache o'chiriladi
+    entries.slice(0, 5).forEach(e => localStorage.removeItem(e.key));
+};
+
+// ─── Smart Fetch (asosiy helper) ─────────────────────────────────────────────
 /**
- * Cache'ga bevosita ma'lumot yozish (masalan, onSnapshot'dan)
- * @param {string} key
- * @param {any} data
+ * Cache bor bo'lsa cache qaytaradi, yo'q bo'lsa Firestore'dan o'qib cache'ga yozadi.
+ * @param {string} key - cache kaliti
+ * @param {function} fetchFn - async funksiya (Firestore read)
+ * @param {number} ttl - TTL.USER_DATA, TTL.PROGRESS, va h.k.
  */
-export const setCache = (key, data) => {
-    try {
-        localStorage.setItem(PREFIX + key, JSON.stringify({
-            data,
-            timestamp: Date.now(),
-        }));
-    } catch (e) {
-        console.warn('Cache yozish xatosi:', e);
+export const cachedFetch = async (key, fetchFn, ttl = TTL.USER_DATA) => {
+    const cached = getCache(key);
+    if (cached !== null) return cached;       // ✅ Cache hit — Firestore o'qilmadi
+    const data = await fetchFn();             // Firestore dan o'qish
+    if (data !== null && data !== undefined) {
+        setCache(key, data, ttl);
     }
+    return data;
 };

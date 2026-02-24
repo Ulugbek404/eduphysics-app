@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { clearUserCache } from '../utils/cache';
 import { auth, googleProvider, db } from '../firebase';
 import {
     signInWithPopup,
@@ -168,7 +169,9 @@ export function AuthProvider({ children }) {
     // Chiqish
     const logout = async () => {
         try {
+            const uid = auth.currentUser?.uid;
             await signOut(auth);
+            if (uid) clearUserCache(uid); // Cache tozalash
             setUserData(null);
         } catch (err) {
             console.error('Logout error:', err);
