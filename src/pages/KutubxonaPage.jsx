@@ -6,6 +6,7 @@ import {
     ArrowLeft, BookMarked, Video, Globe, FileText,
     Sparkles, ChevronRight, X
 } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 // ─── Ma'lumotlar bazasi ───────────────────────────────────────────────────────
 const libraryData = [
@@ -162,12 +163,12 @@ const libraryData = [
     },
 ];
 
-const CATEGORIES = [
-    { id: 'all', label: 'Barchasi', icon: <BookOpen size={15} /> },
-    { id: 'darsliklar', label: 'Darsliklar', icon: <BookMarked size={15} /> },
-    { id: 'qollanmalar', label: "Qo'llanmalar", icon: <FileText size={15} /> },
-    { id: 'video', label: 'Video Resurslar', icon: <Video size={15} /> },
-    { id: 'tashqi', label: 'Tashqi Manbalar', icon: <Globe size={15} /> },
+const getCategories = (t) => [
+    { id: 'all', label: t('kutubxona_all') || 'Barchasi', icon: <BookOpen size={15} /> },
+    { id: 'darsliklar', label: t('kutubxona_books') || 'Darsliklar', icon: <BookMarked size={15} /> },
+    { id: 'qollanmalar', label: t('kutubxona_guides') || "Qo'llanmalar", icon: <FileText size={15} /> },
+    { id: 'video', label: t('kutubxona_video') || 'Video Resurslar', icon: <Video size={15} /> },
+    { id: 'tashqi', label: t('kutubxona_external') || 'Tashqi Manbalar', icon: <Globe size={15} /> },
 ];
 
 const CHAPTERS = [
@@ -177,12 +178,13 @@ const CHAPTERS = [
 
 // ─── Resource Card ────────────────────────────────────────────────────────────
 function ResourceCard({ item, index }) {
+    const { t } = useLanguage();
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05, duration: 0.3 }}
-            className="group relative flex flex-col rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur-sm overflow-hidden hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 hover:-translate-y-1"
+            className="group relative flex flex-col rounded-2xl border theme-border theme-surface backdrop-blur-sm overflow-hidden hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 hover:-translate-y-1"
         >
             {/* Book Cover */}
             <div className={`relative h-32 bg-gradient-to-br ${item.color} flex items-center justify-center overflow-hidden`}>
@@ -195,7 +197,7 @@ function ResourceCard({ item, index }) {
                 <div className="absolute top-3 right-3 flex gap-2">
                     {item.isNew && (
                         <span className="text-[10px] font-bold bg-emerald-500 text-white px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <Sparkles size={9} /> Yangi
+                            <Sparkles size={9} /> {t('common_new') || 'Yangi'}
                         </span>
                     )}
                     <span className="text-[10px] font-medium bg-black/30 text-white/80 px-2 py-0.5 rounded-full backdrop-blur-sm uppercase">
@@ -228,7 +230,7 @@ function ResourceCard({ item, index }) {
                         rel="noopener noreferrer"
                         className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/30 hover:border-indigo-500/60 text-indigo-300 hover:text-white rounded-xl text-xs font-semibold transition-all duration-200"
                     >
-                        <Eye size={13} /> Ko'rish
+                        <Eye size={13} /> {t('common_view') || "Ko'rish"}
                     </a>
                     {item.downloadLink && (
                         <a
@@ -237,7 +239,7 @@ function ResourceCard({ item, index }) {
                             rel="noopener noreferrer"
                             className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-slate-700/50 hover:bg-slate-700 border border-slate-600/40 hover:border-slate-500 text-slate-300 hover:text-white rounded-xl text-xs font-semibold transition-all duration-200"
                         >
-                            <Download size={13} /> Yuklash
+                            <Download size={13} /> {t('common_download') || 'Yuklash'}
                         </a>
                     )}
                     {!item.downloadLink && (
@@ -247,7 +249,7 @@ function ResourceCard({ item, index }) {
                             rel="noopener noreferrer"
                             className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-slate-700/50 hover:bg-slate-700 border border-slate-600/40 hover:border-slate-500 text-slate-300 hover:text-white rounded-xl text-xs font-semibold transition-all duration-200"
                         >
-                            <ExternalLink size={13} /> Ochish
+                            <ExternalLink size={13} /> {t('common_open') || 'Ochish'}
                         </a>
                     )}
                 </div>
@@ -258,6 +260,7 @@ function ResourceCard({ item, index }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function KutubxonaPage() {
+    const { t } = useLanguage();
     const navigate = useNavigate();
     const [activeCategory, setActiveCategory] = useState('all');
     const [activeChapter, setActiveChapter] = useState('Barchasi');
@@ -277,7 +280,7 @@ export default function KutubxonaPage() {
     }, [activeCategory, activeChapter, searchQuery]);
 
     return (
-        <div className="h-screen overflow-y-auto custom-scrollbar font-sans text-slate-100">
+        <div className="h-screen overflow-y-auto custom-scrollbar theme-bg theme-text font-sans">
             <div className="max-w-7xl mx-auto px-6 pb-24 pt-6">
 
                 {/* Back Button */}
@@ -286,7 +289,7 @@ export default function KutubxonaPage() {
                     className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6 group"
                 >
                     <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-                    <span className="font-medium text-sm">Ortga qaytish</span>
+                    <span className="font-medium text-sm">{t('nav_back') || 'Ortga qaytish'}</span>
                 </button>
 
                 {/* ── Hero Section ── */}
@@ -302,11 +305,11 @@ export default function KutubxonaPage() {
                     <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div>
                             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                                📚 Kutubxona
+                                📚 {t('nav_library') || 'Kutubxona'}
                             </h1>
                             <p className="text-slate-400 text-base">
-                                Barcha o'quv materiallari bir joyda —{' '}
-                                <span className="text-indigo-400 font-semibold">{libraryData.length} ta resurs</span>
+                                {t('kutubxona_desc_1') || "Barcha o'quv materiallari bir joyda —"}{' '}
+                                <span className="text-indigo-400 font-semibold">{libraryData.length} {t('kutubxona_resource_count') || 'ta resurs'}</span>
                             </p>
                         </div>
 
@@ -315,7 +318,7 @@ export default function KutubxonaPage() {
                             <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
                             <input
                                 type="text"
-                                placeholder="Resurs nomi yoki mavzu..."
+                                placeholder={t('kutubxona_search_placeholder') || "Resurs nomi yoki mavzu..."}
                                 value={searchQuery}
                                 onChange={e => setSearchQuery(e.target.value)}
                                 className="w-full bg-slate-800/80 border border-slate-700/60 rounded-xl pl-10 pr-10 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all"
@@ -331,13 +334,13 @@ export default function KutubxonaPage() {
 
                 {/* ── Category Tabs ── */}
                 <div className="flex gap-2 overflow-x-auto pb-2 mb-5 custom-scrollbar">
-                    {CATEGORIES.map(cat => (
+                    {getCategories(t).map(cat => (
                         <button
                             key={cat.id}
                             onClick={() => setActiveCategory(cat.id)}
                             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap border transition-all duration-200 ${activeCategory === cat.id
                                 ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-                                : 'bg-slate-800/60 border-slate-700/50 text-slate-400 hover:text-white hover:border-slate-600'
+                                : 'theme-card theme-border theme-muted hover:theme-text hover:border-slate-600'
                                 }`}
                         >
                             {cat.icon}
@@ -357,7 +360,7 @@ export default function KutubxonaPage() {
                                 : 'bg-slate-800/40 border-slate-700/40 text-slate-500 hover:text-slate-300 hover:border-slate-600'
                                 }`}
                         >
-                            {ch}
+                            {ch === 'Barchasi' ? (t('common_all') || 'Barchasi') : ch}
                         </button>
                     ))}
                 </div>
@@ -365,15 +368,15 @@ export default function KutubxonaPage() {
                 {/* ── Results count ── */}
                 <div className="flex items-center justify-between mb-5">
                     <p className="text-xs text-slate-500">
-                        {filtered.length} ta resurs topildi
-                        {searchQuery && <span className="text-indigo-400"> · "{searchQuery}" bo'yicha</span>}
+                        {filtered.length} {t('kutubxona_found_count') || 'ta resurs topildi'}
+                        {searchQuery && <span className="text-indigo-400"> · "{searchQuery}" {t('kutubxona_by') || "bo'yicha"}</span>}
                     </p>
                     {(activeCategory !== 'all' || activeChapter !== 'Barchasi' || searchQuery) && (
                         <button
                             onClick={() => { setActiveCategory('all'); setActiveChapter('Barchasi'); setSearchQuery(''); }}
                             className="text-xs text-slate-500 hover:text-slate-300 flex items-center gap-1 transition-colors"
                         >
-                            <X size={12} /> Filterni tozalash
+                            <X size={12} /> {t('kutubxona_clear_filter') || 'Filterni tozalash'}
                         </button>
                     )}
                 </div>
@@ -403,13 +406,13 @@ export default function KutubxonaPage() {
                             <div className="p-6 bg-slate-800/40 rounded-3xl border border-slate-700/40 mb-6">
                                 <BookOpen size={48} className="text-slate-600 mx-auto" />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-400 mb-2">Hech narsa topilmadi</h3>
-                            <p className="text-slate-600 text-sm mb-6">Boshqa kalit so'z yoki kategoriya tanlang</p>
+                            <h3 className="text-xl font-bold text-slate-400 mb-2">{t('error_not_found') || 'Hech narsa topilmadi'}</h3>
+                            <p className="text-slate-600 text-sm mb-6">{t('kutubxona_empty_desc') || "Boshqa kalit so'z yoki kategoriya tanlang"}</p>
                             <button
                                 onClick={() => { setActiveCategory('all'); setActiveChapter('Barchasi'); setSearchQuery(''); }}
                                 className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600/20 border border-indigo-500/30 rounded-xl text-indigo-400 hover:text-indigo-300 text-sm font-medium transition-all"
                             >
-                                <ChevronRight size={16} /> Barchasini ko'rish
+                                <ChevronRight size={16} /> {t('kutubxona_see_all') || "Barchasini ko'rish"}
                             </button>
                         </motion.div>
                     )}

@@ -10,10 +10,11 @@ import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     sendPasswordResetEmail,
+    sendEmailVerification,
     updateProfile
 } from 'firebase/auth';
 import {
-    doc, getDoc, setDoc, serverTimestamp
+    doc, getDoc, setDoc, updateDoc, serverTimestamp
 } from 'firebase/firestore';
 
 const AuthContext = createContext();
@@ -58,10 +59,42 @@ export function AuthProvider({ children }) {
         setPersistence(auth, browserLocalPersistence).catch(console.error);
 
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-            setUser(currentUser);
             if (currentUser) {
-                await fetchUserData(currentUser.uid);
+                // ── Email/parol foydalanuvchisi tasdiqlanganmi? ──────────────
+                const isEmailProvider = currentUser.providerData
+                    .some(p => p.providerId === 'password');
+
+                if (isEmailProvider && !currentUser.emailVerified) {
+                    // Tasdiqlanmagan — logout va bloklash
+                    await signOut(auth);
+                    setUser(null);
+                    setUserData(null);
+                    setLoading(false);
+                    return;
+                }
+
+                setUser(currentUser);
+                const data = await fetchUserData(currentUser.uid);
+
+                // Bloklangan foydalanuvchi tekshiruvi
+                if (data?.blocked) {
+                    await signOut(auth);
+                    setUser(null);
+                    setUserData(null);
+                    setLoading(false);
+                    return;
+                }
+
+                // Email tasdiqlangan bo'lsa Firestore ga sync
+                if (currentUser.emailVerified && data && !data.emailVerified) {
+                    try {
+                        await updateDoc(doc(db, 'users', currentUser.uid), {
+                            emailVerified: true,
+                        });
+                    } catch (e) { /* ignore — doc may not exist yet */ }
+                }
             } else {
+                setUser(null);
                 setUserData(null);
             }
             setLoading(false);
@@ -94,12 +127,21 @@ export function AuthProvider({ children }) {
                     activeDates: [],
                     createdAt: serverTimestamp(),
                 });
+            } else {
+                // Bloklangan foydalanuvchini tekshirish
+                const data = snap.data();
+                if (data?.blocked) {
+                    await signOut(auth);
+                    const err = new Error('Akkauntingiz bloklangan. Admin bilan bog\'laning.');
+                    setError(err.message);
+                    throw err;
+                }
             }
             await fetchUserData(result.user.uid);
             return result.user;
         } catch (err) {
             console.error('Login error:', err);
-            setError(err.message);
+            if (!err.message.includes('bloklangan')) setError(err.message);
             throw err;
         }
     };
@@ -111,12 +153,19 @@ export function AuthProvider({ children }) {
             const result = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(result.user, { displayName });
 
-            // Firestore ga yoz
+            // Tasdiqlash xati yuborish
+            await sendEmailVerification(result.user, {
+                url: window.location.origin + '/login',
+                handleCodeInApp: false,
+            });
+
+            // Firestore ga yoz (emailVerified: false)
             await setDoc(doc(db, 'users', result.user.uid), {
                 uid: result.user.uid,
                 email,
                 displayName,
                 role,
+                emailVerified: false,
                 region: '',
                 currentLevel: 1,
                 totalXP: 0,
@@ -125,9 +174,16 @@ export function AuthProvider({ children }) {
                 createdAt: serverTimestamp(),
             });
 
-            await fetchUserData(result.user.uid);
-            // role ni qaytaramiz — LoginPage yo'nalishni aniqlash uchun
-            return { user: result.user, role };
+            // Admin uchun — darhol kirishga ruxsat (email tekshirilmaydi)
+            if (role === 'admin') {
+                await fetchUserData(result.user.uid);
+                return { user: result.user, role };
+            }
+
+            // Oddiy foydalanuvchi — signOut, verify sahifaga
+            await signOut(auth);
+            setUserData(null);
+            return { user: result.user, role, needsVerification: true, email };
         } catch (err) {
             console.error('Sign up error:', err);
             setError(err.message);
@@ -145,11 +201,32 @@ export function AuthProvider({ children }) {
             setError(null);
             const result = await signInWithEmailAndPassword(auth, email, password);
             const data = await fetchUserData(result.user.uid);
+
+            // Bloklangan foydalanuvchini tekshirish
+            if (data?.blocked) {
+                await signOut(auth);
+                setUserData(null);
+                const err = new Error('Akkauntingiz bloklangan. Admin bilan bog\'laning.');
+                setError(err.message);
+                throw err;
+            }
+
+            // Email tasdiqlanganmi? (admin uchun tekshirilmaydi)
+            if (!result.user.emailVerified && data?.role !== 'admin') {
+                await signOut(auth);
+                setUserData(null);
+                const err = new Error('EMAIL_NOT_VERIFIED');
+                err.email = email;
+                throw err;
+            }
+
             // role ni qaytaramiz — LoginPage yo'nalishni aniqlash uchun
             return { user: result.user, role: data?.role || 'student' };
         } catch (err) {
             console.error('Email login error:', err);
-            setError(err.message);
+            if (!err.message.includes('bloklangan') && !err.message.includes('EMAIL_NOT_VERIFIED')) {
+                setError(err.message);
+            }
             throw err;
         }
     };
@@ -170,8 +247,18 @@ export function AuthProvider({ children }) {
     const logout = async () => {
         try {
             const uid = auth.currentUser?.uid;
+            // localStorage eski kalitlarini tozalash
+            if (uid) {
+                const keysToRemove = [
+                    `progress_${uid}`,
+                    `assessment_completed_${uid}`,
+                    `assessment_results_${uid}`,
+                ];
+                keysToRemove.forEach(k => localStorage.removeItem(k));
+                localStorage.removeItem('userStats');
+                clearUserCache(uid);
+            }
             await signOut(auth);
-            if (uid) clearUserCache(uid); // Cache tozalash
             setUserData(null);
         } catch (err) {
             console.error('Logout error:', err);
@@ -179,15 +266,18 @@ export function AuthProvider({ children }) {
         }
     };
 
+
     // Rol yordamchilari
-    const isTeacher = userData?.role === 'teacher';
-    const isStudent = userData?.role === 'student' || !userData?.role;
+    const isAdmin = userData?.role === 'admin';
+    const isTeacher = userData?.role === 'teacher'; // orqaga moslash uchun saqlanadi
+    const isStudent = userData?.role === 'student' || (!userData?.role && !isAdmin);
 
     const value = {
         user,
         userData,
         loading,
         error,
+        isAdmin,
         isTeacher,
         isStudent,
         loginWithGoogle,

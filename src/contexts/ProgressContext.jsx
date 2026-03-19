@@ -1,14 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import {
-    calculateLevel,
-    getXPProgress,
-    calculateOverallProgress,
-    calculateStreak,
-    getXPReward,
-    getLast7DaysActivity,
-    calculateAverageScore
-} from '../utils/progressHelpers';
+    doc, onSnapshot, updateDoc, arrayUnion, serverTimestamp, setDoc
+} from 'firebase/firestore';
+import { db } from '../firebase';
+import { updateUserStats, trackTodayActivity } from '../services/userService';
 
 const ProgressContext = createContext();
 
@@ -23,13 +19,13 @@ export const useProgress = () => {
 export const ProgressProvider = ({ children }) => {
     const { user } = useAuth();
 
-    // Initial state
     const [progress, setProgress] = useState({
         userId: null,
-        totalXP: 0,
+        xp: 0,
         level: 1,
-        topics: {},
-        dailyActivity: {},
+        streak: 0,
+        completedLessons: [],
+        quizResults: [],
         achievements: [],
         stats: {
             totalLessonsCompleted: 0,
@@ -37,353 +33,134 @@ export const ProgressProvider = ({ children }) => {
             totalLabsCompleted: 0,
             totalTimeSpent: 0,
             averageTestScore: 0,
-            currentStreak: 0,
-            longestStreak: 0
-        }
+        },
+        assessmentCompleted: false,
+        assessmentResults: null,
     });
-
     const [loading, setLoading] = useState(true);
 
-    // Load progress from localStorage on mount
+    // ── Firestore real-time listener ──────────────────────────────────────────
     useEffect(() => {
-        if (user) {
-            loadProgress(user.uid);
-        } else {
+        if (!user?.uid) {
             setLoading(false);
+            return;
         }
-    }, [user]);
 
-    // Load progress from localStorage
-    const loadProgress = (userId) => {
+        const unsub = onSnapshot(
+            doc(db, 'users', user.uid),
+            (snap) => {
+                if (snap.exists()) {
+                    const d = snap.data();
+                    setProgress({
+                        userId: user.uid,
+                        xp: d.xp || 0,
+                        level: d.level || 1,
+                        streak: d.streak || d.streakDays || 0,
+                        completedLessons: d.completedLessons || [],
+                        quizResults: d.quizResults || [],
+                        achievements: d.achievements || [],
+                        stats: {
+                            totalLessonsCompleted: d.stats?.totalLessonsCompleted || (d.completedLessons?.length ?? 0),
+                            totalTestsCompleted: d.stats?.testsSolved || 0,
+                            totalLabsCompleted: d.stats?.completedLabs || 0,
+                            totalTimeSpent: d.stats?.timeSpent || 0,
+                            averageTestScore: d.stats?.averageScore || 0,
+                        },
+                        assessmentCompleted: d.assessmentCompleted || false,
+                        assessmentResults: d.assessmentResults || null,
+                    });
+                }
+                setLoading(false);
+            },
+            (err) => {
+                console.warn('ProgressContext listener error:', err?.code || err?.message);
+                setLoading(false);
+            }
+        );
+
+        return () => unsub();
+    }, [user?.uid]);
+
+    // ── Complete lesson ────────────────────────────────────────────────────────
+    const completeLesson = useCallback(async (lessonId) => {
+        if (!user?.uid) return;
         try {
-            const savedProgress = localStorage.getItem(`progress_${userId}`);
-            if (savedProgress) {
-                setProgress(JSON.parse(savedProgress));
-            } else {
-                // Initialize new progress
-                setProgress(prev => ({ ...prev, userId }));
-            }
-        } catch (error) {
-            console.error('Error loading progress:', error);
-        } finally {
-            setLoading(false);
+            await updateDoc(doc(db, 'users', user.uid), {
+                completedLessons: arrayUnion(lessonId),
+            });
+            await trackTodayActivity(user.uid);
+            // stats.totalLessonsCompleted Firestore trigger orqali yangilanadi (onSnapshot)
+        } catch (err) {
+            console.error('completeLesson error:', err);
         }
-    };
+    }, [user?.uid]);
 
-    // Save progress to localStorage
-    const saveProgress = (newProgress) => {
+    // ── Complete test ──────────────────────────────────────────────────────────
+    const completeTest = useCallback(async (testId, score) => {
+        if (!user?.uid) return;
         try {
-            if (newProgress.userId) {
-                localStorage.setItem(`progress_${newProgress.userId}`, JSON.stringify(newProgress));
-            }
-        } catch (error) {
-            console.error('Error saving progress:', error);
+            await updateDoc(doc(db, 'users', user.uid), {
+                quizResults: arrayUnion({ testId, score, completedAt: new Date().toISOString() }),
+            });
+            await updateUserStats(user.uid, {
+                testsSolved: 1,
+                totalScore: score,
+            });
+            await trackTodayActivity(user.uid);
+        } catch (err) {
+            console.error('completeTest error:', err);
         }
-    };
+    }, [user?.uid]);
 
-    // Add XP
-    const addXP = (amount, source = 'unknown') => {
-        setProgress(prev => {
-            const newTotalXP = prev.totalXP + amount;
-            const newLevel = calculateLevel(newTotalXP);
+    // ── Complete lab ───────────────────────────────────────────────────────────
+    const completeLab = useCallback(async (labId) => {
+        if (!user?.uid) return;
+        try {
+            await updateDoc(doc(db, 'users', user.uid), {
+                completedLabs: arrayUnion(labId),
+            });
+            await updateUserStats(user.uid, { completedLabs: 1 });
+            await trackTodayActivity(user.uid);
+        } catch (err) {
+            console.error('completeLab error:', err);
+        }
+    }, [user?.uid]);
 
-            // Update daily activity
+    // ── Track daily activity ───────────────────────────────────────────────────
+    const trackDailyActivity = useCallback(async () => {
+        if (!user?.uid) return;
+        try {
             const today = new Date().toISOString().split('T')[0];
-            const todayActivity = prev.dailyActivity[today] || {
-                xpEarned: 0,
-                timeSpent: 0,
-                lessonsCompleted: 0,
-                testsCompleted: 0
-            };
+            // activeDates array ga qo'shamiz (AdminDashboard streak uchun)
+            await updateDoc(doc(db, 'users', user.uid), {
+                activeDates: arrayUnion(today),
+                lastActiveAt: serverTimestamp(),
+            });
+        } catch (err) {
+            console.error('trackDailyActivity error:', err);
+        }
+    }, [user?.uid]);
 
-            const newProgress = {
-                ...prev,
-                totalXP: newTotalXP,
-                level: newLevel,
-                dailyActivity: {
-                    ...prev.dailyActivity,
-                    [today]: {
-                        ...todayActivity,
-                        xpEarned: todayActivity.xpEarned + amount
-                    }
-                }
-            };
-
-            saveProgress(newProgress);
-            return newProgress;
-        });
-    };
-
-    // Complete lesson
-    const completeLesson = (topicId, lessonId) => {
-        const xpReward = getXPReward('lesson_complete');
-
-        setProgress(prev => {
-            const topic = prev.topics[topicId] || {
-                lessonsCompleted: 0,
-                totalLessons: 8, // Default, should be dynamic
-                testsCompleted: 0,
-                totalTests: 5,
-                labsCompleted: 0,
-                totalLabs: 3,
-                xpEarned: 0,
-                timeSpent: 0,
-                lastAccessed: new Date().toISOString(),
-                averageScore: 0
-            };
-
-            const today = new Date().toISOString().split('T')[0];
-            const todayActivity = prev.dailyActivity[today] || {
-                xpEarned: 0,
-                timeSpent: 0,
-                lessonsCompleted: 0,
-                testsCompleted: 0
-            };
-
-            const newProgress = {
-                ...prev,
-                totalXP: prev.totalXP + xpReward,
-                level: calculateLevel(prev.totalXP + xpReward),
-                topics: {
-                    ...prev.topics,
-                    [topicId]: {
-                        ...topic,
-                        lessonsCompleted: topic.lessonsCompleted + 1,
-                        xpEarned: topic.xpEarned + xpReward,
-                        lastAccessed: new Date().toISOString()
-                    }
-                },
-                dailyActivity: {
-                    ...prev.dailyActivity,
-                    [today]: {
-                        ...todayActivity,
-                        xpEarned: todayActivity.xpEarned + xpReward,
-                        lessonsCompleted: todayActivity.lessonsCompleted + 1
-                    }
-                },
-                stats: {
-                    ...prev.stats,
-                    totalLessonsCompleted: prev.stats.totalLessonsCompleted + 1
-                }
-            };
-
-            saveProgress(newProgress);
-            return newProgress;
-        });
-    };
-
-    // Complete test
-    const completeTest = (topicId, testId, score) => {
-        const xpReward = getXPReward('test_complete', score);
-
-        setProgress(prev => {
-            const topic = prev.topics[topicId] || {
-                lessonsCompleted: 0,
-                totalLessons: 8,
-                testsCompleted: 0,
-                totalTests: 5,
-                labsCompleted: 0,
-                totalLabs: 3,
-                xpEarned: 0,
-                timeSpent: 0,
-                lastAccessed: new Date().toISOString(),
-                averageScore: 0
-            };
-
-            // Calculate new average score
-            const newAverageScore = topic.testsCompleted === 0
-                ? score
-                : Math.round((topic.averageScore * topic.testsCompleted + score) / (topic.testsCompleted + 1));
-
-            const today = new Date().toISOString().split('T')[0];
-            const todayActivity = prev.dailyActivity[today] || {
-                xpEarned: 0,
-                timeSpent: 0,
-                lessonsCompleted: 0,
-                testsCompleted: 0
-            };
-
-            const newProgress = {
-                ...prev,
-                totalXP: prev.totalXP + xpReward,
-                level: calculateLevel(prev.totalXP + xpReward),
-                topics: {
-                    ...prev.topics,
-                    [topicId]: {
-                        ...topic,
-                        testsCompleted: topic.testsCompleted + 1,
-                        xpEarned: topic.xpEarned + xpReward,
-                        lastAccessed: new Date().toISOString(),
-                        averageScore: newAverageScore
-                    }
-                },
-                dailyActivity: {
-                    ...prev.dailyActivity,
-                    [today]: {
-                        ...todayActivity,
-                        xpEarned: todayActivity.xpEarned + xpReward,
-                        testsCompleted: todayActivity.testsCompleted + 1
-                    }
-                },
-                stats: {
-                    ...prev.stats,
-                    totalTestsCompleted: prev.stats.totalTestsCompleted + 1,
-                    averageTestScore: calculateAverageScore({
-                        ...prev.topics,
-                        [topicId]: {
-                            ...topic,
-                            averageScore: newAverageScore
-                        }
-                    })
-                }
-            };
-
-            saveProgress(newProgress);
-            return newProgress;
-        });
-    };
-
-    // Complete lab
-    const completeLab = (topicId, labId) => {
-        const xpReward = getXPReward('lab_complete');
-
-        setProgress(prev => {
-            const topic = prev.topics[topicId] || {
-                lessonsCompleted: 0,
-                totalLessons: 8,
-                testsCompleted: 0,
-                totalTests: 5,
-                labsCompleted: 0,
-                totalLabs: 3,
-                xpEarned: 0,
-                timeSpent: 0,
-                lastAccessed: new Date().toISOString(),
-                averageScore: 0
-            };
-
-            const newProgress = {
-                ...prev,
-                totalXP: prev.totalXP + xpReward,
-                level: calculateLevel(prev.totalXP + xpReward),
-                topics: {
-                    ...prev.topics,
-                    [topicId]: {
-                        ...topic,
-                        labsCompleted: topic.labsCompleted + 1,
-                        xpEarned: topic.xpEarned + xpReward,
-                        lastAccessed: new Date().toISOString()
-                    }
-                },
-                stats: {
-                    ...prev.stats,
-                    totalLabsCompleted: prev.stats.totalLabsCompleted + 1
-                }
-            };
-
-            saveProgress(newProgress);
-            return newProgress;
-        });
-    };
-
-    // Track time spent
-    const trackTimeSpent = (topicId, seconds) => {
-        setProgress(prev => {
-            const topic = prev.topics[topicId] || {
-                lessonsCompleted: 0,
-                totalLessons: 8,
-                testsCompleted: 0,
-                totalTests: 5,
-                labsCompleted: 0,
-                totalLabs: 3,
-                xpEarned: 0,
-                timeSpent: 0,
-                lastAccessed: new Date().toISOString(),
-                averageScore: 0
-            };
-
-            const today = new Date().toISOString().split('T')[0];
-            const todayActivity = prev.dailyActivity[today] || {
-                xpEarned: 0,
-                timeSpent: 0,
-                lessonsCompleted: 0,
-                testsCompleted: 0
-            };
-
-            const newProgress = {
-                ...prev,
-                topics: {
-                    ...prev.topics,
-                    [topicId]: {
-                        ...topic,
-                        timeSpent: topic.timeSpent + seconds,
-                        lastAccessed: new Date().toISOString()
-                    }
-                },
-                dailyActivity: {
-                    ...prev.dailyActivity,
-                    [today]: {
-                        ...todayActivity,
-                        timeSpent: todayActivity.timeSpent + seconds
-                    }
-                },
-                stats: {
-                    ...prev.stats,
-                    totalTimeSpent: prev.stats.totalTimeSpent + seconds
-                }
-            };
-
-            saveProgress(newProgress);
-            return newProgress;
-        });
-    };
-
-    // Unlock achievement
-    const unlockAchievement = (achievementId, xpReward = 50) => {
-        setProgress(prev => {
-            // Check if already unlocked
-            if (prev.achievements.some(a => a.id === achievementId)) {
-                return prev;
-            }
-
-            const newProgress = {
-                ...prev,
-                totalXP: prev.totalXP + xpReward,
-                level: calculateLevel(prev.totalXP + xpReward),
-                achievements: [
-                    ...prev.achievements,
-                    {
-                        id: achievementId,
-                        unlockedAt: new Date().toISOString(),
-                        xpReward
-                    }
-                ]
-            };
-
-            saveProgress(newProgress);
-            return newProgress;
-        });
-    };
-
-    // Get computed values
-    const getComputedProgress = () => {
-        return {
-            ...progress,
-            xpProgress: getXPProgress(progress.totalXP),
-            overallProgress: calculateOverallProgress(progress.topics),
-            currentStreak: calculateStreak(progress.dailyActivity),
-            last7Days: getLast7DaysActivity(progress.dailyActivity)
-        };
-    };
+    // ── Unlock achievement ──────────────────────────────────────────────────────
+    const unlockAchievement = useCallback(async (achievementId) => {
+        if (!user?.uid) return;
+        try {
+            await updateDoc(doc(db, 'users', user.uid), {
+                achievements: arrayUnion(achievementId),
+            });
+        } catch (err) {
+            console.error('unlockAchievement error:', err);
+        }
+    }, [user?.uid]);
 
     const value = {
-        progress: getComputedProgress(),
+        progress,
         loading,
-        addXP,
         completeLesson,
         completeTest,
         completeLab,
-        trackTimeSpent,
-        unlockAchievement
+        trackDailyActivity,
+        unlockAchievement,
     };
 
     return (

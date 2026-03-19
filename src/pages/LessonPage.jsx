@@ -10,12 +10,15 @@ import LessonQuiz from '../components/darsliklar/LessonQuiz';
 import AITutorModule from '../components/AITutorModule';
 import { ArrowLeft, PlayCircle, FileText, CheckSquare, MessageSquare, BookOpen, Calculator, Trophy, Award, CheckCircle, Star, Youtube } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function LessonPage() {
+    const { t } = useLanguage();
     const { gradeId, chapterId, lessonId } = useParams();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('dars');
     const [showXPPopup, setShowXPPopup] = useState(false);
+    const [aiMessages, setAiMessages] = useState([]);
 
     const { getGrade } = useGrades();
     const { completedLessons, completeLesson } = useProgress();
@@ -35,9 +38,16 @@ export default function LessonPage() {
             };
             localStorage.setItem('lastViewedLesson', JSON.stringify(lastLesson));
         }
-    }, [lessonId, lesson?.title]);
+    }, [lessonId, lesson?.title, gradeId, chapterId]);
 
-    if (!grade || !chapter || !lesson) return <div className="p-8 text-center">Dars topilmadi</div>;
+    // ── AI Ustoz holatini saqlash ──
+    useEffect(() => {
+        if (aiMessages.length === 0 && chapter?.name && lesson?.title) {
+            setAiMessages([{ role: 'ai', text: `Salom! Men NurFizika AI ustoziman. ⚛️\n"${chapter.name} — ${lesson.title}" mavzusidan savollaringiz bo'lsa bemalol so'rang!` }]);
+        }
+    }, [chapter?.name, lesson?.title, aiMessages.length]);
+
+    if (!grade || !chapter || !lesson) return <div className="p-8 text-center">{t('error_lesson_not_found') || 'Dars topilmadi'}</div>;
 
     const isLessonCompleted = completedLessons.includes(lessonId);
 
@@ -57,12 +67,12 @@ export default function LessonPage() {
     };
 
     const tabs = [
-        { id: 'dars', label: 'Dars', icon: PlayCircle },
-        { id: 'video', label: 'Video', icon: Youtube },
-        { id: 'formulalar', label: 'Formulalar', icon: Calculator },
-        { id: 'misollar', label: 'Misollar', icon: FileText },
-        { id: 'testlar', label: 'Testlar', icon: CheckSquare },
-        { id: 'ai-ustoz', label: 'AI Ustoz', icon: MessageSquare },
+        { id: 'dars', label: t('tabs_lesson') || 'Dars', icon: PlayCircle },
+        { id: 'video', label: t('tabs_video') || 'Video', icon: Youtube },
+        { id: 'formulalar', label: t('tabs_formulas') || 'Formulalar', icon: Calculator },
+        { id: 'misollar', label: t('tabs_examples') || 'Misollar', icon: FileText },
+        { id: 'testlar', label: t('tabs_tests') || 'Testlar', icon: CheckSquare },
+        { id: 'ai-ustoz', label: t('tabs_ai_tutor') || 'AI Ustoz', icon: MessageSquare },
     ];
 
     const formulas = lesson.content?.formulas || [];
@@ -116,14 +126,14 @@ export default function LessonPage() {
                     {activeTab === 'dars' && (
                         <div className="prose prose-invert max-w-none">
                             <div className="bg-blue-500/10 border-l-4 border-blue-500 p-4 mb-6 rounded-r-xl">
-                                <h3 className="text-blue-400 font-bold m-0">Dars maqsadi:</h3>
+                                <h3 className="text-blue-400 font-bold m-0">{t('lesson_goal') || 'Dars maqsadi:'}</h3>
                                 <p className="m-0 text-slate-300">{lesson.description}</p>
                             </div>
 
                             {/* Key Concepts */}
                             {lesson.content?.key_concepts?.length > 0 && (
                                 <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-                                    <h3 className="text-emerald-400 font-bold mb-3 flex items-center gap-2">🎯 Asosiy tushunchalar:</h3>
+                                    <h3 className="text-emerald-400 font-bold mb-3 flex items-center gap-2">{t('lesson_key_concepts') || '🎯 Asosiy tushunchalar:'}</h3>
                                     <div className="flex flex-wrap gap-2">
                                         {lesson.content.key_concepts.map((c, i) => (
                                             <span key={i} className="px-3 py-1.5 bg-emerald-500/15 text-emerald-300 rounded-full text-sm border border-emerald-500/30">{c}</span>
@@ -139,12 +149,12 @@ export default function LessonPage() {
                             ) : (
                                 <div className="flex flex-col items-center justify-center h-64 text-slate-500">
                                     <PlayCircle size={48} className="mb-4 opacity-50" />
-                                    <p>Video va matnli dars kontenti</p>
+                                    <p>{t('lesson_video_text_content') || 'Video va matnli dars kontenti'}</p>
                                 </div>
                             )}
                             {formulas.length > 0 && (
                                 <div className="mt-8 p-5 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20 rounded-xl">
-                                    <h3 className="text-purple-400 font-bold mb-3 flex items-center gap-2"><Calculator size={18} /> Asosiy formulalar:</h3>
+                                    <h3 className="text-purple-400 font-bold mb-3 flex items-center gap-2"><Calculator size={18} /> {t('lesson_main_formulas') || 'Asosiy formulalar:'}</h3>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         {formulas.map((f, i) => (
                                             <div key={i} className="bg-slate-900/60 rounded-lg px-4 py-3 border border-slate-700/50">
@@ -162,7 +172,7 @@ export default function LessonPage() {
                                 {isLessonCompleted ? (
                                     <div className="flex items-center justify-center gap-3 py-4 px-6 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl">
                                         <CheckCircle size={24} className="text-emerald-400" />
-                                        <span className="text-emerald-400 font-bold text-lg">Mavzu tugatilgan!</span>
+                                        <span className="text-emerald-400 font-bold text-lg">{t('lesson_completed_title') || 'Mavzu tugatilgan!'}</span>
                                         <span className="px-3 py-1 bg-emerald-500/20 rounded-full text-emerald-300 text-sm font-semibold">+50 XP ✓</span>
                                     </div>
                                 ) : (
@@ -171,7 +181,7 @@ export default function LessonPage() {
                                         className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-2xl text-white font-bold text-lg transition-all duration-300 active:scale-[0.98] shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40"
                                     >
                                         <Trophy size={24} />
-                                        <span>Mavzuni tugatish</span>
+                                        <span>{t('lesson_finish_btn') || 'Mavzuni tugatish'}</span>
                                         <span className="px-3 py-1 bg-white/20 rounded-full text-sm">+50 XP</span>
                                     </button>
                                 )}
@@ -183,7 +193,7 @@ export default function LessonPage() {
                     {activeTab === 'video' && (
                         <div className="space-y-6">
                             <h3 className="text-xl font-bold flex items-center gap-2">
-                                <Youtube size={22} className="text-red-500" /> Video darslik
+                                <Youtube size={22} className="text-red-500" /> {t('lesson_video_tutorial') || 'Video darslik'}
                             </h3>
                             {lesson.video_url ? (
                                 <motion.div
@@ -204,7 +214,7 @@ export default function LessonPage() {
                                         </div>
                                         <div className="p-4 border-t border-slate-700/50">
                                             <p className="text-white font-semibold">{lesson.title}</p>
-                                            <p className="text-slate-400 text-sm mt-1">📺 YouTube orqali ko'ring — to'liq ekran uchun ▶ tugmasini bosing</p>
+                                            <p className="text-slate-400 text-sm mt-1">{t('lesson_watch_youtube') || "📺 YouTube orqali ko'ring — to'liq ekran uchun ▶ tugmasini bosing"}</p>
                                         </div>
                                     </div>
                                 </motion.div>
@@ -213,8 +223,8 @@ export default function LessonPage() {
                                     <div className="bg-red-500/10 p-6 rounded-full mb-6">
                                         <Youtube size={56} className="text-red-500/50" />
                                     </div>
-                                    <h4 className="text-xl font-bold text-slate-300 mb-2">Video darslik tez orada yuklanadi</h4>
-                                    <p className="text-slate-500 max-w-md">Bu mavzu uchun video darslik tayyorlanmoqda. Iltimos, boshqa bo'limlardan foydalaning.</p>
+                                    <h4 className="text-xl font-bold text-slate-300 mb-2">{t('lesson_video_soon') || 'Video darslik tez orada yuklanadi'}</h4>
+                                    <p className="text-slate-500 max-w-md">{t('lesson_video_desc_soon') || "Bu mavzu uchun video darslik tayyorlanmoqda. Iltimos, boshqa bo'limlardan foydalaning."}</p>
                                 </div>
                             )}
                         </div>
@@ -224,7 +234,7 @@ export default function LessonPage() {
                     {activeTab === 'formulalar' && (
                         <div className="space-y-4">
                             <h3 className="text-xl font-bold flex items-center gap-2">
-                                <Calculator size={22} className="text-purple-400" /> Formulalar
+                                <Calculator size={22} className="text-purple-400" /> {t('tabs_formulas') || 'Formulalar'}
                             </h3>
                             {formulas.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -257,7 +267,7 @@ export default function LessonPage() {
                             ) : (
                                 <div className="text-center text-slate-500 py-12">
                                     <Calculator size={48} className="mx-auto mb-4 opacity-30" />
-                                    <p>Bu darsda formulalar yo'q</p>
+                                    <p>{t('lesson_no_formulas') || "Bu darsda formulalar yo'q"}</p>
                                 </div>
                             )}
                         </div>
@@ -267,7 +277,7 @@ export default function LessonPage() {
                     {activeTab === 'misollar' && (
                         <div className="space-y-6">
                             <h3 className="text-xl font-bold flex items-center gap-2">
-                                <BookOpen size={22} className="text-green-400" /> Misollar va masalalar
+                                <BookOpen size={22} className="text-green-400" /> {t('lesson_examples_problems') || 'Misollar va masalalar'}
                             </h3>
                             {examples.length > 0 ? (
                                 examples.map((ex, i) => (
@@ -279,13 +289,13 @@ export default function LessonPage() {
                                         className="p-6 bg-slate-900 rounded-xl border border-slate-700"
                                     >
                                         <div className="flex items-center justify-between mb-1">
-                                            <p className="text-slate-400 text-sm">Masala #{i + 1}</p>
+                                            <p className="text-slate-400 text-sm">{t('lesson_problem_num') || 'Masala #'}{i + 1}</p>
                                             {ex.difficulty && (
                                                 <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${ex.difficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
                                                     ex.difficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
                                                         'bg-red-500/20 text-red-400'
                                                     }`}>
-                                                    {ex.difficulty === 'easy' ? '⭐ Oson' : ex.difficulty === 'medium' ? '⭐⭐ O\'rta' : '⭐⭐⭐ Qiyin'}
+                                                    {ex.difficulty === 'easy' ? (t('difficulty_easy') || '⭐ Oson') : ex.difficulty === 'medium' ? (t('difficulty_medium') || "⭐⭐ O'rta") : (t('difficulty_hard') || '⭐⭐⭐ Qiyin')}
                                                 </span>
                                             )}
                                         </div>
@@ -295,7 +305,7 @@ export default function LessonPage() {
                                         {/* Given Data Table */}
                                         {ex.given_data && Object.keys(ex.given_data).length > 0 && (
                                             <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                                                <p className="text-blue-400 text-sm font-bold mb-2">📋 Berilgan:</p>
+                                                <p className="text-blue-400 text-sm font-bold mb-2">📋 {t('lesson_given') || 'Berilgan:'}</p>
                                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                                     {Object.entries(ex.given_data).map(([key, val], gi) => (
                                                         <div key={gi} className="bg-slate-900/50 px-3 py-1.5 rounded text-sm">
@@ -310,7 +320,7 @@ export default function LessonPage() {
                                         {/* Solution Steps */}
                                         {ex.solution_steps?.length > 0 ? (
                                             <div className="bg-slate-800 p-4 rounded-lg mb-3">
-                                                <p className="text-yellow-400 font-bold mb-3">📝 Yechish:</p>
+                                                <p className="text-yellow-400 font-bold mb-3">📝 {t('lesson_solution') || 'Yechish:'}</p>
                                                 <div className="space-y-2">
                                                     {ex.solution_steps.map((step, si) => (
                                                         <div key={si} className="flex gap-3 items-start">
@@ -322,13 +332,13 @@ export default function LessonPage() {
                                             </div>
                                         ) : ex.solution ? (
                                             <div className="bg-slate-800 p-4 rounded-lg font-mono text-sm text-green-400 whitespace-pre-line mb-3">
-                                                <p className="text-yellow-400 font-bold mb-2">Yechish:</p>
+                                                <p className="text-yellow-400 font-bold mb-2">{t('lesson_solution') || 'Yechish:'}</p>
                                                 {ex.solution}
                                             </div>
                                         ) : null}
 
                                         <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-4 py-3">
-                                            <span className="text-emerald-400 font-bold">✅ Javob: </span>
+                                            <span className="text-emerald-400 font-bold">✅ {t('lesson_answer') || 'Javob:'} </span>
                                             <span className="text-white font-mono">{ex.answer}</span>
                                         </div>
                                     </motion.div>
@@ -353,9 +363,11 @@ export default function LessonPage() {
 
                     {/* AI USTOZ TAB */}
                     {activeTab === 'ai-ustoz' && (
-                        <div className="h-[600px] border border-slate-700 rounded-xl overflow-hidden">
+                        <div className="h-[600px]">
                             <AITutorModule
                                 topic={`${chapter.name} — ${lesson.title}`}
+                                messages={aiMessages}
+                                setMessages={setAiMessages}
                             />
                         </div>
                     )}

@@ -3,10 +3,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard, BookOpen, Bot, MoreHorizontal,
     Library, Target, Trophy, FlaskConical, BookMarked,
-    User, Settings, LogOut, X
+    User, Settings, LogOut, X, Crown, ArrowRight
 } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
+import { useAuth } from '../../contexts/AuthContext';
 
 // ─── Main 4 tabs ──────────────────────────────────────────────────────────────
 const mainTabs = [
@@ -20,7 +21,7 @@ const mainTabs = [
 const menuItems = [
     { label: 'Kutubxona', path: '/kutubxona', icon: Library, iconBg: 'bg-indigo-500/20', iconColor: 'text-indigo-400' },
     { label: 'Missiyalar', path: '/missiyalar', icon: Target, iconBg: 'bg-violet-500/20', iconColor: 'text-violet-400' },
-    { label: 'Testlar', path: '/dashboard', icon: Trophy, iconBg: 'bg-yellow-500/20', iconColor: 'text-yellow-400', tabHint: 'tests' },
+    { label: 'Live Test', path: '/dashboard', icon: Trophy, iconBg: 'bg-yellow-500/20', iconColor: 'text-yellow-400', tabHint: 'tests' },
     { label: 'Laboratoriya', path: '/laboratoriya', icon: FlaskConical, iconBg: 'bg-emerald-500/20', iconColor: 'text-emerald-400' },
     { label: 'Uy Vazifasi', path: '/dashboard', icon: BookMarked, iconBg: 'bg-orange-500/20', iconColor: 'text-orange-400', tabHint: 'homework' },
     { label: 'Profil', path: '/dashboard', icon: User, iconBg: 'bg-pink-500/20', iconColor: 'text-pink-400', tabHint: 'profile' },
@@ -35,7 +36,9 @@ function haptic(ms = 10) {
 export default function BottomNav() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { userData } = useAuth();
     const [panelOpen, setPanelOpen] = useState(false);
+    const isAdmin = userData?.role === 'admin';
 
     // Close panel on route change
     useEffect(() => { setPanelOpen(false); }, [location.pathname]);
@@ -215,6 +218,31 @@ export default function BottomNav() {
 
                     {/* Divider */}
                     <div className="h-px bg-slate-800 mx-4" />
+
+                    {/* Admin Panel button - admin uchun */}
+                    {isAdmin && (
+                        <div className="px-4 pt-3">
+                            <button
+                                onClick={() => { setPanelOpen(false); navigate('/admin'); }}
+                                className="
+                                    w-full flex items-center gap-3
+                                    bg-violet-500/10 hover:bg-violet-500/20
+                                    active:scale-95
+                                    rounded-2xl px-4 py-3.5
+                                    transition-all duration-150
+                                    touch-manipulation
+                                    border border-violet-500/20
+                                    group
+                                "
+                            >
+                                <div className="p-2 rounded-xl flex-shrink-0 bg-violet-500/20">
+                                    <Crown size={18} className="text-violet-400" />
+                                </div>
+                                <span className="text-violet-300 text-sm font-semibold flex-1 text-left">Admin Panel</span>
+                                <ArrowRight size={16} className="text-violet-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                            </button>
+                        </div>
+                    )}
 
                     {/* Bottom actions: Settings + Logout */}
                     <div className="flex gap-3 px-4 py-4">

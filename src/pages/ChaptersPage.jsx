@@ -7,8 +7,10 @@ import ChapterCard from '../components/darsliklar/ChapterCard';
 import BreadcrumbNav from '../components/darsliklar/BreadcrumbNav';
 import { ArrowLeft, BookOpen, FlaskConical, ClipboardList, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function ChaptersPage() {
+    const { t } = useLanguage();
     const { gradeId } = useParams();
     const navigate = useNavigate();
     const { getGrade } = useGrades();
@@ -17,7 +19,7 @@ export default function ChaptersPage() {
 
     const grade = getGrade(gradeId);
 
-    if (!grade) return <div className="p-8 text-center text-slate-400">Sinf topilmadi</div>;
+    if (!grade) return <div className="p-8 text-center text-slate-400">{t('error_class_not_found') || 'Sinf topilmadi'}</div>;
 
     // Calculate overall stats
     const totalLessons = chapters.reduce((sum, ch) => sum + (ch.lessons?.length || 0), 0);
@@ -29,10 +31,10 @@ export default function ChaptersPage() {
         : 0;
 
     const stats = [
-        { icon: <BookOpen size={18} />, value: totalLessons, label: 'Darslar', iconColor: 'text-blue-400' },
-        { icon: <ClipboardList size={18} />, value: totalTests, label: 'Testlar', iconColor: 'text-green-400' },
-        { icon: <FlaskConical size={18} />, value: totalLabs, label: 'Tajribalar', iconColor: 'text-purple-400' },
-        { icon: <Clock size={18} />, value: `${totalHours}h`, label: 'Soat', iconColor: 'text-amber-400' },
+        { icon: <BookOpen size={18} />, value: totalLessons, label: t('nav_lessons') || 'Darslar', iconColor: 'text-blue-400' },
+        { icon: <ClipboardList size={18} />, value: totalTests, label: t('nav_tests') || 'Testlar', iconColor: 'text-green-400' },
+        { icon: <FlaskConical size={18} />, value: totalLabs, label: t('nav_lab') || 'Tajribalar', iconColor: 'text-purple-400' },
+        { icon: <Clock size={18} />, value: `${totalHours}h`, label: t('common_hours') || 'Soat', iconColor: 'text-amber-400' },
     ];
 
     return (
@@ -75,7 +77,7 @@ export default function ChaptersPage() {
                             <div>
                                 <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{grade.name}</h1>
                                 <p className="text-white/70 text-lg">{grade.description}</p>
-                                <p className="text-white/50 text-sm mt-2">O'zbekiston Davlat Ta'lim Standarti asosida</p>
+                                <p className="text-white/50 text-sm mt-2">{t('chapters_uz_standard') || "O'zbekiston Davlat Ta'lim Standarti asosida"}</p>
                             </div>
                         </div>
 
@@ -98,7 +100,7 @@ export default function ChaptersPage() {
                                     <span className="text-2xl font-bold text-white">{overallProgress}%</span>
                                 </div>
                             </div>
-                            <span className="text-white/60 text-sm font-medium">Umumiy progress</span>
+                            <span className="text-white/60 text-sm font-medium">{t('chapters_overall_progress') || 'Umumiy progress'}</span>
                         </div>
                     </div>
 
@@ -120,8 +122,8 @@ export default function ChaptersPage() {
 
                 {/* Section Title */}
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-white">Bo'limlar</h2>
-                    <span className="text-sm text-slate-500">{chapters.length} ta bob</span>
+                    <h2 className="text-xl font-bold text-white">{t('chapters_sections') || "Bo'limlar"}</h2>
+                    <span className="text-sm text-slate-500">{chapters.length} {t('chapters_count') || 'ta bob'}</span>
                 </div>
 
                 {/* Chapters Grid */}

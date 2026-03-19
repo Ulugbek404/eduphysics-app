@@ -5,16 +5,22 @@ import { Atom, Sparkles, Mail, Lock, User, Eye, EyeOff, AlertCircle } from 'luci
 import { Button } from './ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription } from './ui/Card';
 import { Input } from './ui/Input';
+import { useSystemSettings } from '../hooks/useSystemSettings';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebase';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function LoginPage() {
     const navigate = useNavigate();
     const { loginWithGoogle, loginWithEmail, signUpWithEmailAndRole, resetPassword, error } = useAuth();
+    const settings = useSystemSettings();
+    const { t } = useLanguage();
     const [activeTab, setActiveTab] = useState('signin'); // 'signin' | 'signup'
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showForgotPassword, setShowForgotPassword] = useState(false);
-    const [isTeacher, setIsTeacher] = useState(false);
-    const [teacherCode, setTeacherCode] = useState('');
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [adminCode, setAdminCode] = useState('');
 
     // Form states
     const [email, setEmail] = useState('');
@@ -48,18 +54,36 @@ export default function LoginPage() {
         try {
             const result = await loginWithEmail(email, password);
             const role = result?.role || 'student';
-            navigate(role === 'teacher' ? '/teacher' : '/dashboard', { replace: true });
+            navigate(role === 'admin' ? '/admin' : '/dashboard', { replace: true });
         } catch (err) {
-            setMessage('Email yoki parol noto\'g\'ri');
+            if (err.message === 'EMAIL_NOT_VERIFIED') {
+                // Verify sahifaga yo'naltirish — u yerda qayta yuborish ham bor
+                navigate('/verify-email', { state: { email } });
+            } else if (err.message?.includes('bloklangan')) {
+                setMessage('🚫 Akkauntingiz bloklangan. Admin bilan bog\'laning.');
+            } else if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+                setMessage('❌ Email yoki parol noto\'g\'ri');
+            } else if (err.code === 'auth/user-not-found') {
+                setMessage('❌ Bu email ro\'yxatdan o\'tmagan!');
+            } else if (err.code === 'auth/too-many-requests') {
+                setMessage('⏳ Ko\'p urinish! 5 daqiqadan keyin qayta urining.');
+            } else {
+                setMessage('❌ Email yoki parol noto\'g\'ri');
+            }
         } finally {
             setIsLoading(false);
         }
     };
 
-    const TEACHER_CODE = 'NURFIZIKA2026';
+    const ADMIN_CODE = 'NURFIZIKA_ADMIN_2026';
 
     const handleEmailSignUp = async (e) => {
         e.preventDefault();
+        // Ro'yxatdan o'tish yopiq bo'lsa
+        if (!settings.allowRegistration) {
+            setMessage("Ro'yxatdan o'tish vaqtincha yopiq. Admin tomonidan to'xtatilgan.");
+            return;
+        }
         if (!displayName || !email || !password || !confirmPassword) {
             setMessage('Barcha maydonlarni to\'ldiring');
             return;
@@ -72,19 +96,37 @@ export default function LoginPage() {
             setMessage('Parol kamida 6 ta belgidan iborat bo\'lishi kerak');
             return;
         }
-        if (isTeacher && teacherCode !== TEACHER_CODE) {
-            setMessage('Ustoz kodi noto\'g\'ri! Iltimos administratorga murojaat qiling.');
+        if (isAdmin && adminCode !== ADMIN_CODE) {
+            setMessage('Admin kodi noto\'g\'ri! Iltimos to\'g\'ri kodni kiriting.');
             return;
         }
         setIsLoading(true);
         setMessage('');
-        const role = isTeacher ? 'teacher' : 'student';
+        // Maksimal o'quvchilar tekshiruvi
+        try {
+            const snap = await getDocs(collection(db, 'users'));
+            const studentCount = snap.docs.filter(d => d.data().role !== 'admin').length;
+            if (studentCount >= (settings.maxStudents || 1000)) {
+                setMessage(`Platforma ${settings.maxStudents} ta o'quvchiga to'lgan!`);
+                setIsLoading(false);
+                return;
+            }
+        } catch { }
+        const role = isAdmin ? 'admin' : 'student';
         try {
             const result = await signUpWithEmailAndRole(email, password, displayName, role);
+
+            // Email tasdiqlash kerak (oddiy user)
+            if (result?.needsVerification) {
+                navigate('/verify-email', { state: { email: result.email } });
+                return;
+            }
+
+            // Admin — darhol kirish
             const finalRole = result?.role || role;
-            navigate(finalRole === 'teacher' ? '/teacher' : '/dashboard', { replace: true });
+            navigate(finalRole === 'admin' ? '/admin' : '/dashboard', { replace: true });
         } catch (err) {
-            setMessage(err.message.includes('email-already-in-use')
+            setMessage(err.message?.includes('email-already-in-use')
                 ? 'Bu email allaqachon ro\'yxatdan o\'tgan'
                 : 'Xatolik yuz berdi');
         } finally {
@@ -136,7 +178,7 @@ export default function LoginPage() {
     );
 
     return (
-        <div className="h-screen overflow-y-auto bg-slate-950">
+        <div className="h-screen overflow-y-auto bg-slate-900">
             {/* Dynamic Background */}
             <div className="fixed inset-0 pointer-events-none">
                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/20 rounded-full blur-[120px] animate-pulse" />
@@ -154,39 +196,49 @@ export default function LoginPage() {
                     </div>
                     <div>
                         <h1 className="text-4xl font-extrabold bg-gradient-to-r from-blue-400 via-purple-400 to-white bg-clip-text text-transparent tracking-tight mb-3">
-                            NurFizika
+                            {t('app_name')}
                         </h1>
                         <p className="text-sm text-yellow-300 italic font-medium mb-2">
-                            Kuch — bilimda, bilim — bizda!
+                            {t('hero_slogan')}
                         </p>
                         <p className="text-slate-400 flex items-center justify-center gap-2 font-medium">
-                            AI-powered Fizika Platformasi
+                            {t('hero_badge')}
                             <Sparkles size={16} className="text-yellow-400" />
                         </p>
                     </div>
                 </div>
 
+                {/* Maintenance Banner */}
+                {settings.maintenanceMode && (
+                    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 flex items-center gap-3 animate-fadeIn">
+                        <span className="text-xl">🔧</span>
+                        <p className="text-yellow-400 text-sm leading-relaxed">
+                            Tizim texnik ishlar olib borilmoqda. Tez orada qayta ishga tushadi.
+                        </p>
+                    </div>
+                )}
+
                 {/* Main Card */}
                 <Card variant="glass" className="w-full backdrop-blur-3xl shadow-2xl shadow-blue-900/10 animate-slideInUp">
                     {/* Tabs */}
-                    <div className="flex bg-slate-900/50 p-1 rounded-xl mb-6 border border-slate-800">
+                    <div className="flex bg-slate-900 p-1 rounded-xl mb-6 border border-slate-700">
                         <button
                             onClick={() => { setActiveTab('signin'); setMessage(''); }}
                             className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-300 ${activeTab === 'signin'
                                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
                                 }`}
                         >
-                            Kirish
+                            {t('auth_login')}
                         </button>
                         <button
                             onClick={() => { setActiveTab('signup'); setMessage(''); }}
                             className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-300 ${activeTab === 'signup'
                                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
                                 }`}
                         >
-                            Ro'yxatdan o'tish
+                            {t('auth_register')}
                         </button>
                     </div>
 
@@ -227,7 +279,7 @@ export default function LoginPage() {
                                             <button
                                                 type="button"
                                                 onClick={() => setShowPassword(!showPassword)}
-                                                className="text-slate-500 hover:text-white transition-colors"
+                                                className="text-slate-400 hover:text-white transition-colors"
                                             >
                                                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                             </button>
@@ -239,7 +291,7 @@ export default function LoginPage() {
                                             onClick={() => setShowForgotPassword(true)}
                                             className="text-xs text-blue-400 hover:text-blue-300 transition-colors font-medium mt-1"
                                         >
-                                            Parolni unutdingizmi?
+                                            {t('auth_forgot')}
                                         </button>
                                     </div>
                                 </div>
@@ -248,14 +300,15 @@ export default function LoginPage() {
                                     className="w-full"
                                     size="lg"
                                     isLoading={isLoading}
+                                    disabled={isLoading || settings.maintenanceMode}
                                 >
-                                    Kirish
+                                {settings.maintenanceMode ? `🔒 ${t('common_loading')}` : t('auth_login')}
                                 </Button>
                             </form>
                         ) : (
                             <form onSubmit={handleEmailSignUp} className="space-y-4">
                                 <Input
-                                    label="Ism"
+                                    label={t('register_name')}
                                     type="text"
                                     placeholder="Ismingiz"
                                     icon={<User size={18} />}
@@ -281,14 +334,14 @@ export default function LoginPage() {
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            className="text-slate-500 hover:text-white transition-colors"
+                                            className="text-slate-400 hover:text-white transition-colors"
                                         >
                                             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                         </button>
                                     }
                                 />
                                 <Input
-                                    label="Parolni tasdiqlang"
+                                    label={t('register_confirm_password')}
                                     type={showPassword ? 'text' : 'password'}
                                     placeholder="••••••••"
                                     icon={<Lock size={18} />}
@@ -296,29 +349,29 @@ export default function LoginPage() {
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                 />
 
-                                {/* Teacher Toggle */}
-                                <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-indigo-500/40 transition-all duration-200">
+                                {/* Admin Toggle */}
+                                <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl bg-slate-800 border border-slate-700 hover:border-violet-500/40 transition-all duration-200">
                                     <input
                                         type="checkbox"
-                                        checked={isTeacher}
-                                        onChange={e => setIsTeacher(e.target.checked)}
-                                        className="w-4 h-4 accent-indigo-500 rounded"
+                                        checked={isAdmin}
+                                        onChange={e => setIsAdmin(e.target.checked)}
+                                        className="w-4 h-4 accent-violet-500 rounded"
                                     />
-                                    <span className="text-slate-300 text-sm">👨‍🏫 Men o'qituvchiman</span>
+                                    <span className="text-slate-300 text-sm">👑 Men adminman</span>
                                 </label>
 
-                                {/* Teacher Code Input — animated */}
-                                <div className={`overflow-hidden transition-all duration-300 ${isTeacher ? 'max-h-24 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                {/* Admin Code Input — animated */}
+                                <div className={`overflow-hidden transition-all duration-300 ${isAdmin ? 'max-h-24 opacity-100' : 'max-h-0 opacity-0'}`}>
                                     <div className="space-y-1">
-                                        <label className="text-slate-400 text-sm block">Ustoz kodi *</label>
+                                        <label className="text-slate-400 text-sm block">Admin kodi *</label>
                                         <input
                                             type="password"
-                                            placeholder="Maxsus ustoz kodini kiriting"
-                                            value={teacherCode}
-                                            onChange={e => setTeacherCode(e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-white text-sm outline-none transition-colors duration-200"
+                                            placeholder="Maxsus admin kodini kiriting"
+                                            value={adminCode}
+                                            onChange={e => setAdminCode(e.target.value)}
+                                            className="w-full bg-slate-800 border border-slate-700 focus:border-violet-500 rounded-xl px-4 py-3 text-white text-sm outline-none transition-colors duration-200"
                                         />
-                                        <p className="text-slate-500 text-xs">* Kod maktab administratoridan olinadi</p>
+                                        <p className="text-slate-400 text-xs">* Faqat tizim administratori uchun</p>
                                     </div>
                                 </div>
 
@@ -328,7 +381,7 @@ export default function LoginPage() {
                                     size="lg"
                                     isLoading={isLoading}
                                 >
-                                    {isTeacher ? '👨‍🏫 Ustoz sifatida ro\'yxatdan o\'tish' : 'Ro\'yxatdan o\'tish'}
+                                    {isAdmin ? `👑 ${t('register_admin_submit')}` : t('auth_register')}
                                 </Button>
                             </form>
                         )}
@@ -336,28 +389,28 @@ export default function LoginPage() {
                         {/* Divider */}
                         <div className="relative py-2">
                             <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-slate-700/50"></div>
+                                <div className="w-full border-t border-slate-700"></div>
                             </div>
                             <div className="relative flex justify-center text-xs uppercase">
-                                <span className="bg-slate-900/50 px-2 text-slate-500 backdrop-blur-sm">yoki</span>
+                                <span className="bg-slate-900 px-2 text-slate-400 backdrop-blur-sm">{t('common_or')}</span>
                             </div>
                         </div>
 
                         {/* Social Login */}
                         <Button
                             variant="secondary"
-                            className="w-full bg-slate-800/50 text-white hover:bg-slate-700 border-slate-700 hover:border-slate-600"
+                            className="w-full bg-slate-800 text-white hover:bg-slate-800 border-slate-700 hover:border-slate-700"
                             onClick={handleGoogleLogin}
                             isLoading={isLoading}
                             leftIcon={<GoogleIcon />}
                         >
-                            Google bilan kirish
+                            {t('login_google')}
                         </Button>
                     </div>
 
-                    <p className="text-[10px] text-slate-500 text-center mt-6">
-                        Kirish orqali siz <span className="text-blue-400 cursor-pointer hover:underline">Foydalanish shartlari</span> va <span className="text-blue-400 cursor-pointer hover:underline">Maxfiylik siyosati</span>ga rozilik bildirasiz
-                    </p>
+                        <p className="text-[10px] text-slate-400 text-center mt-6">
+                            {t('auth_terms_agree')} <span className="text-blue-400 cursor-pointer hover:underline">{t('auth_terms')}</span> {t('common_and')} <span className="text-blue-400 cursor-pointer hover:underline">{t('auth_privacy')}</span>
+                        </p>
                 </Card>
 
                 <p className="text-center text-xs text-slate-600 font-medium">
@@ -370,9 +423,9 @@ export default function LoginPage() {
                 <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
                     <Card variant="elevated" className="w-full max-w-md animate-scaleIn border-slate-700">
                         <CardHeader>
-                            <CardTitle>Parolni Tiklash</CardTitle>
+                            <CardTitle>{t('reset_title')}</CardTitle>
                             <CardDescription>
-                                Emaillingizni kiriting va biz tiklash havolasini yuboramiz.
+                                {t('reset_desc')}
                             </CardDescription>
                         </CardHeader>
 
@@ -402,14 +455,14 @@ export default function LoginPage() {
                                         setMessage('');
                                     }}
                                 >
-                                    Bekor qilish
+                                    {t('common_cancel')}
                                 </Button>
                                 <Button
                                     type="submit"
                                     className="flex-1"
                                     isLoading={isLoading}
                                 >
-                                    Yuborish
+                                    {t('contact_send')}
                                 </Button>
                             </div>
                         </form>

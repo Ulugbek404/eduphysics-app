@@ -5,6 +5,7 @@ import {
     ArrowLeft, Clock, Zap, ChevronRight, CheckCircle,
     FlaskConical, Star, Lock
 } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 // ─── Lab ma'lumotlari ─────────────────────────────────────────────────────────
 const labsData = [
@@ -87,7 +88,14 @@ function CircleRing({ value, max, size = 64, stroke = 6, color = "#6366f1" }) {
 
 // ─── Lab Card ─────────────────────────────────────────────────────────────────
 function LabCard({ lab, completed, index, onStart }) {
+    const { t } = useLanguage();
     const isAvailable = lab.id === 'ohm' || lab.id === 'gaz';
+
+    let diffText = lab.difficulty;
+    if(diffText === 'Oson') diffText = t('common_easy') || 'Oson';
+    else if(diffText === "O'rta") diffText = t('common_medium') || "O'rta";
+    else if(diffText === 'Qiyin') diffText = t('common_hard') || 'Qiyin';
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -97,8 +105,8 @@ function LabCard({ lab, completed, index, onStart }) {
                 ${completed
                     ? 'border-emerald-500/40 bg-emerald-950/20'
                     : isAvailable
-                        ? 'border-slate-800 bg-slate-900/60 hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-1'
-                        : 'border-slate-800/50 bg-slate-900/30 opacity-70'
+                        ? 'theme-border theme-surface hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-1'
+                        : 'theme-border theme-surface opacity-70'
                 }`}
         >
             {/* Cover */}
@@ -112,7 +120,7 @@ function LabCard({ lab, completed, index, onStart }) {
                     <div className="absolute inset-0 bg-emerald-900/60 flex items-center justify-center backdrop-blur-sm">
                         <div className="flex flex-col items-center gap-1">
                             <CheckCircle size={36} className="text-emerald-400" />
-                            <span className="text-emerald-300 font-bold text-sm">Tugallandi ✓</span>
+                            <span className="text-emerald-300 font-bold text-sm">{t('lab_completed') || 'Tugallandi'} ✓</span>
                         </div>
                     </div>
                 )}
@@ -127,7 +135,7 @@ function LabCard({ lab, completed, index, onStart }) {
                 {/* Badges */}
                 <div className="absolute top-3 left-3 flex gap-1.5">
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${DIFFICULTY_COLOR[lab.difficulty]}`}>
-                        {lab.difficulty}
+                        {diffText}
                     </span>
                 </div>
                 <div className="absolute bottom-3 right-3">
@@ -163,9 +171,9 @@ function LabCard({ lab, completed, index, onStart }) {
                             }`}
                     >
                         {isAvailable ? (
-                            <><ChevronRight size={14} /> Boshlash</>
+                            <><ChevronRight size={14} /> {t('common_start') || 'Boshlash'}</>
                         ) : (
-                            <><Lock size={12} /> Yaqinda</>
+                            <><Lock size={12} /> {t('common_soon') || 'Yaqinda'}</>
                         )}
                     </button>
                 </div>
@@ -177,6 +185,7 @@ function LabCard({ lab, completed, index, onStart }) {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function LaboratoriyaPage() {
     const navigate = useNavigate();
+    const { t } = useLanguage();
     const [activeChapter, setActiveChapter] = useState('Barchasi');
     // Completed labs from localStorage
     const [completedLabs] = useState(() => {
@@ -197,16 +206,15 @@ export default function LaboratoriyaPage() {
     }, 0);
 
     return (
-        <div className="h-screen overflow-y-auto custom-scrollbar font-sans text-slate-100">
+        <div className="h-screen overflow-y-auto custom-scrollbar theme-bg theme-text font-sans">
             <div className="max-w-7xl mx-auto px-6 pb-24 pt-6">
 
-                {/* Back */}
                 <button
                     onClick={() => navigate('/dashboard')}
                     className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6 group"
                 >
                     <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-                    <span className="font-medium text-sm">Ortga qaytish</span>
+                    <span className="font-medium text-sm">{t('nav_back') || 'Ortga qaytish'}</span>
                 </button>
 
                 {/* ── Hero ── */}
@@ -223,10 +231,10 @@ export default function LaboratoriyaPage() {
                         <div>
                             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
                                 <FlaskConical size={36} className="text-indigo-400" />
-                                Virtual Laboratoriya
+                                {t('nav_lab') || 'Virtual Laboratoriya'}
                             </h1>
                             <p className="text-slate-400">
-                                Fizika qonunlarini interaktiv simulyatsiyalar orqali o'rganing
+                                {t('lab_desc') || "Fizika qonunlarini interaktiv simulyatsiyalar orqali o'rganing"}
                             </p>
                         </div>
 
@@ -237,17 +245,17 @@ export default function LaboratoriyaPage() {
                                 <CircleRing value={completedLabs.length} max={labsData.length} size={64} />
                                 <div className="absolute flex flex-col items-center">
                                     <span className="text-white font-bold text-sm">{completedLabs.length}/{labsData.length}</span>
-                                    <span className="text-slate-500 text-[9px]">tajriba</span>
+                                    <span className="text-slate-500 text-[9px]">{t('lab_experiment') || 'tajriba'}</span>
                                 </div>
                             </div>
 
                             <div className="flex flex-col gap-2">
                                 <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl px-4 py-2.5">
-                                    <p className="text-slate-500 text-[10px] uppercase tracking-wide">Jami</p>
-                                    <p className="text-white font-bold">{labsData.length} tajriba</p>
+                                    <p className="text-slate-500 text-[10px] uppercase tracking-wide">{t('lab_total') || 'Jami'}</p>
+                                    <p className="text-white font-bold">{labsData.length} {t('lab_experiment') || 'tajriba'}</p>
                                 </div>
                                 <div className="bg-indigo-900/30 border border-indigo-500/30 rounded-xl px-4 py-2.5">
-                                    <p className="text-slate-500 text-[10px] uppercase tracking-wide">Yig'ilgan</p>
+                                    <p className="text-slate-500 text-[10px] uppercase tracking-wide">{t('lab_collected') || "Yig'ilgan"}</p>
                                     <p className="text-indigo-400 font-bold flex items-center gap-1">
                                         <Star size={12} /> {totalXP} XP
                                     </p>
@@ -265,10 +273,10 @@ export default function LaboratoriyaPage() {
                             onClick={() => setActiveChapter(ch)}
                             className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap border transition-all duration-200 ${activeChapter === ch
                                 ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-                                : 'bg-slate-800/60 border-slate-700/50 text-slate-400 hover:text-white hover:border-slate-600'
+                                : 'theme-card theme-border theme-muted hover:theme-text hover:border-slate-600'
                                 }`}
                         >
-                            {ch}
+                            {ch === 'Barchasi' ? (t('common_all') || 'Barchasi') : ch}
                         </button>
                     ))}
                 </div>

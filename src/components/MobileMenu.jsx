@@ -56,7 +56,7 @@ export default function MobileMenu({ setActiveTab, onMenuClick, setShowSettings,
             title: 'O\'quv Materiallari',
             items: [
                 { id: 'lessons', icon: Book, label: 'Darsliklar', color: 'text-blue-400' },
-                { id: 'tests', icon: Trophy, label: 'Testlar', color: 'text-yellow-400' },
+                { id: 'tests', icon: Trophy, label: 'Live Test', color: 'text-yellow-400' },
                 { id: 'homework', icon: BookOpen, label: 'Uy Vazifasi', color: 'text-green-400' },
             ]
         },

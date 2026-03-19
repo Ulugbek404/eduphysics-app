@@ -31,10 +31,10 @@ const Navbar = () => {
     }, [isMobileMenuOpen]);
 
     const navLinks = [
-        { label: t('nav.home'), section: 'hero' },
-        { label: 'Imkoniyatlar', section: 'features' },
-        { label: t('nav.about'), section: 'about' },
-        { label: t('nav.contact'), section: 'contact' },
+        { label: t('nav_home'), section: 'hero' },
+        { label: t('nav_features'), section: 'features' },
+        { label: t('nav_about'), section: 'about' },
+        { label: t('nav_contact'), section: 'contact' },
     ];
 
     const scrollToSection = (sectionId) => {
@@ -104,8 +104,8 @@ const Navbar = () => {
                                 style={{ filter: 'drop-shadow(0 4px 10px rgba(255, 215, 0, 0.3))' }}
                             />
                             <div className="flex flex-col items-start">
-                                <span className="text-xl md:text-2xl font-bold text-white">NurFizika</span>
-                                <span className="text-xs text-yellow-300 italic">Kuch — bilimda, bilim — bizda!</span>
+                                <span className="text-xl md:text-2xl font-bold text-white">{t('app_name')}</span>
+                                <span className="text-xs text-yellow-300 italic">{t('hero_slogan')}</span>
                             </div>
                         </button>
 
@@ -130,14 +130,14 @@ const Navbar = () => {
                                 className="flex items-center space-x-2 px-4 py-2 text-white hover:text-blue-400 transition-colors font-medium"
                             >
                                 <LogIn size={18} />
-                                <span>{t('nav.login')}</span>
+                                <span>{t('nav_login')}</span>
                             </button>
                             <button
                                 onClick={() => navigate('/register')}
                                 className="flex items-center space-x-2 px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105"
                             >
                                 <UserPlus size={18} />
-                                <span>{t('nav.register')}</span>
+                                <span>{t('nav_register')}</span>
                             </button>
                         </div>
 
@@ -180,8 +180,8 @@ const Navbar = () => {
                                         <Atom size={20} className="text-white" />
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-lg font-bold text-white">NurFizika</span>
-                                        <span className="text-xs text-yellow-300 italic">Kuch — bilimda, bilim — bizda!</span>
+                                        <span className="text-lg font-bold text-white">{t('app_name')}</span>
+                                        <span className="text-xs text-yellow-300 italic">{t('hero_slogan')}</span>
                                     </div>
                                 </div>
                                 <button
@@ -215,7 +215,7 @@ const Navbar = () => {
                                     className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors font-medium"
                                 >
                                     <LogIn size={18} />
-                                    <span>Kirish</span>
+                                    <span>{t('nav_login')}</span>
                                 </button>
                                 <button
                                     onClick={() => {
@@ -225,7 +225,7 @@ const Navbar = () => {
                                     className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold hover:shadow-lg hover:shadow-blue-500/50 transition-all"
                                 >
                                     <UserPlus size={18} />
-                                    <span>Ro'yxatdan o'tish</span>
+                                    <span>{t('nav_register')}</span>
                                 </button>
                             </div>
                         </motion.div>

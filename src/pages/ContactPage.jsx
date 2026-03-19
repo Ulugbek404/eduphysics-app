@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/landing/Footer';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebase';
 
 const ContactPage = () => {
     const [formData, setFormData] = useState({
@@ -32,14 +34,25 @@ const ContactPage = () => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        // Simulate form submission
-        setTimeout(() => {
-            setSubmitStatus('success');
-            setIsSubmitting(false);
-            setFormData({ name: '', email: '', subject: '', message: '' });
+        try {
+            await addDoc(collection(db, "contacts"), {
+                name: formData.name,
+                email: formData.email,
+                subject: formData.subject,
+                message: formData.message,
+                createdAt: serverTimestamp(),
+                read: false,
+            });
 
+            setSubmitStatus('success');
+            setFormData({ name: '', email: '', subject: '', message: '' });
             setTimeout(() => setSubmitStatus(null), 5000);
-        }, 1500);
+
+        } catch (err) {
+            setSubmitStatus('error');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleChange = (e) => {
@@ -239,8 +252,8 @@ const ContactPage = () => {
                                             </div>
                                             <div>
                                                 <div className="text-slate-400 text-sm mb-1">Email</div>
-                                                <a href="mailto:support@eduphysics.uz" className="text-white hover:text-blue-400 transition-colors">
-                                                    support@eduphysics.uz
+                                                <a href="mailto:ulugbekroziboyeb05@gmail.com" className="text-white hover:text-blue-400 transition-colors">
+                                                    ulugbekroziboyeb05@gmail.com
                                                 </a>
                                             </div>
                                         </div>
@@ -251,8 +264,8 @@ const ContactPage = () => {
                                             </div>
                                             <div>
                                                 <div className="text-slate-400 text-sm mb-1">Telefon</div>
-                                                <a href="tel:+998901234567" className="text-white hover:text-purple-400 transition-colors">
-                                                    +998 (90) 123-45-67
+                                                <a href="tel:+998931863404" className="text-white hover:text-purple-400 transition-colors">
+                                                    +998 (93) 186-34-04
                                                 </a>
                                             </div>
                                         </div>
@@ -263,9 +276,9 @@ const ContactPage = () => {
                                             </div>
                                             <div>
                                                 <div className="text-slate-400 text-sm mb-1">Manzil</div>
-                                                <div className="text-white">
+                                                <a href="https://yandex.uz/maps/-/CPBoAKJ6" target="_blank" rel="noopener noreferrer" className="text-white hover:text-pink-400 transition-colors">
                                                     Toshkent, O'zbekiston
-                                                </div>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -309,7 +322,7 @@ const ContactPage = () => {
                                         </a>
 
                                         <a
-                                            href="https://t.me/eduphysics"
+                                            href="https://t.me/Ulugbek1434"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="flex items-center gap-3 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl hover:bg-blue-500/20 transition-all group"

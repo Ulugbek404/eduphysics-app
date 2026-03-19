@@ -12,8 +12,10 @@ import {
     Users,
     ArrowRight
 } from 'lucide-react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const About = () => {
+    const { t } = useLanguage();
     return (
         <section className="min-h-screen flex items-center justify-center py-20 pt-20" style={{ background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)' }}>
             <div className="container mx-auto px-4">
@@ -25,11 +27,10 @@ const About = () => {
                     className="text-center mb-16"
                 >
                     <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-                        Biz haqimizda
+                        {t('about_title')}
                     </h2>
                     <p className="text-xl text-slate-700 max-w-3xl mx-auto">
-                        NurFizika - O'zbekistonda birinchi sun'iy intellektga asoslangan
-                        fizika o'rganish platformasi. Kuch — bilimda, bilim — bizda!
+                        {t('about_subtitle')}
                     </p>
                 </motion.div>
 
@@ -41,15 +42,14 @@ const About = () => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6 }}
-                        className="bg-gradient-to-br from-blue-900/30 to-blue-800/20 backdrop-blur-sm border border-blue-500/20 rounded-3xl p-8 hover:border-blue-500/40 transition-all"
+                        className="bg-white shadow-xl shadow-blue-900/5 border border-blue-100 rounded-3xl p-8 hover:shadow-2xl hover:shadow-blue-900/10 hover:-translate-y-1 transition-all"
                     >
-                        <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6">
+                        <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-500/30">
                             <Target className="w-8 h-8 text-white" />
                         </div>
-                        <h3 className="text-2xl font-bold text-white mb-4">Missiyamiz</h3>
-                        <p className="text-slate-300 leading-relaxed">
-                            Har bir 9-sinf o'quvchisiga zamonaviy texnologiyalar yordamida
-                            fizikani chuqur va qiziqarli tarzda o'rganish imkoniyatini berish.
+                        <h3 className="text-2xl font-bold text-slate-900 mb-4">{t('about_mission_title')}</h3>
+                        <p className="text-slate-600 leading-relaxed">
+                            {t('about_mission_desc')}
                         </p>
                     </motion.div>
 
@@ -59,15 +59,14 @@ const About = () => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6 }}
-                        className="bg-gradient-to-br from-purple-900/30 to-purple-800/20 backdrop-blur-sm border border-purple-500/20 rounded-3xl p-8 hover:border-purple-500/40 transition-all"
+                        className="bg-white shadow-xl shadow-purple-900/5 border border-purple-100 rounded-3xl p-8 hover:shadow-2xl hover:shadow-purple-900/10 hover:-translate-y-1 transition-all"
                     >
-                        <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6">
+                        <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-purple-500/30">
                             <Eye className="w-8 h-8 text-white" />
                         </div>
-                        <h3 className="text-2xl font-bold text-white mb-4">Vizyonimiz</h3>
-                        <p className="text-slate-300 leading-relaxed">
-                            O'zbekistonda eng yaxshi AI-ga asoslangan ta'lim platformasiga
-                            aylanish va minglab o'quvchilarga yuqori sifatli ta'lim berish.
+                        <h3 className="text-2xl font-bold text-slate-900 mb-4">{t('about_vision_title')}</h3>
+                        <p className="text-slate-600 leading-relaxed">
+                            {t('about_vision_desc')}
                         </p>
                     </motion.div>
                 </div>
@@ -80,7 +79,7 @@ const About = () => {
                         viewport={{ once: true }}
                         className="text-3xl font-bold text-slate-900 text-center mb-12"
                     >
-                        Nima uchun NurFizika?
+                        {t('about_why_title')}
                     </motion.h3>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

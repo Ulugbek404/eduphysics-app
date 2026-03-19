@@ -3,6 +3,7 @@
         "rules": "firestore.rules"
     },
     "hosting": {
+        "site": "eduphysics-app",
         "public": "dist",
         "ignore": [
             "firebase.json",

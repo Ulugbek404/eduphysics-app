@@ -1,28 +1,30 @@
 import React from 'react';
 import { Atom, Mail, Phone, MapPin, Facebook, Instagram, Youtube, Send } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const Footer = () => {
+    const { t } = useLanguage();
     const currentYear = new Date().getFullYear();
 
     const footerLinks = {
         platform: [
-            { label: 'Bosh sahifa', path: '/' },
-            { label: 'Darslar', path: '/dashboard/lessons' },
-            { label: 'Testlar', path: '/dashboard/tests' },
-            { label: 'Virtual Lab', path: '/dashboard/lab' },
+            { label: t('nav_home'), path: '/' },
+            { label: t('footer_lessons'), path: '/dashboard/lessons' },
+            { label: t('footer_tests'), path: '/dashboard/tests' },
+            { label: t('footer_lab'), path: '/dashboard/lab' },
         ],
         company: [
-            { label: 'Biz haqimizda', path: '/about' },
-            { label: 'Bog\'lanish', path: '/contact' },
-            { label: 'Maxfiylik siyosati', path: '/privacy' },
-            { label: 'Foydalanish shartlari', path: '/terms' },
+            { label: t('footer_about'), path: '/about' },
+            { label: t('footer_contact'), path: '/contact' },
+            { label: t('footer_privacy'), path: '/privacy' },
+            { label: t('footer_terms'), path: '/terms' },
         ],
         resources: [
-            { label: 'Yordam markazi', path: '/help' },
-            { label: 'FAQ', path: '/faq' },
+            { label: t('footer_help'), path: '/help' },
+            { label: t('footer_faq'), path: '/faq' },
             { label: 'Blog', path: '/blog' },
-            { label: 'Yangiliklar', path: '/news' },
+            { label: t('footer_community'), path: '/news' },
         ],
     };
 
@@ -44,12 +46,11 @@ const Footer = () => {
                             <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg">
                                 <Atom size={24} className="text-white" />
                             </div>
-                            <span className="text-xl font-bold text-white">NurFizika</span>
-                            <span className="text-sm text-yellow-300 italic">Kuch — bilimda, bilim — bizda!</span>
+                            <span className="text-xl font-bold text-white">{t('app_name')}</span>
+                            <span className="text-sm text-yellow-300 italic">{t('hero_slogan')}</span>
                         </div>
                         <p className="text-slate-400 mb-4 leading-relaxed">
-                            Sun'iy intellekt yordamida 9-sinf fizikasini o'rganish platformasi.
-                            Virtual laboratoriya, AI ustoz va interaktiv darslar bilan bilimingizni oshiring.
+                            {t('footer_desc')}
                         </p>
 
                         {/* Contact Info */}
@@ -64,21 +65,18 @@ const Footer = () => {
                             </div>
                             <div className="flex items-center space-x-2">
                                 <MapPin size={16} className="text-blue-400" />
-                                <span>Toshkent, O'zbekiston</span>
+                                <span>{t('contact_location_value')}</span>
                             </div>
                         </div>
                     </div>
 
                     {/* Platform Links */}
                     <div>
-                        <h3 className="text-white font-bold mb-4">Platforma</h3>
+                        <h3 className="text-white font-bold mb-4">{t('footer_platform')}</h3>
                         <ul className="space-y-2">
                             {footerLinks.platform.map((link, index) => (
                                 <li key={index}>
-                                    <Link
-                                        to={link.path}
-                                        className="text-slate-400 hover:text-blue-400 transition-colors text-sm"
-                                    >
+                                    <Link to={link.path} className="text-slate-400 hover:text-blue-400 transition-colors text-sm">
                                         {link.label}
                                     </Link>
                                 </li>
@@ -88,14 +86,11 @@ const Footer = () => {
 
                     {/* Company Links */}
                     <div>
-                        <h3 className="text-white font-bold mb-4">Kompaniya</h3>
+                        <h3 className="text-white font-bold mb-4">{t('footer_support')}</h3>
                         <ul className="space-y-2">
                             {footerLinks.company.map((link, index) => (
                                 <li key={index}>
-                                    <Link
-                                        to={link.path}
-                                        className="text-slate-400 hover:text-blue-400 transition-colors text-sm"
-                                    >
+                                    <Link to={link.path} className="text-slate-400 hover:text-blue-400 transition-colors text-sm">
                                         {link.label}
                                     </Link>
                                 </li>
@@ -105,14 +100,11 @@ const Footer = () => {
 
                     {/* Resources Links */}
                     <div>
-                        <h3 className="text-white font-bold mb-4">Resurslar</h3>
+                        <h3 className="text-white font-bold mb-4">{t('footer_legal')}</h3>
                         <ul className="space-y-2">
                             {footerLinks.resources.map((link, index) => (
                                 <li key={index}>
-                                    <Link
-                                        to={link.path}
-                                        className="text-slate-400 hover:text-blue-400 transition-colors text-sm"
-                                    >
+                                    <Link to={link.path} className="text-slate-400 hover:text-blue-400 transition-colors text-sm">
                                         {link.label}
                                     </Link>
                                 </li>
@@ -126,11 +118,26 @@ const Footer = () => {
                     <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                         {/* Copyright */}
                         <div className="text-slate-400 text-sm">
-                            © {currentYear} NurFizika. Barcha huquqlar himoyalangan.
+                            © {currentYear} {t('app_name')}. {t('footer_rights')}.
                         </div>
 
-                        {/* Social Links */}
-                        <div className="flex items-center space-x-4">
+                        {/* QR Code & Social Links */}
+                        <div className="flex items-center gap-6 mt-4 md:mt-0">
+                            {/* QR Code Mini */}
+                            <a href="https://eduphysics-app.web.app" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-slate-900/80 p-2 rounded-xl border border-slate-700 hover:border-blue-500/50 transition-colors group">
+                                <img
+                                    src="/qr-code.jpg"
+                                    alt="QR Code"
+                                    className="w-10 h-10 bg-white p-1 rounded-lg group-hover:scale-105 transition-transform"
+                                />
+                                <div className="hidden sm:block text-left">
+                                    <p className="text-xs text-slate-300 font-medium">Telefoningizda</p>
+                                    <p className="text-[10px] text-slate-400">ochish uchun skanerlang</p>
+                                </div>
+                            </a>
+
+                            {/* Social Links */}
+                            <div className="flex items-center space-x-3">
                             {socialLinks.map((social, index) => {
                                 const Icon = social.icon;
                                 return (
@@ -146,6 +153,7 @@ const Footer = () => {
                                     </a>
                                 );
                             })}
+                            </div>
                         </div>
                     </div>
                 </div>

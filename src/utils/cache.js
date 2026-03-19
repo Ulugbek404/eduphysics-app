@@ -39,7 +39,7 @@ export const setCache = (key, data, ttl = TTL.USER_DATA) => {
             timestamp: Date.now(),
             ttl: ttl === Infinity ? null : ttl,
         }));
-    } catch (e) {
+    } catch {
         // localStorage to'lib ketsa — eski cache tozalanadi
         clearOldCache();
         try {

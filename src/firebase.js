@@ -1,6 +1,7 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 // Firebase konfiguratsiyasi
 const firebaseConfig = {
@@ -16,6 +17,7 @@ let app = null;
 let auth = null;
 let googleProvider = null;
 let db = null;
+let storage = null;
 
 try {
     if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
@@ -30,10 +32,11 @@ try {
     auth = getAuth(app);
     googleProvider = new GoogleAuthProvider();
     db = getFirestore(app);
+    storage = getStorage(app);
 
 } catch (error) {
     console.error('Firebase ishga tushishida xatolik:', error);
 }
 
-export { auth, googleProvider, db };
+export { auth, googleProvider, db, storage };
 export default app;

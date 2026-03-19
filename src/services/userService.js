@@ -7,6 +7,7 @@ import {
     increment, arrayUnion, serverTimestamp, getDocs,
     query, orderBy, limit, addDoc
 } from 'firebase/firestore';
+
 import { db } from '../firebase';
 import { cachedFetch, clearCache, clearUserCache, setCache, TTL } from '../utils/cache';
 
@@ -240,4 +241,128 @@ export async function getLeaderboard(type = 'global', timeFilter = 'weekly') {
 
 export function onUserLogout(uid) {
     clearUserCache(uid);
+}
+
+// ─── Stats Yangilash — Firestore increment ────────────────────────────────────
+
+/**
+ * Foydalanuvchi statistikasini Firestore increment bilan yangilaydi.
+ * testsSolved, timeSpent, totalScore, completedLabs
+ */
+export async function updateUserStats(userId, statsUpdate) {
+    try {
+        const userRef = doc(db, 'users', userId);
+        const updates = {};
+
+        if (statsUpdate.testsSolved)
+            updates['stats.testsSolved'] = increment(statsUpdate.testsSolved);
+        if (statsUpdate.timeSpent)
+            updates['stats.timeSpent'] = increment(statsUpdate.timeSpent);
+        if (statsUpdate.totalScore)
+            updates['stats.totalScore'] = increment(statsUpdate.totalScore);
+        if (statsUpdate.completedLabs)
+            updates['stats.completedLabs'] = increment(statsUpdate.completedLabs);
+
+        if (Object.keys(updates).length > 0) {
+            await updateDoc(userRef, updates);
+        }
+    } catch (err) {
+        console.error('updateUserStats error:', err);
+    }
+}
+
+// ─── Assessment Natijasini Saqlash ────────────────────────────────────────────
+
+/**
+ * Assessment natijasini Firestore ga saqlaydi (localStorage emas!)
+ */
+export async function saveAssessmentResult(userId, results) {
+    try {
+        await updateDoc(doc(db, 'users', userId), {
+            assessmentCompleted: true,
+            assessmentResults: results,
+            assessmentCompletedAt: serverTimestamp(),
+        });
+        clearCache(`user_${userId}`);
+    } catch (err) {
+        console.error('saveAssessmentResult error:', err);
+    }
+}
+
+// ─── Stats Maydonini Ishga Tushirish ─────────────────────────────────────────
+
+/**
+ * Agar stats maydoni yo'q bo'lsa — standart qiymatlar bilan yaratadi.
+ * Birinchi kirish da avtomatik chaqiriladi.
+ */
+export async function initUserStats(userId) {
+    try {
+        await updateDoc(doc(db, 'users', userId), {
+            'stats.timeSpent': 0,
+            'stats.testsSolved': 0,
+            'stats.totalScore': 0,
+            'stats.completedLabs': 0,
+            'stats.averageScore': 0,
+        });
+        clearCache(`user_${userId}`);
+    } catch (err) {
+        console.error('initUserStats error:', err);
+    }
+}
+// ─── Streak hisoblash (ichki yordamchi) ──────────────────────────────────────
+
+function calculateStreak(activeDates) {
+    if (!activeDates?.length) return 0;
+    // Noyob sanalar, katta → kichik tartiblangan
+    const unique = [...new Set(activeDates)].sort((a, b) => b.localeCompare(a));
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let streak = 0;
+    let current = new Date(today);
+    for (const dateStr of unique) {
+        const d = new Date(dateStr);
+        d.setHours(0, 0, 0, 0);
+        if (d.getTime() === current.getTime()) {
+            streak++;
+            current.setDate(current.getDate() - 1);
+        } else if (d < current) {
+            break; // ketma-ketlik uzildi
+        }
+    }
+    return streak;
+}
+
+// ─── Bugungi Faollikni Belgilash ──────────────────────────────────────────────
+
+/**
+ * Foydalanuvchi har sessiyada bu funksiyani chaqiradi:
+ *  - activeDates ga bugungi sanani qo'shadi (arrayUnion — takrorlanmaydi)
+ *  - Streak va bestStreak ni yangilaydi
+ */
+export async function trackTodayActivity(userId) {
+    if (!userId) return;
+    const today = new Date().toISOString().split('T')[0]; // "2026-03-06"
+    try {
+        const userRef = doc(db, 'users', userId);
+        // 1. Avval activeDates ga today ni qo'shamiz
+        await updateDoc(userRef, { activeDates: arrayUnion(today) });
+
+        // 2. Yangilangan doc ni olib streak hisoblaymiz
+        const snap = await getDoc(userRef);
+        if (!snap.exists()) return;
+        const data = snap.data();
+        const activeDates = data.activeDates || [];
+        const newStreak = calculateStreak(activeDates);
+        const currentBest = data.bestStreak || 0;
+
+        // 3. streakDays, bestStreak, lastActiveDate yangilash
+        await updateDoc(userRef, {
+            streakDays: newStreak,
+            lastActiveDate: today,
+            bestStreak: newStreak > currentBest ? newStreak : currentBest,
+        });
+        clearCache(`user_${userId}`);
+    } catch (err) {
+        console.error('trackTodayActivity error:', err);
+    }
 }

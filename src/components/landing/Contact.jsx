@@ -1,26 +1,15 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-    Mail,
-    Phone,
-    MapPin,
-    Send,
-    MessageSquare,
-    HelpCircle,
-    ChevronDown,
-    Facebook,
-    Instagram,
-    Youtube,
+    Mail, Phone, MapPin, Send, MessageSquare,
+    HelpCircle, ChevronDown, Facebook, Instagram, Youtube,
     Send as TelegramIcon
 } from 'lucide-react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const Contact = () => {
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        subject: '',
-        message: ''
-    });
+    const { t } = useLanguage();
+    const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
     const [openFaq, setOpenFaq] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState(null);
@@ -28,22 +17,16 @@ const Contact = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-
-        // Simulate form submission
         setTimeout(() => {
             setSubmitStatus('success');
             setIsSubmitting(false);
             setFormData({ name: '', email: '', subject: '', message: '' });
-
             setTimeout(() => setSubmitStatus(null), 5000);
         }, 1500);
     };
 
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const faqs = [
@@ -76,10 +59,10 @@ const Contact = () => {
                     className="text-center mb-16"
                 >
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                        Biz bilan bog'laning
+                        {t('contact_title')}
                     </h2>
                     <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-                        Savollaringiz yoki takliflaringiz bo'lsa, biz bilan aloqaga chiqing
+                        {t('contact_subtitle')}
                     </p>
                 </motion.div>
 
@@ -95,13 +78,13 @@ const Contact = () => {
                         <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-3xl p-8">
                             <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
                                 <MessageSquare className="w-7 h-7 text-blue-400" />
-                                Xabar Yuboring
+                                {t('contact_form_title')}
                             </h3>
 
                             <form onSubmit={handleSubmit} className="space-y-5">
                                 <div>
                                     <label className="block text-slate-300 mb-2 font-medium text-sm">
-                                        Ismingiz
+                                        {t('contact_name')}
                                     </label>
                                     <input
                                         type="text"
@@ -110,13 +93,13 @@ const Contact = () => {
                                         onChange={handleChange}
                                         required
                                         className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
-                                        placeholder="Ismingizni kiriting"
+                                        placeholder={t('contact_name')}
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-slate-300 mb-2 font-medium text-sm">
-                                        Email
+                                        {t('contact_email_label')}
                                     </label>
                                     <input
                                         type="email"
@@ -131,7 +114,7 @@ const Contact = () => {
 
                                 <div>
                                     <label className="block text-slate-300 mb-2 font-medium text-sm">
-                                        Mavzu
+                                        {t('contact_subject')}
                                     </label>
                                     <input
                                         type="text"
@@ -140,13 +123,13 @@ const Contact = () => {
                                         onChange={handleChange}
                                         required
                                         className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
-                                        placeholder="Xabar mavzusi"
+                                        placeholder={t('contact_subject')}
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-slate-300 mb-2 font-medium text-sm">
-                                        Xabar
+                                        {t('contact_message')}
                                     </label>
                                     <textarea
                                         name="message"
@@ -155,13 +138,13 @@ const Contact = () => {
                                         required
                                         rows={5}
                                         className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors resize-none"
-                                        placeholder="Xabaringizni yozing..."
+                                        placeholder={t('contact_message')}
                                     />
                                 </div>
 
                                 {submitStatus === 'success' && (
                                     <div className="bg-green-500/20 border border-green-500/50 rounded-xl p-4 text-green-300 text-sm">
-                                        ✓ Xabaringiz muvaffaqiyatli yuborildi!
+                                        ✓ {t('contact_success')}
                                     </div>
                                 )}
 
@@ -170,9 +153,9 @@ const Contact = () => {
                                     disabled={isSubmitting}
                                     className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl hover:from-blue-500 hover:to-purple-500 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
-                                    {isSubmitting ? 'Yuborilmoqda...' : (
+                                    {isSubmitting ? t('contact_sending') : (
                                         <>
-                                            Yuborish
+                                            {t('contact_send')}
                                             <Send className="w-5 h-5" />
                                         </>
                                     )}
@@ -192,7 +175,7 @@ const Contact = () => {
                         {/* Contact Details */}
                         <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-3xl p-8">
                             <h3 className="text-xl font-bold text-white mb-6">
-                                Aloqa Ma'lumotlari
+                                {t('contact_info_title')}
                             </h3>
 
                             <div className="space-y-5">
@@ -201,9 +184,9 @@ const Contact = () => {
                                         <Mail className="w-6 h-6 text-blue-400" />
                                     </div>
                                     <div>
-                                        <div className="text-slate-400 text-sm mb-1">Email</div>
-                                        <a href="mailto:support@ulugbekedu.uz" className="text-white hover:text-blue-400 transition-colors">
-                                            support@ulugbekedu.uz
+                                        <div className="text-slate-400 text-sm mb-1">{t('contact_email_label')}</div>
+                                        <a href="mailto:ulugbekroziboyev05@gmail.com" className="text-white hover:text-blue-400 transition-colors">
+                                            ulugbekroziboyev05@gmail.com
                                         </a>
                                     </div>
                                 </div>
@@ -213,7 +196,7 @@ const Contact = () => {
                                         <Phone className="w-6 h-6 text-purple-400" />
                                     </div>
                                     <div>
-                                        <div className="text-slate-400 text-sm mb-1">Telefon</div>
+                                        <div className="text-slate-400 text-sm mb-1">{t('contact_telegram')}</div>
                                         <a href="tel:+998931863404" className="text-white hover:text-purple-400 transition-colors">
                                             +998 (93) 186-34-04
                                         </a>
@@ -225,8 +208,8 @@ const Contact = () => {
                                         <MapPin className="w-6 h-6 text-pink-400" />
                                     </div>
                                     <div>
-                                        <div className="text-slate-400 text-sm mb-1">Manzil</div>
-                                        <div className="text-white">Toshkent, O'zbekiston</div>
+                                        <div className="text-slate-400 text-sm mb-1">{t('contact_location')}</div>
+                                        <div className="text-white">{t('contact_location_value')}</div>
                                     </div>
                                 </div>
                             </div>
@@ -235,7 +218,7 @@ const Contact = () => {
                         {/* Social Media */}
                         <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-3xl p-8">
                             <h3 className="text-xl font-bold text-white mb-6">
-                                Ijtimoiy Tarmoqlar
+                                {t('contact_social')}
                             </h3>
 
                             <div className="grid grid-cols-2 gap-3">
@@ -243,7 +226,7 @@ const Contact = () => {
                                     { icon: <Facebook className="w-5 h-5" />, name: "Facebook", color: "blue", url: "https://facebook.com" },
                                     { icon: <Instagram className="w-5 h-5" />, name: "Instagram", color: "pink", url: "https://instagram.com" },
                                     { icon: <Youtube className="w-5 h-5" />, name: "YouTube", color: "red", url: "https://youtube.com" },
-                                    { icon: <TelegramIcon className="w-5 h-5" />, name: "Telegram", color: "blue", url: "https://t.me/eduphysics" }
+                                    { icon: <TelegramIcon className="w-5 h-5" />, name: "Telegram", color: "blue", url: "https://t.me/Ulugbek1434" }
                                 ].map((social, index) => (
                                     <a
                                         key={index}
@@ -252,9 +235,7 @@ const Contact = () => {
                                         rel="noopener noreferrer"
                                         className={`flex items-center gap-2 p-3 bg-${social.color}-500/10 border border-${social.color}-500/20 rounded-xl hover:bg-${social.color}-500/20 transition-all group`}
                                     >
-                                        <div className="group-hover:scale-110 transition-transform">
-                                            {social.icon}
-                                        </div>
+                                        <div className="group-hover:scale-110 transition-transform">{social.icon}</div>
                                         <span className="text-white font-medium text-sm">{social.name}</span>
                                     </a>
                                 ))}
@@ -263,8 +244,42 @@ const Contact = () => {
                     </motion.div>
                 </div>
 
+                    {/* App Download/QR Code Section */}
+                    <motion.div 
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="mt-16 flex flex-col items-center justify-center text-center gap-6"
+                    >
+                        <div className="bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-3xl p-8 max-w-sm w-full mx-auto relative overflow-hidden group">
+                            {/* Decorative background glow */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl group-hover:bg-blue-500/30 transition-colors duration-500 pointer-events-none"></div>
+                            
+                            <h4 className="text-xl font-bold text-white mb-2 flex flex-col items-center justify-center gap-2">
+                                <span className="text-2xl">📱</span>
+                                Telefoningizda oching
+                            </h4>
+                            <p className="text-slate-400 font-medium mb-6">
+                                Platformamizga istalgan qurilmadan tezkor kirish uchun ushbu QR kodni skanerlang.
+                            </p>
+                            
+                            <div className="relative inline-block mt-2">
+                                <div className="absolute -inset-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-2xl blur-md opacity-40 group-hover:opacity-100 transition duration-500"></div>
+                                <img
+                                    src="/qr-code.jpg"
+                                    alt="NurFizika QR"
+                                    className="relative w-48 h-48 md:w-56 md:h-56 object-cover rounded-2xl border-4 border-white/10 bg-white p-2 transform group-hover:scale-105 group-hover:-translate-y-2 transition-all duration-300 shadow-2xl"
+                                />
+                            </div>
+                            
+                            <p className="text-blue-400 font-bold tracking-widest text-sm mt-6 uppercase">
+                                eduphysics-app.web.app
+                            </p>
+                        </div>
+                    </motion.div>
+
                 {/* FAQ Section */}
-                <div className="max-w-4xl mx-auto">
+                <div className="max-w-4xl mx-auto mt-24">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -273,7 +288,7 @@ const Contact = () => {
                     >
                         <h3 className="text-3xl font-bold text-white mb-4 flex items-center justify-center gap-3">
                             <HelpCircle className="w-8 h-8 text-blue-400" />
-                            Tez-tez So'raladigan Savollar
+                            {t('footer_faq')}
                         </h3>
                     </motion.div>
 
@@ -291,13 +306,8 @@ const Contact = () => {
                                     onClick={() => setOpenFaq(openFaq === index ? null : index)}
                                     className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-slate-700/30 transition-colors"
                                 >
-                                    <span className="text-lg font-semibold text-white pr-4">
-                                        {faq.question}
-                                    </span>
-                                    <ChevronDown
-                                        className={`w-6 h-6 text-blue-400 flex-shrink-0 transition-transform ${openFaq === index ? 'rotate-180' : ''
-                                            }`}
-                                    />
+                                    <span className="text-lg font-semibold text-white pr-4">{faq.question}</span>
+                                    <ChevronDown className={`w-6 h-6 text-blue-400 flex-shrink-0 transition-transform ${openFaq === index ? 'rotate-180' : ''}`} />
                                 </button>
 
                                 {openFaq === index && (
@@ -308,9 +318,7 @@ const Contact = () => {
                                         transition={{ duration: 0.3 }}
                                         className="px-6 pb-4"
                                     >
-                                        <p className="text-slate-300 leading-relaxed">
-                                            {faq.answer}
-                                        </p>
+                                        <p className="text-slate-300 leading-relaxed">{faq.answer}</p>
                                     </motion.div>
                                 )}
                             </motion.div>

@@ -10,7 +10,7 @@ import {
     Users, BarChart2, ClipboardList, Bell,
     Search, Eye, Zap, Send, LogOut, Atom,
     TrendingUp, BookOpen, FlaskConical, Award,
-    ChevronDown, X, CheckCircle, Clock, AlertCircle
+    ChevronDown, X, CheckCircle, Clock, AlertCircle, Settings
 } from 'lucide-react';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -378,10 +378,10 @@ export default function TeacherDashboard() {
 
     // ══════════════════════════════════════════════════════════════════════
     return (
-        <div className="h-screen bg-slate-950 flex overflow-hidden">
+        <div className="h-screen theme-bg theme-text flex overflow-hidden">
 
             {/* ── Sidebar ── */}
-            <aside className="w-60 fixed inset-y-0 left-0 bg-gradient-to-b from-slate-900 to-slate-950 border-r border-slate-800 flex flex-col z-40">
+            <aside className="w-60 fixed inset-y-0 left-0 theme-surface border-r theme-border flex flex-col z-40">
                 <div className="p-5 flex items-center gap-3 border-b border-slate-800">
                     <div className="bg-gradient-to-br from-indigo-500 to-violet-600 p-2 rounded-xl">
                         <Atom size={22} className="text-white" />
@@ -402,6 +402,13 @@ export default function TeacherDashboard() {
                             {t.label}
                         </button>
                     ))}
+                    {/* Sozlamalar — /settings ga navigate */}
+                    <button
+                        onClick={() => navigate('/settings')}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-left text-slate-400 hover:text-white hover:bg-slate-800/50"
+                    >
+                        ⚙️ Sozlamalar
+                    </button>
                 </nav>
 
                 <div className="p-4 border-t border-slate-800 space-y-2">

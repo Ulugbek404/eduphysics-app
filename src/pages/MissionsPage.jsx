@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useXP, calcLevel, xpForNextLevel, xpInCurrentLevel } from '../contexts/XPContext';
 import { useMissions } from '../contexts/MissionsContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import LeaderboardTab from '../components/leaderboard/LeaderboardTab';
 
 // ─── Icon Map ─────────────────────────────────────────────────────────────────
@@ -22,6 +23,7 @@ const ICON_MAP = {
 
 // ─── XP Level Bar ─────────────────────────────────────────────────────────────
 function XPBar({ totalXP }) {
+    const { t } = useLanguage();
     const level = calcLevel(totalXP);
     const inLevel = xpInCurrentLevel(totalXP);
     const needed = 500;
@@ -30,7 +32,7 @@ function XPBar({ totalXP }) {
     return (
         <div className="flex-1">
             <div className="flex justify-between items-center mb-1.5">
-                <span className="text-white font-bold text-sm">Daraja {level}</span>
+                <span className="text-white font-bold text-sm">{t('missions_level') || 'Daraja'} {level}</span>
                 <span className="text-slate-400 text-xs">{inLevel} / {needed} XP</span>
             </div>
             <div className="h-2.5 bg-slate-800 rounded-full overflow-hidden">
@@ -41,13 +43,14 @@ function XPBar({ totalXP }) {
                     className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500"
                 />
             </div>
-            <p className="text-slate-600 text-xs mt-1">Keyingi darajaga: {needed - inLevel} XP</p>
+            <p className="text-slate-600 text-xs mt-1">{t('missions_to_next') || 'Keyingi darajaga:'} {needed - inLevel} XP</p>
         </div>
     );
 }
 
 // ─── Mission Card ─────────────────────────────────────────────────────────────
 function MissionCard({ mission, index }) {
+    const { t } = useLanguage();
     const { completed, current, target, title, xp, icon } = mission;
     const pct = Math.min((current / target) * 100, 100);
 
@@ -58,7 +61,7 @@ function MissionCard({ mission, index }) {
             transition={{ delay: index * 0.06 }}
             className={`relative rounded-2xl border p-4 transition-all duration-300 ${completed
                 ? 'border-emerald-500/50 bg-emerald-950/25 shadow-lg shadow-emerald-500/10'
-                : 'border-slate-800 bg-slate-900/60 hover:border-slate-700'
+                : 'theme-border theme-surface hover:border-slate-700'
                 }`}
         >
             <div className="flex items-start gap-4">
@@ -96,8 +99,8 @@ function MissionCard({ mission, index }) {
 
                     <p className="text-slate-500 text-xs">
                         {completed
-                            ? '✓ Bajarildi!'
-                            : `${current}/${target} bajarildi`}
+                            ? `✓ ${t('missions_completed') || 'Bajarildi!'}`
+                            : `${current}/${target} ${t('missions_completed_lower') || 'bajarildi'}`}
                     </p>
                 </div>
             </div>
@@ -114,6 +117,7 @@ function MissionCard({ mission, index }) {
 
 // ─── Achievement Card ─────────────────────────────────────────────────────────
 function AchievementCard({ ach, index }) {
+    const { t } = useLanguage();
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -121,7 +125,7 @@ function AchievementCard({ ach, index }) {
             transition={{ delay: index * 0.07 }}
             className={`relative rounded-2xl border p-5 text-center transition-all duration-300 ${ach.earned
                 ? 'border-yellow-500/50 bg-yellow-950/20 shadow-lg shadow-yellow-500/10'
-                : 'border-slate-800/60 bg-slate-900/40'
+                : 'theme-border theme-surface'
                 }`}
         >
             {/* Emoji icon */}
@@ -148,7 +152,7 @@ function AchievementCard({ ach, index }) {
                 <div className="absolute inset-0 flex items-end justify-center pb-3 pointer-events-none">
                     <div className="bg-slate-900/80 rounded-lg px-2 py-1 flex items-center gap-1">
                         <Lock size={10} className="text-slate-600" />
-                        <span className="text-slate-600 text-[10px]">Qulflangan</span>
+                        <span className="text-slate-600 text-[10px]">{t('missions_locked') || 'Qulflangan'}</span>
                     </div>
                 </div>
             )}
@@ -157,16 +161,17 @@ function AchievementCard({ ach, index }) {
 }
 
 // ─── TABS ─────────────────────────────────────────────────────────────────────
-const TABS = [
-    { id: 'daily', label: 'Kunlik', icon: <Target size={15} /> },
-    { id: 'weekly', label: 'Haftalik', icon: <Flame size={15} /> },
-    { id: 'achieve', label: 'Yutuqlar', icon: <Trophy size={15} /> },
-    { id: 'reyting', label: 'Reyting', icon: <Trophy size={15} className="text-yellow-400" /> },
+const getTabs = (t) => [
+    { id: 'daily', label: t('missions_daily') || 'Kunlik', icon: <Target size={15} /> },
+    { id: 'weekly', label: t('missions_weekly') || 'Haftalik', icon: <Flame size={15} /> },
+    { id: 'achieve', label: t('missions_achievements') || 'Yutuqlar', icon: <Trophy size={15} /> },
+    { id: 'reyting', label: t('missions_rating') || 'Reyting', icon: <Trophy size={15} className="text-yellow-400" /> },
 ];
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function MissionsPage() {
     const navigate = useNavigate();
+    const { t } = useLanguage();
     const { totalXP } = useXP();
     const { dailyMissions, weeklyMissions, achievements } = useMissions();
     const [activeTab, setActiveTab] = useState('daily');
@@ -176,7 +181,7 @@ export default function MissionsPage() {
     const achieveDone = achievements.filter(a => a.earned).length;
 
     return (
-        <div className="h-screen overflow-y-auto custom-scrollbar font-sans text-slate-100">
+        <div className="h-screen overflow-y-auto custom-scrollbar theme-bg theme-text font-sans">
             <div className="max-w-3xl mx-auto px-6 pb-24 pt-6">
 
                 {/* Back */}
@@ -185,7 +190,7 @@ export default function MissionsPage() {
                     className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6 group"
                 >
                     <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-                    <span className="font-medium text-sm">Ortga qaytish</span>
+                    <span className="font-medium text-sm">{t('nav_back') || 'Ortga qaytish'}</span>
                 </button>
 
                 {/* ── Hero / XP Card ── */}
@@ -206,7 +211,7 @@ export default function MissionsPage() {
                                 <span className="text-2xl font-black text-white">{calcLevel(totalXP)}</span>
                             </div>
                             <div>
-                                <p className="text-slate-400 text-xs">Umumiy XP</p>
+                                <p className="text-slate-400 text-xs">{t('missions_total_xp') || 'Umumiy XP'}</p>
                                 <p className="text-2xl font-black text-white">{totalXP.toLocaleString()}</p>
                             </div>
                         </div>
@@ -219,22 +224,22 @@ export default function MissionsPage() {
                     <div className="relative z-10 flex gap-3 mt-5 text-xs">
                         <div className="flex items-center gap-1.5 bg-slate-800/60 border border-slate-700/50 rounded-full px-3 py-1.5">
                             <Target size={11} className="text-indigo-400" />
-                            <span className="text-slate-300">{dailyDone}/{dailyMissions.length} kunlik</span>
+                            <span className="text-slate-300">{dailyDone}/{dailyMissions.length} {t('missions_daily_lower') || 'kunlik'}</span>
                         </div>
                         <div className="flex items-center gap-1.5 bg-slate-800/60 border border-slate-700/50 rounded-full px-3 py-1.5">
                             <Flame size={11} className="text-orange-400" />
-                            <span className="text-slate-300">{weeklyDone}/{weeklyMissions.length} haftalik</span>
+                            <span className="text-slate-300">{weeklyDone}/{weeklyMissions.length} {t('missions_weekly_lower') || 'haftalik'}</span>
                         </div>
                         <div className="flex items-center gap-1.5 bg-slate-800/60 border border-slate-700/50 rounded-full px-3 py-1.5">
                             <Trophy size={11} className="text-yellow-400" />
-                            <span className="text-slate-300">{achieveDone}/{achievements.length} yutuq</span>
+                            <span className="text-slate-300">{achieveDone}/{achievements.length} {t('missions_achievement_lower') || 'yutuq'}</span>
                         </div>
                     </div>
                 </motion.div>
 
                 {/* ── Tab bar ── */}
-                <div className="flex gap-1 bg-slate-900/80 border border-slate-800 rounded-2xl p-1 mb-6">
-                    {TABS.map(tab => (
+                <div className="flex gap-1 theme-surface border theme-border rounded-2xl p-1 mb-6">
+                    {getTabs(t).map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
@@ -254,7 +259,7 @@ export default function MissionsPage() {
                         <motion.div key="daily" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             className="space-y-3"
                         >
-                            <p className="text-slate-500 text-xs mb-4">Har kuni yangilanadi · {dailyDone}/{dailyMissions.length} bajarildi</p>
+                            <p className="text-slate-500 text-xs mb-4">{t('missions_daily_desc') || 'Har kuni yangilanadi'} · {dailyDone}/{dailyMissions.length} {t('missions_completed_lower') || 'bajarildi'}</p>
                             {dailyMissions.map((m, i) => <MissionCard key={m.id} mission={m} index={i} />)}
                         </motion.div>
                     )}
@@ -263,14 +268,14 @@ export default function MissionsPage() {
                         <motion.div key="weekly" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             className="space-y-3"
                         >
-                            <p className="text-slate-500 text-xs mb-4">Har dushanba yangilanadi · {weeklyDone}/{weeklyMissions.length} bajarildi</p>
+                            <p className="text-slate-500 text-xs mb-4">{t('missions_weekly_desc') || 'Har dushanba yangilanadi'} · {weeklyDone}/{weeklyMissions.length} {t('missions_completed_lower') || 'bajarildi'}</p>
                             {weeklyMissions.map((m, i) => <MissionCard key={m.id} mission={m} index={i} />)}
                         </motion.div>
                     )}
 
                     {activeTab === 'achieve' && (
                         <motion.div key="achieve" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                            <p className="text-slate-500 text-xs mb-4">Bir marta beriladigan yutuqlar · {achieveDone}/{achievements.length} ochilgan</p>
+                            <p className="text-slate-500 text-xs mb-4">{t('missions_achieve_desc') || 'Bir marta beriladigan yutuqlar'} · {achieveDone}/{achievements.length} {t('missions_unlocked_lower') || 'ochilgan'}</p>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                 {achievements.map((a, i) => <AchievementCard key={a.id} ach={a} index={i} />)}
                             </div>

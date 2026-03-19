@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import ProgressDashboard from '../components/dashboard/ProgressDashboard';
+import { useLanguage } from '../contexts/LanguageContext';
 
 /**
  * Progress Page
@@ -9,6 +10,7 @@ import ProgressDashboard from '../components/dashboard/ProgressDashboard';
  */
 const ProgressPage = () => {
     const navigate = useNavigate();
+    const { t } = useLanguage();
 
     return (
         <div className="h-screen overflow-y-auto custom-scrollbar font-sans text-slate-100">
@@ -20,7 +22,7 @@ const ProgressPage = () => {
                     className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6"
                 >
                     <ArrowLeft size={20} />
-                    <span className="font-medium">Ortga qaytish</span>
+                    <span className="font-medium">{t('nav_back') || 'Ortga'}</span>
                 </button>
 
                 {/* Progress Dashboard */}

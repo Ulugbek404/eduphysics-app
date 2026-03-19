@@ -713,3 +713,70 @@ code {
     display: none !important;
   }
 }
+
+/* ============================================
+   📱 RESPONSIVE UTILITIES
+   ============================================ */
+
+/* Scrollbar hide */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Safe area padding for mobile (iPhone notch / home bar) */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Minimum touch target size (WCAG 44x44px) */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* XS breakpoint helpers (480px) — use with Tailwind */
+@media (min-width: 480px) {
+  .xs\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .xs\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .xs\:flex-row   { flex-direction: row; }
+  .xs\:block      { display: block; }
+  .xs\:hidden     { display: none; }
+  .xs\:text-sm    { font-size: 0.875rem; }
+  .xs\:px-4       { padding-left: 1rem; padding-right: 1rem; }
+}
+
+/* Bottom nav safe area */
+.bottom-nav-safe {
+  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Responsive table wrapper */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent text overflow globally */
+.text-balance {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Mobile bottom padding for pages with bottom nav */
+.pb-safe-nav {
+  padding-bottom: 5rem; /* 80px for bottom nav height */
+}
+
+@media (min-width: 1024px) {
+  .pb-safe-nav {
+    padding-bottom: 1.5rem;
+  }
+}

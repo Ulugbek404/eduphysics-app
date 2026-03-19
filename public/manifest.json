@@ -1,49 +1,50 @@
 {
-    "name": "NurFizika - 9-sinf Fizika",
-    "short_name": "NurFizika",
-    "description": "NurFizika - 9-sinf fizika kursi. AI yordamchisi, virtual laboratoriya va interaktiv darslar. Kuch — bilimda, bilim — bizda!",
-    "start_url": "/",
-    "scope": "/",
-    "display": "standalone",
-    "background_color": "#0F172A",
-    "theme_color": "#0F172A",
-    "orientation": "portrait-primary",
-    "icons": [
-        {
-            "src": "/assets/nurfizika.jpg",
-            "sizes": "192x192",
-            "type": "image/jpeg",
-            "purpose": "any"
-        },
-        {
-            "src": "/assets/nurfizika.jpg",
-            "sizes": "192x192",
-            "type": "image/jpeg",
-            "purpose": "maskable"
-        },
-        {
-            "src": "/assets/nurfizika.jpg",
-            "sizes": "512x512",
-            "type": "image/jpeg",
-            "purpose": "any"
-        },
-        {
-            "src": "/assets/nurfizika.jpg",
-            "sizes": "512x512",
-            "type": "image/jpeg",
-            "purpose": "maskable"
-        },
-        {
-            "src": "/assets/nurfizika.jpg",
-            "sizes": "180x180",
-            "type": "image/jpeg"
-        }
-    ],
-    "categories": [
-        "education",
-        "productivity"
-    ],
-    "lang": "uz",
-    "dir": "ltr",
-    "prefer_related_applications": false
+  "name": "NurFizika — Fizikani AI bilan o'rgan",
+  "short_name": "NurFizika",
+  "description": "9-sinf fizikasini sun'iy intellekt yordamida o'rgan. Virtual laboratoriya, AI ustoz, 100+ test.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#020617",
+  "theme_color": "#6366f1",
+  "lang": "uz",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education"],
+  "screenshots": [
+    {
+      "src": "/screenshots/dashboard.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
 }

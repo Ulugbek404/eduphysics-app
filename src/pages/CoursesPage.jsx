@@ -51,7 +51,7 @@ export default function CoursesPage() {
     const levelData = getLevelData(totalXP);
 
     return (
-        <div className="h-screen overflow-y-auto custom-scrollbar font-sans text-slate-100">
+        <div className="h-screen overflow-y-auto custom-scrollbar theme-bg theme-text font-sans">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -62,7 +62,7 @@ export default function CoursesPage() {
                 <div className="flex items-center justify-between mb-12">
                     <button
                         onClick={() => navigate('/dashboard')}
-                        className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 hover:bg-slate-800 rounded-xl border border-slate-700/50 hover:border-slate-600 transition-all text-slate-400 hover:text-white"
+                        className="flex items-center gap-2 px-4 py-2 theme-card hover:opacity-80 rounded-xl border theme-border transition-all theme-muted hover:theme-text"
                     >
                         <ArrowLeft size={18} />
                         <span className="font-medium">Ortga qaytish</span>
@@ -104,7 +104,7 @@ export default function CoursesPage() {
                                 navigate('/darsliklar/grade-9');
                             }
                         }}
-                        className="cursor-pointer group relative overflow-hidden rounded-2xl border border-slate-700/60 bg-slate-800/50 p-5 hover:border-blue-500/50 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300"
+                        className="cursor-pointer group relative overflow-hidden rounded-2xl border theme-border theme-card p-5 hover:border-blue-500/50 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300"
                     >
                         {/* Bg glow */}
                         <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -140,7 +140,7 @@ export default function CoursesPage() {
                     <motion.div
                         whileHover={{ y: -4, scale: 1.01 }}
                         transition={{ duration: 0.2 }}
-                        className="cursor-default group relative overflow-hidden rounded-2xl border border-slate-700/60 bg-slate-800/50 p-5 hover:border-amber-500/50 hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-300"
+                        className="cursor-default group relative overflow-hidden rounded-2xl border theme-border theme-card p-5 hover:border-amber-500/50 hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-300"
                     >
                         <div className="absolute inset-0 bg-gradient-to-br from-amber-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
@@ -194,7 +194,7 @@ export default function CoursesPage() {
                         whileHover={{ y: -4, scale: 1.01 }}
                         transition={{ duration: 0.2 }}
                         onClick={() => navigate('/progress')}
-                        className="cursor-pointer group relative overflow-hidden rounded-2xl border border-slate-700/60 bg-slate-800/50 p-5 hover:border-purple-500/50 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300"
+                        className="cursor-pointer group relative overflow-hidden rounded-2xl border theme-border theme-card p-5 hover:border-purple-500/50 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300"
                     >
                         <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 

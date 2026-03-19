@@ -154,12 +154,23 @@ function RankRow({ user, rank, xpField, isCurrentUser }) {
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 export default function LeaderboardTab() {
-    const { user } = useAuth();
+    const { user, userData } = useAuth();
 
     // Controls
     const [mode, setMode] = useState('global');  // 'global' | 'region'
     const [timeKey, setTimeKey] = useState('Hafta');
-    const [region, setRegion] = useState(REGIONS[0]);
+    
+    // Auto-select user's region if available, else fallback
+    const [region, setRegion] = useState(() => {
+        return userData?.region && REGIONS.includes(userData.region) ? userData.region : REGIONS[0];
+    });
+
+    // Update region state if userData changes later
+    useEffect(() => {
+        if (userData?.region && REGIONS.includes(userData.region)) {
+            setRegion(userData.region);
+        }
+    }, [userData?.region]);
 
     // Data
     const [users, setUsers] = useState([]);

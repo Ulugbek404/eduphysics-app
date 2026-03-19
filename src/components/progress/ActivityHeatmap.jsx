@@ -1,6 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Flame, Trophy, Activity, ChevronLeft, ChevronRight } from 'lucide-react';
+import { doc, onSnapshot, collection, query, where, orderBy } from 'firebase/firestore';
+import { db } from '../../firebase';
+import { useAuth } from '../../contexts/AuthContext';
+import { trackTodayActivity } from '../../services/userService';
 
 // ─── UZ oy nomlari ────────────────────────────────────────────────────────────
 const UZ_MONTHS = [
@@ -18,35 +22,23 @@ function getColorClass(xp) {
     return 'bg-purple-500    text-white      border-purple-400/60';
 }
 
-// ─── Bir oy uchun mock XP data ────────────────────────────────────────────────
-function generateMonthData(year, month) {
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const data = {};
-    for (let d = 1; d <= daysInMonth; d++) {
-        const date = new Date(year, month, d);
-        const dow = date.getDay(); // 0=Sun
-        const isWeekend = dow === 0 || dow === 6;
-        const active = Math.random() < (isWeekend ? 0.28 : 0.62);
-        data[d] = active ? Math.floor(Math.random() * 140) + 5 : 0;
+// ─── Streakni sanalar array dan hisoblash ─────────────────────────────────────
+function calcCurrentStreak(activeDates) {
+    if (!activeDates?.length) return 0;
+    const unique = [...new Set(activeDates)].sort((a, b) => b.localeCompare(a));
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let streak = 0;
+    let current = new Date(today);
+    for (const dateStr of unique) {
+        const d = new Date(dateStr);
+        d.setHours(0, 0, 0, 0);
+        if (d.getTime() === current.getTime()) {
+            streak++;
+            current.setDate(current.getDate() - 1);
+        } else if (d < current) break;
     }
-    return data;
-}
-
-// ─── Streak hisoblash ─────────────────────────────────────────────────────────
-function calcStreaks(allData) {
-    const entries = Object.entries(allData).sort(([a], [b]) => a.localeCompare(b));
-    let current = 0, longest = 0, run = 0, totalActive = 0;
-    for (const [, xp] of entries) {
-        if (xp > 0) { run++; totalActive++; if (run > longest) longest = run; }
-        else run = 0;
-    }
-    // current streak from today backwards
-    const todayKey = (() => { const t = new Date(); return `${t.getFullYear()}-${t.getMonth()}-${t.getDate()}`; })();
-    for (let i = entries.length - 1; i >= 0; i--) {
-        if (entries[i][1] > 0) current++;
-        else break;
-    }
-    return { current, longest, totalActive };
+    return streak;
 }
 
 // ─── Tooltip ─────────────────────────────────────────────────────────────────
@@ -63,7 +55,7 @@ function Tooltip({ text, visible }) {
 }
 
 // ─── Bir kunlik katakcha ──────────────────────────────────────────────────────
-function DayCell({ day, xp, year, month }) {
+function DayCell({ day, xp, year, month, isToday }) {
     const [hovered, setHovered] = useState(false);
     const dateLabel = `${day} ${UZ_MONTHS[month]} ${year}`;
     const xpLabel = xp > 0 ? `${xp} XP ishlangan` : 'Dars qilinmagan';
@@ -80,6 +72,7 @@ function DayCell({ day, xp, year, month }) {
                     cursor-pointer select-none font-semibold text-sm
                     transition-shadow duration-200
                     ${getColorClass(xp)}
+                    ${isToday ? 'ring-2 ring-blue-400 ring-offset-1 ring-offset-slate-900' : ''}
                     ${hovered ? 'shadow-lg shadow-indigo-500/20 z-10' : ''}
                 `}
             >
@@ -92,20 +85,89 @@ function DayCell({ day, xp, year, month }) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function ActivityHeatmap() {
+    const { user } = useAuth();
     const today = new Date();
     const [viewDate, setViewDate] = useState({ year: today.getFullYear(), month: today.getMonth() });
 
-    // Generate (and memo-ize per month) mock XP data
-    const monthXP = useMemo(
-        () => generateMonthData(viewDate.year, viewDate.month),
-        [viewDate.year, viewDate.month]
-    );
+    // ── Firestore dan user data (activeDates, streakDays, bestStreak) ─────────
+    const [activeDates, setActiveDates] = useState([]);
+    const [streakDays, setStreakDays] = useState(0);
+    const [bestStreak, setBestStreak] = useState(0);
 
-    // Calendar grid construction
+    useEffect(() => {
+        if (!user?.uid) return;
+        const unsub = onSnapshot(
+            doc(db, 'users', user.uid),
+            (snap) => {
+                if (!snap.exists()) return;
+                const data = snap.data();
+                const dates = data.activeDates || [];
+                setActiveDates(dates);
+                setStreakDays(data.streakDays || calcCurrentStreak(dates));
+                setBestStreak(data.bestStreak || 0);
+            },
+            () => { }
+        );
+        return () => unsub();
+    }, [user?.uid]);
+
+    // ── Sahifa ochilganda bugungi kunni belgilash ─────────────────────────────
+    useEffect(() => {
+        if (user?.uid) {
+            trackTodayActivity(user.uid);
+        }
+    }, [user?.uid]);
+
+    // ── xpLogs dan oylik XP data ──────────────────────────────────────────────
+    const [monthXP, setMonthXP] = useState({});
+
+    useEffect(() => {
+        if (!user?.uid) return;
+
+        // Oy boshidan oxirigacha sana oralig'i
+        const startStr = `${viewDate.year}-${String(viewDate.month + 1).padStart(2, '0')}-01`;
+        const endDate = new Date(viewDate.year, viewDate.month + 1, 0);
+        const endStr = `${viewDate.year}-${String(viewDate.month + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
+
+        // xpLogs subcollection dan shu oy uchun ma'lumotlar
+        const logsRef = collection(db, 'xpLogs', user.uid, 'logs');
+        // Barcha loglarni olib, frontendda filtrar qilamiz (timestamp filter ham mumkin)
+        const unsub = onSnapshot(logsRef, (snap) => {
+            const dayXP = {};
+            snap.docs.forEach(d => {
+                const log = d.data();
+                let dateStr = null;
+                if (log.timestamp?.toDate) {
+                    dateStr = log.timestamp.toDate().toISOString().split('T')[0];
+                } else if (log.date) {
+                    dateStr = log.date;
+                }
+                if (!dateStr) return;
+                // Faqat shu oy
+                if (dateStr >= startStr && dateStr <= endStr) {
+                    const day = parseInt(dateStr.split('-')[2], 10);
+                    dayXP[day] = (dayXP[day] || 0) + (log.amount || 0);
+                }
+            });
+
+            // activeDates dan ham faollikni belgilash (XP bo'lmasa ham active bo'lishi mumkin)
+            activeDates.forEach(dateStr => {
+                if (dateStr >= startStr && dateStr <= endStr) {
+                    const day = parseInt(dateStr.split('-')[2], 10);
+                    if (!dayXP[day]) dayXP[day] = 1; // Kamida 1 — faol bo'lgan
+                }
+            });
+
+            setMonthXP(dayXP);
+        }, () => { });
+
+        return () => unsub();
+    }, [user?.uid, viewDate.year, viewDate.month, activeDates]);
+
+    // ── Calendar grid ─────────────────────────────────────────────────────────
     const daysInMonth = new Date(viewDate.year, viewDate.month + 1, 0).getDate();
-    // Monday-based: Mon=0 … Sun=6
     const firstDayRaw = new Date(viewDate.year, viewDate.month, 1).getDay(); // 0=Sun
-    const firstDayMon = (firstDayRaw + 6) % 7; // convert Sun-based to Mon-based
+    const firstDayMon = (firstDayRaw + 6) % 7; // Sun-based → Mon-based
     const totalCells = Math.ceil((firstDayMon + daysInMonth) / 7) * 7;
 
     const cells = [];
@@ -114,21 +176,8 @@ export default function ActivityHeatmap() {
         cells.push(dayNum >= 1 && dayNum <= daysInMonth ? dayNum : null);
     }
 
-    // All-time mock streaks (simple: just use current month data flattened)
-    const streakData = useMemo(() => {
-        const flat = Object.values(monthXP);
-        let current = 0, longest = 0, run = 0, totalActive = 0;
-        for (const xp of flat) {
-            if (xp > 0) { run++; totalActive++; if (run > longest) longest = run; }
-            else run = 0;
-        }
-        // rough: current = tail streak
-        for (let i = flat.length - 1; i >= 0; i--) {
-            if (flat[i] > 0) current++;
-            else break;
-        }
-        return { current, longest, totalActive };
-    }, [monthXP]);
+    // Faol kunlar soni (shu oydagi)
+    const totalActiveDays = activeDates.length;
 
     const prevMonth = () => setViewDate(({ year, month }) =>
         month === 0 ? { year: year - 1, month: 11 } : { year, month: month - 1 }
@@ -137,11 +186,30 @@ export default function ActivityHeatmap() {
         month === 11 ? { year: year + 1, month: 0 } : { year, month: month + 1 }
     );
     const isCurrentMonth = viewDate.year === today.getFullYear() && viewDate.month === today.getMonth();
+    const todayDay = today.getDate();
 
     const statCards = [
-        { icon: <Flame size={20} />, label: 'Joriy seriya', value: `${streakData.current} kun`, color: 'border-orange-500/30 from-orange-600/15 to-red-600/5', iconColor: 'text-orange-400' },
-        { icon: <Trophy size={20} />, label: 'Eng yaxshi natija', value: `${streakData.longest} kun`, color: 'border-yellow-500/30 from-yellow-600/15 to-amber-600/5', iconColor: 'text-yellow-400' },
-        { icon: <Activity size={20} />, label: 'Faol kunlar', value: `${streakData.totalActive} kun`, color: 'border-indigo-500/30 from-indigo-600/15 to-purple-600/5', iconColor: 'text-indigo-400' },
+        {
+            icon: <Flame size={20} />,
+            label: 'Joriy seriya',
+            value: `${streakDays} kun`,
+            color: 'border-orange-500/30 from-orange-600/15 to-red-600/5',
+            iconColor: 'text-orange-400',
+        },
+        {
+            icon: <Trophy size={20} />,
+            label: 'Eng yaxshi natija',
+            value: `${bestStreak} kun`,
+            color: 'border-yellow-500/30 from-yellow-600/15 to-amber-600/5',
+            iconColor: 'text-yellow-400',
+        },
+        {
+            icon: <Activity size={20} />,
+            label: 'Faol kunlar',
+            value: `${totalActiveDays} kun`,
+            color: 'border-indigo-500/30 from-indigo-600/15 to-purple-600/5',
+            iconColor: 'text-indigo-400',
+        },
     ];
 
     return (
@@ -228,7 +296,14 @@ export default function ActivityHeatmap() {
                     >
                         {cells.map((day, i) => (
                             day
-                                ? <DayCell key={i} day={day} xp={monthXP[day] ?? 0} year={viewDate.year} month={viewDate.month} />
+                                ? <DayCell
+                                    key={i}
+                                    day={day}
+                                    xp={monthXP[day] ?? 0}
+                                    year={viewDate.year}
+                                    month={viewDate.month}
+                                    isToday={isCurrentMonth && day === todayDay}
+                                />
                                 : <div key={i} className="w-10 h-10" />
                         ))}
                     </motion.div>

@@ -1,0 +1,83 @@
+/* ═══════════════════════════════════════════════════════
+   NurFizika — Dark Theme CSS Variables
+   Yagona Dark tema. Boshqa temalar tez kunda!
+═══════════════════════════════════════════════════════ */
+
+/* ── Dark tema (default & yagona aktiv tema) ── */
+:root,
+html.dark {
+  color-scheme: dark;
+  --bg-primary: #020617;
+  /* slate-950 */
+  --bg-surface: #0f172a;
+  /* slate-900 */
+  --bg-card: #1e293b;
+  /* slate-800 */
+  --border-color: #334155;
+  /* slate-700 */
+  --text-primary: #f8fafc;
+  /* slate-50  */
+  --text-muted: #94a3b8;
+  /* slate-400 */
+  --accent: #6366f1;
+  /* indigo-500 */
+}
+
+/* ── Utility classes ── */
+.theme-bg {
+  background-color: var(--bg-primary) !important;
+}
+
+.theme-surface {
+  background-color: var(--bg-surface) !important;
+}
+
+.theme-card {
+  background-color: var(--bg-card) !important;
+}
+
+.theme-border {
+  border-color: var(--border-color) !important;
+}
+
+.theme-text {
+  color: var(--text-primary) !important;
+}
+
+.theme-muted {
+  color: var(--text-muted) !important;
+}
+
+.theme-accent {
+  color: var(--accent) !important;
+}
+
+/* ── Input ── */
+.theme-input {
+  background-color: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.theme-input::placeholder {
+  color: var(--text-muted);
+}
+
+.theme-input:focus {
+  border-color: var(--accent) !important;
+  outline: none;
+}
+
+/* ── Custom scrollbar ── */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}

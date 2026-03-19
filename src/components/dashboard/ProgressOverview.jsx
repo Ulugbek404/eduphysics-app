@@ -2,8 +2,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useProgress } from '../../contexts/ProgressContext';
 import { Zap, Trophy, Flame, Clock } from 'lucide-react';
-import { StatCard, XPBar, LevelBadge } from '../progress';
 import { formatTimeSpent } from '../../utils/progressHelpers';
+import { xpInCurrentLevel, xpForNextLevel, calcLevel } from '../../contexts/XPContext';
+import { StatCard, XPBar, LevelBadge } from '../progress';
 
 /**
  * Progress Overview Component
@@ -12,35 +13,42 @@ import { formatTimeSpent } from '../../utils/progressHelpers';
 const ProgressOverview = () => {
     const { progress } = useProgress();
 
+    // XP bar calculation using exact formulas from XPContext
+    const currentXP = progress.xp || 0;
+    const currentLevel = calcLevel(currentXP);
+    const xpInLevel = xpInCurrentLevel(currentXP);
+    const nextLevelXP = xpForNextLevel(currentXP);
+    const xpPercentage = Math.min(Math.round((xpInLevel / 500) * 100), 100);
+
     const stats = [
         {
             label: 'Total XP',
-            value: progress.totalXP.toLocaleString(),
+            value: (progress.xp || 0).toLocaleString(),
             icon: Zap,
             color: 'yellow',
             trend: 'up',
-            trendValue: '+12',
+            trendValue: 'Active',
             subtitle: 'This week'
         },
         {
             label: 'Current Level',
-            value: progress.level,
+            value: progress.level || 1,
             icon: Trophy,
             color: 'purple',
-            subtitle: `${progress.xpProgress.percentage}% to next level`
+            subtitle: `${xpPercentage}% to next level`
         },
         {
             label: 'Day Streak',
-            value: progress.currentStreak,
+            value: progress.streak || 0,
             icon: Flame,
             color: 'pink',
-            trend: progress.currentStreak > 0 ? 'up' : 'neutral',
-            trendValue: progress.currentStreak > 0 ? `${progress.currentStreak} days` : '0',
+            trend: (progress.streak || 0) > 0 ? 'up' : 'neutral',
+            trendValue: (progress.streak || 0) > 0 ? `${progress.streak} days` : '0',
             subtitle: 'Keep it up!'
         },
         {
             label: 'Time Spent',
-            value: formatTimeSpent(progress.stats.totalTimeSpent),
+            value: formatTimeSpent(progress.stats?.totalTimeSpent || 0),
             icon: Clock,
             color: 'blue',
             subtitle: 'Total learning time'
@@ -69,9 +77,9 @@ const ProgressOverview = () => {
                 transition={{ delay: 0.1 }}
             >
                 <XPBar
-                    currentXP={progress.xpProgress.current}
-                    neededXP={progress.xpProgress.needed}
-                    level={progress.level}
+                    currentXP={xpInLevel}
+                    neededXP={500}
+                    level={currentLevel}
                 />
             </motion.div>
 

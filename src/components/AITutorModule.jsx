@@ -48,12 +48,17 @@ function MessageBubble({ msg }) {
 }
 
 // ─── Main Component ────────────────────────────────────────────────────────
-export default function AITutorModule({ topic = '' }) {
+export default function AITutorModule({ topic = '', messages: propMessages, setMessages: propSetMessages }) {
     const greeting = topic
         ? `Salom! Men NurFizika AI ustoziman. ⚛️\n"${topic}" mavzusidan savollaringiz bo'lsa bemalol so'rang!`
         : "Salom! Men NurFizika AI ustoziman. ⚛️\nFizikadan har qanday savol bering — qadamba-qadam tushuntiraman!";
 
-    const [messages, setMessages] = useState([{ role: 'ai', text: greeting }]);
+    const [localMessages, setLocalMessages] = useState([{ role: 'ai', text: greeting }]);
+    
+    // Prefer props if provided, fallback to local state
+    const messages = propMessages || localMessages;
+    const setMessages = propSetMessages || setLocalMessages;
+
     const [input, setInput] = useState('');
     const [localError, setLocalError] = useState(null);
     const messagesEndRef = useRef(null);
@@ -100,9 +105,9 @@ export default function AITutorModule({ topic = '' }) {
     }, []);
 
     return (
-        <div className="flex flex-col h-[calc(100vh-160px)] min-h-[500px]">
+        <div className="border border-slate-700 rounded-2xl bg-slate-900/50 backdrop-blur-sm flex flex-col h-full min-h-[400px] overflow-hidden shadow-xl">
             {/* Header */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-900/80">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
                         <Bot size={20} className="text-white" />
@@ -125,8 +130,7 @@ export default function AITutorModule({ topic = '' }) {
             </div>
 
             {/* Chat area */}
-            <div className="flex-1 bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl overflow-hidden flex flex-col shadow-xl">
-                <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
                     {messages.map((msg, idx) => <MessageBubble key={idx} msg={msg} />)}
 
                     {isLoading && (
@@ -178,7 +182,6 @@ export default function AITutorModule({ topic = '' }) {
                         AI xato qilishi mumkin. Muhim ma'lumotlarni tekshiring.
                     </p>
                 </div>
-            </div>
         </div>
     );
 }
