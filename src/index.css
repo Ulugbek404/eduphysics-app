@@ -3,6 +3,23 @@
 @tailwind utilities;
 
 /* ============================================
+   🌗 TEMA STILLARI: LIGHT / DARK
+   ============================================ */
+
+/* DARK MODE — default */
+html, html.dark {
+  background-color: #030712;
+  color-scheme: dark;
+}
+
+/* LIGHT MODE */
+html.light {
+  background-color: #f8fafc;
+  color-scheme: light;
+}
+
+
+/* ============================================
    🎨 NURFIZIKA DESIGN SYSTEM
    Modern, Mobile-First, Accessible
    ============================================ */

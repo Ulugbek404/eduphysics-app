@@ -4,12 +4,26 @@ import { useNavigate } from 'react-router-dom';
 import {
     Search, BookOpen, ExternalLink, Download, Eye,
     ArrowLeft, BookMarked, Video, Globe, FileText,
-    Sparkles, ChevronRight, X
+    Sparkles, ChevronRight, X, ZoomIn
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 // ─── Ma'lumotlar bazasi ───────────────────────────────────────────────────────
 const libraryData = [
+    // RASMIY PDF — LOCAL
+    {
+        id: 0, category: 'darsliklar', type: 'pdf',
+        title: "Umumiy Fizika — NurFizika Darsligi",
+        author: "NurFizika jamoasi",
+        description: "NurFizika platformasiga maxsus tayyorlangan umumiy fizika darsligi. Barcha mavzular, formulalar va misollar bir kitobda.",
+        chapter: "Barchasi",
+        color: "from-indigo-600 to-violet-700",
+        emoji: "📘",
+        localPdf: "/fizika-kitob.pdf",
+        link: "/fizika-kitob.pdf",
+        downloadLink: "/fizika-kitob.pdf",
+        isNew: true,
+    },
     // DARSLIKLAR
     {
         id: 1, category: 'darsliklar', type: 'pdf',
@@ -19,9 +33,11 @@ const libraryData = [
         chapter: "Barchasi",
         color: "from-blue-600 to-indigo-700",
         emoji: "📗",
-        link: "https://uzedu.uz/",
-        downloadLink: "https://uzedu.uz/",
-        isNew: false,
+        localPdf: "/9-SINF_FIZIKA_DARSLIK.pdf",
+        link: "/9-SINF_FIZIKA_DARSLIK.pdf",
+        downloadLink: "/9-SINF_FIZIKA_DARSLIK.pdf",
+        isNew: true,
+        comingSoon: false,
     },
     {
         id: 2, category: 'darsliklar', type: 'pdf',
@@ -31,9 +47,10 @@ const libraryData = [
         chapter: "Mexanika",
         color: "from-violet-600 to-purple-700",
         emoji: "⚙️",
-        link: "https://uzedu.uz/",
-        downloadLink: "https://uzedu.uz/",
-        isNew: true,
+        link: null,
+        downloadLink: null,
+        isNew: false,
+        comingSoon: true,
     },
     {
         id: 3, category: 'darsliklar', type: 'pdf',
@@ -43,9 +60,10 @@ const libraryData = [
         chapter: "Elektromagnetizm",
         color: "from-amber-600 to-orange-700",
         emoji: "⚡",
-        link: "https://uzedu.uz/",
+        link: null,
         downloadLink: null,
         isNew: false,
+        comingSoon: true,
     },
 
     // QO'LLANMALAR
@@ -57,9 +75,10 @@ const libraryData = [
         chapter: "Barchasi",
         color: "from-emerald-600 to-teal-700",
         emoji: "📐",
-        link: "#",
-        downloadLink: "#",
-        isNew: true,
+        link: null,
+        downloadLink: null,
+        isNew: false,
+        comingSoon: true,
     },
     {
         id: 5, category: 'qollanmalar', type: 'pdf',
@@ -69,9 +88,10 @@ const libraryData = [
         chapter: "Mexanika",
         color: "from-sky-600 to-blue-700",
         emoji: "🧮",
-        link: "#",
-        downloadLink: "#",
+        link: null,
+        downloadLink: null,
         isNew: false,
+        comingSoon: true,
     },
     {
         id: 6, category: 'qollanmalar', type: 'pdf',
@@ -81,9 +101,10 @@ const libraryData = [
         chapter: "Optika",
         color: "from-rose-600 to-pink-700",
         emoji: "🔭",
-        link: "#",
-        downloadLink: "#",
-        isNew: true,
+        link: null,
+        downloadLink: null,
+        isNew: false,
+        comingSoon: true,
     },
 
     // VIDEO
@@ -91,25 +112,27 @@ const libraryData = [
         id: 7, category: 'video', type: 'video',
         title: "Mexanika — To'liq Kurs",
         author: "NurFizika YouTube",
-        description: "Mexanika bo'limi bo'yicha 12 ta qisqa va tushunarsiz video dars. Har bir video 8–15 daqiqa.",
+        description: "Mexanika bo'limi bo'yicha 12 ta qisqa video dars tayyorlanmoqda.",
         chapter: "Mexanika",
         color: "from-red-600 to-rose-700",
         emoji: "🎬",
-        link: "https://youtube.com",
+        link: null,
         downloadLink: null,
         isNew: false,
+        comingSoon: true,
     },
     {
         id: 8, category: 'video', type: 'video',
         title: "Elektr Toki — Animatsiyali Darslar",
-        author: "PhysicsUz Channel",
-        description: "Elektr toki, rezistorlar va Om qonuni animatsiyali va interaktiv video darslar orqali.",
+        author: "NurFizika YouTube",
+        description: "Elektr toki, rezistorlar va Om qonuni animatsiyali video darslar tayyorlanmoqda.",
         chapter: "Elektr Toki",
         color: "from-yellow-500 to-amber-600",
         emoji: "💡",
-        link: "https://youtube.com",
+        link: null,
         downloadLink: null,
-        isNew: true,
+        isNew: false,
+        comingSoon: true,
     },
     {
         id: 9, category: 'video', type: 'video',
@@ -176,8 +199,55 @@ const CHAPTERS = [
     'Elektr', 'Elektr Toki', 'Elektromagnetizm', 'Optika', 'Atom Fizikasi',
 ];
 
+// ─── PDF Modal ────────────────────────────────────────────────────────────────
+function PDFModal({ url, title, onClose }) {
+    return (
+        <AnimatePresence>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[100] flex flex-col bg-black/90 backdrop-blur-sm"
+                onClick={(e) => e.target === e.currentTarget && onClose()}
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between px-5 py-3 bg-slate-900/95 border-b border-slate-700/60 shrink-0">
+                    <div className="flex items-center gap-3">
+                        <span className="text-xl">📘</span>
+                        <h2 className="text-white font-semibold text-sm md:text-base truncate max-w-xs md:max-w-xl">{title}</h2>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <a
+                            href={url}
+                            download
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/40 text-indigo-300 hover:text-white rounded-xl text-xs font-semibold transition-all"
+                        >
+                            <Download size={13} /> Yuklash
+                        </a>
+                        <button
+                            onClick={onClose}
+                            className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/60 rounded-xl transition-all"
+                        >
+                            <X size={18} />
+                        </button>
+                    </div>
+                </div>
+                {/* PDF Iframe */}
+                <div className="flex-1 overflow-hidden">
+                    <iframe
+                        src={url}
+                        title={title}
+                        className="w-full h-full border-0"
+                        allow="fullscreen"
+                    />
+                </div>
+            </motion.div>
+        </AnimatePresence>
+    );
+}
+
 // ─── Resource Card ────────────────────────────────────────────────────────────
-function ResourceCard({ item, index }) {
+function ResourceCard({ item, index, onView }) {
     const { t } = useLanguage();
     return (
         <motion.div
@@ -223,36 +293,43 @@ function ResourceCard({ item, index }) {
                 </p>
 
                 {/* Action Buttons */}
-                <div className="flex gap-2 pt-1">
-                    <a
-                        href={item.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/30 hover:border-indigo-500/60 text-indigo-300 hover:text-white rounded-xl text-xs font-semibold transition-all duration-200"
-                    >
-                        <Eye size={13} /> {t('common_view') || "Ko'rish"}
-                    </a>
-                    {item.downloadLink && (
-                        <a
-                            href={item.downloadLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-slate-700/50 hover:bg-slate-700 border border-slate-600/40 hover:border-slate-500 text-slate-300 hover:text-white rounded-xl text-xs font-semibold transition-all duration-200"
+                {item.comingSoon ? (
+                    <div className="flex gap-2 pt-1">
+                        <div className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-slate-800/60 border border-slate-700/40 text-slate-500 rounded-xl text-xs font-semibold cursor-not-allowed select-none">
+                            🕐 {t('coming_soon') || 'Tez kunda'}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="flex gap-2 pt-1">
+                        <button
+                            onClick={() => item.localPdf ? onView(item) : window.open(item.link, '_blank')}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/30 hover:border-indigo-500/60 text-indigo-300 hover:text-white rounded-xl text-xs font-semibold transition-all duration-200"
                         >
-                            <Download size={13} /> {t('common_download') || 'Yuklash'}
-                        </a>
-                    )}
-                    {!item.downloadLink && (
-                        <a
-                            href={item.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-slate-700/50 hover:bg-slate-700 border border-slate-600/40 hover:border-slate-500 text-slate-300 hover:text-white rounded-xl text-xs font-semibold transition-all duration-200"
-                        >
-                            <ExternalLink size={13} /> {t('common_open') || 'Ochish'}
-                        </a>
-                    )}
-                </div>
+                            {item.localPdf ? <ZoomIn size={13} /> : <Eye size={13} />} {t('common_view') || "Ko'rish"}
+                        </button>
+                        {item.downloadLink && (
+                            <a
+                                href={item.downloadLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                download={!!item.localPdf}
+                                className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-slate-700/50 hover:bg-slate-700 border border-slate-600/40 hover:border-slate-500 text-slate-300 hover:text-white rounded-xl text-xs font-semibold transition-all duration-200"
+                            >
+                                <Download size={13} /> {t('common_download') || 'Yuklash'}
+                            </a>
+                        )}
+                        {!item.downloadLink && (
+                            <a
+                                href={item.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-slate-700/50 hover:bg-slate-700 border border-slate-600/40 hover:border-slate-500 text-slate-300 hover:text-white rounded-xl text-xs font-semibold transition-all duration-200"
+                            >
+                                <ExternalLink size={13} /> {t('common_open') || 'Ochish'}
+                            </a>
+                        )}
+                    </div>
+                )}
             </div>
         </motion.div>
     );
@@ -265,6 +342,7 @@ export default function KutubxonaPage() {
     const [activeCategory, setActiveCategory] = useState('all');
     const [activeChapter, setActiveChapter] = useState('Barchasi');
     const [searchQuery, setSearchQuery] = useState('');
+    const [pdfModal, setPdfModal] = useState(null); // { url, title }
 
     const filtered = useMemo(() => {
         return libraryData.filter(item => {
@@ -276,11 +354,19 @@ export default function KutubxonaPage() {
                 || item.description.toLowerCase().includes(q)
                 || item.chapter.toLowerCase().includes(q);
             return matchCat && matchCh && matchQ;
-        });
+        }).sort((a, b) => (a.comingSoon ? 1 : 0) - (b.comingSoon ? 1 : 0));
     }, [activeCategory, activeChapter, searchQuery]);
 
     return (
         <div className="h-screen overflow-y-auto custom-scrollbar theme-bg theme-text font-sans">
+            {/* PDF Modal */}
+            {pdfModal && (
+                <PDFModal
+                    url={pdfModal.url}
+                    title={pdfModal.title}
+                    onClose={() => setPdfModal(null)}
+                />
+            )}
             <div className="max-w-7xl mx-auto px-6 pb-24 pt-6">
 
                 {/* Back Button */}
@@ -338,7 +424,7 @@ export default function KutubxonaPage() {
                         <button
                             key={cat.id}
                             onClick={() => setActiveCategory(cat.id)}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap border transition-all duration-200 ${activeCategory === cat.id
+                            className={`flex items-center gap-2 px-4 py-2 flex-shrink-0 rounded-xl text-sm font-semibold whitespace-nowrap border transition-all duration-200 ${activeCategory === cat.id
                                 ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20'
                                 : 'theme-card theme-border theme-muted hover:theme-text hover:border-slate-600'
                                 }`}
@@ -392,7 +478,12 @@ export default function KutubxonaPage() {
                             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
                         >
                             {filtered.map((item, i) => (
-                                <ResourceCard key={item.id} item={item} index={i} />
+                                <ResourceCard
+                                    key={item.id}
+                                    item={item}
+                                    index={i}
+                                    onView={(it) => setPdfModal({ url: it.localPdf, title: it.title })}
+                                />
                             ))}
                         </motion.div>
                     ) : (

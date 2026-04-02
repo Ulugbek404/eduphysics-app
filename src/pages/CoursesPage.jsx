@@ -5,6 +5,7 @@ import GradeCard from '../components/darsliklar/GradeCard';
 import { BookOpen, ArrowLeft, PlayCircle, Target, Trophy, Zap, ChevronRight, Flame } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../contexts/LanguageContext';
 import { useXP } from '../contexts/XPContext';
 import { useMissions } from '../contexts/MissionsContext';
 
@@ -34,6 +35,7 @@ function getLastLesson() {
 }
 
 export default function CoursesPage() {
+    const { t } = useLanguage();
     const { grades } = useGrades();
     const navigate = useNavigate();
     const { totalXP } = useXP();
@@ -65,14 +67,14 @@ export default function CoursesPage() {
                         className="flex items-center gap-2 px-4 py-2 theme-card hover:opacity-80 rounded-xl border theme-border transition-all theme-muted hover:theme-text"
                     >
                         <ArrowLeft size={18} />
-                        <span className="font-medium">Ortga qaytish</span>
+                        <span className="font-medium">{t('nav_back') || 'Ortga qaytish'}</span>
                     </button>
 
                     <div className="px-4 py-1.5 bg-slate-800/80 rounded-full border border-slate-700 shadow-xl">
                         <span className="text-sm font-semibold flex items-center gap-2">
                             <span className="text-blue-400">NurFizika</span>
                             <span className="text-slate-600">|</span>
-                            <span>Darsliklar</span>
+                            <span>{t('nav_lessons') || 'Darsliklar'}</span>
                         </span>
                     </div>
 
@@ -82,11 +84,10 @@ export default function CoursesPage() {
                 {/* Hero Section */}
                 <div className="text-center mb-12 space-y-4">
                     <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                        Sinfingizni tanlang
+                        {t('courses_select_grade') || 'Sinfingizni tanlang'}
                     </h1>
                     <p className="text-slate-400 text-lg max-w-2xl mx-auto leading-relaxed">
-                        Hozirda <span className="text-blue-400 font-bold">9-sinf</span> to'liq ishga tushirilgan.
-                        Qolgan sinflar tez orada qo'shiladi. 🚀
+                        {t('courses_grade_desc') || "Hozirda 9-sinf to'liq ishga tushirilgan. Qolgan sinflar tez orada qo'shiladi. 🚀"}
                     </p>
                 </div>
 
@@ -118,20 +119,20 @@ export default function CoursesPage() {
                             </div>
 
                             <p className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-1">
-                                Davom ettirish
+                                {t('courses_continue') || 'Davom ettirish'}
                             </p>
                             <h3 className="text-base font-bold text-white mb-2 leading-snug">
-                                Oxirgi darsga qaytish
+                                {t('courses_back_to_last') || 'Oxirgi darsga qaytish'}
                             </h3>
                             <p className="text-sm text-slate-400 line-clamp-2 leading-relaxed">
                                 {lastLesson?.title
                                     ? `"${lastLesson.title}"`
-                                    : 'Hali birorta dars ochmadingiz. Boshlang! 👆'}
+                                    : (t('courses_no_last_lesson') || 'Hali birorta dars ochmadingiz. Boshlang! 👆')}
                             </p>
 
                             <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 bg-blue-500/10 px-3 py-1.5 rounded-full border border-blue-500/20">
                                 <PlayCircle size={12} />
-                                {lastLesson ? 'Davom etish' : 'Boshlash'}
+                                {lastLesson ? (t('common_continue') || 'Davom etish') : (t('common_start') || 'Boshlash')}
                             </div>
                         </div>
                     </motion.div>
@@ -155,16 +156,16 @@ export default function CoursesPage() {
                             </div>
 
                             <p className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1">
-                                Kunlik Topshiriq
+                                {t('courses_daily_quest') || 'Kunlik Topshiriq'}
                             </p>
                             <h3 className="text-base font-bold text-white mb-2">
-                                Bugun 5 ta test yeching
+                                {t('courses_quest_desc') || 'Bugun 5 ta test yeching'}
                             </h3>
 
                             {/* Quest Progress */}
                             <div className="mt-3">
                                 <div className="flex justify-between items-center mb-1.5">
-                                    <span className="text-xs text-slate-500">Bajarildi</span>
+                                    <span className="text-xs text-slate-500">{t('common_completed') || 'Bajarildi'}</span>
                                     <span className="text-xs font-bold text-amber-400">
                                         {dailyQuest.completed}/{dailyQuest.target}
                                     </span>
@@ -182,8 +183,8 @@ export default function CoursesPage() {
                             <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-500">
                                 <Zap size={12} className="text-amber-500" />
                                 {dailyQuest.completed >= dailyQuest.target
-                                    ? <span className="text-emerald-400 font-semibold">✅ Topshiriq bajarildi!</span>
-                                    : <span>Yana {dailyQuest.target - dailyQuest.completed} ta qoldi</span>
+                                    ? <span className="text-emerald-400 font-semibold">{t('courses_quest_done') || '✅ Topshiriq bajarildi!'}</span>
+                                    : <span>{(t('courses_quest_left') || 'Yana {n} ta qoldi').replace('{n}', dailyQuest.target - dailyQuest.completed)}</span>
                                 }
                             </div>
                         </div>
@@ -209,19 +210,19 @@ export default function CoursesPage() {
                             </div>
 
                             <p className="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-1">
-                                Sizning Darajangiz
+                                {t('courses_your_level') || 'Sizning Darajangiz'}
                             </p>
                             <h3 className="text-base font-bold text-white mb-0.5">
-                                Level {levelData.level}: {levelData.title}
+                                {(t('courses_level_title') || 'Level {level}: {title}').replace('{level}', levelData.level).replace('{title}', levelData.title)}
                             </h3>
                             <p className="text-xs text-slate-500 mb-3">
-                                {totalXP} XP to'plandi
+                                {(t('courses_xp_collected') || "{xp} XP to'plandi").replace('{xp}', totalXP)}
                             </p>
 
                             {/* XP Progress */}
                             <div>
                                 <div className="flex justify-between items-center mb-1.5">
-                                    <span className="text-xs text-slate-500">Keyingi levelgacha</span>
+                                    <span className="text-xs text-slate-500">{t('courses_next_level') || 'Keyingi levelgacha'}</span>
                                     <span className="text-xs font-bold text-purple-400">
                                         {levelData.xpInLevel}/{levelData.xpToNext} XP
                                     </span>
@@ -238,7 +239,7 @@ export default function CoursesPage() {
 
                             <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-purple-400 bg-purple-500/10 px-3 py-1.5 rounded-full border border-purple-500/20">
                                 <BookOpen size={12} />
-                                Progressni ko'rish
+                                {t('courses_view_progress') || "Progressni ko'rish"}
                             </div>
                         </div>
                     </motion.div>

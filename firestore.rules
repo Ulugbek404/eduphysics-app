@@ -11,8 +11,12 @@ service cloud.firestore {
       return request.auth.uid == userId;
     }
 
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
     function getUserRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+      return getUserData().role;
     }
 
     function isAdmin() {
@@ -27,11 +31,32 @@ service cloud.firestore {
       return isAdmin() || isTeacher();
     }
 
+    // Matn uzunligi va xavfsizlik tekshiruvi
+    function isValidText(val, maxLen) {
+      return val is string && val.size() <= maxLen;
+    }
+
+    // Foydalanuvchi profili validatsiyasi
+    function isValidUserUpdate() {
+      let data = request.resource.data;
+      return (
+        (!('displayName' in data) || isValidText(data.displayName, 100)) &&
+        (!('bio' in data)         || isValidText(data.bio, 300)) &&
+        (!('school' in data)      || isValidText(data.school, 150)) &&
+        (!('phone' in data)       || isValidText(data.phone, 20)) &&
+        (!('role' in data)        || false)  // role o'zgartirishga yo'l yo'q!
+      );
+    }
+
     // ─── USERS ───────────────────────────────────────────────────────────────
     match /users/{userId} {
       allow read:   if isLoggedIn() && (isOwner(userId) || isAdminOrTeacher());
-      allow create: if isLoggedIn() && isOwner(userId);
-      allow update: if isLoggedIn() && (isOwner(userId) || isAdmin());
+      allow create: if isLoggedIn() && isOwner(userId) && isValidUserUpdate();
+      // Foydalanuvchi o'zini yangilay oladi, LEKIN role ni emas!
+      allow update: if isLoggedIn() && (
+        (isOwner(userId) && isValidUserUpdate()) ||
+        (isAdmin())
+      );
       allow delete: if isLoggedIn() && isAdmin();
       allow list:   if isLoggedIn() && isAdminOrTeacher();
     }
@@ -56,17 +81,19 @@ service cloud.firestore {
       allow write: if isLoggedIn() && (isOwner(userId) || isAdmin());
     }
 
-    // ─── XP LOGS ─────────────────────────────────────────────────────────────
+    // ─── XP LOGS — faqat yaratish, o'zgartirish/o'chirish mumkin emas ────────
     match /xpLogs/{userId}/logs/{logId} {
-      allow read:   if isLoggedIn() && (isOwner(userId) || isAdminOrTeacher());
-      allow create: if isLoggedIn() && isOwner(userId);
-      allow update, delete: if false;
+      allow read:          if isLoggedIn() && (isOwner(userId) || isAdminOrTeacher());
+      allow create:        if isLoggedIn() && isOwner(userId);
+      allow update, delete: if false; // XP loglari o'zgartirilmaydi — muhim!
     }
 
     // ─── LEADERBOARD ─────────────────────────────────────────────────────────
     match /leaderboard/{document=**} {
       allow read:  if isLoggedIn();
-      allow write: if isLoggedIn() && (isOwner(request.resource.data.uid) || isAdmin());
+      allow write: if isLoggedIn() && (
+        (request.resource.data.uid == request.auth.uid) || isAdmin()
+      );
     }
 
     // ─── ASSIGNMENTS ─────────────────────────────────────────────────────────
@@ -95,12 +122,12 @@ service cloud.firestore {
     match /rooms/{roomCode} {
       allow read:   if isLoggedIn();
       allow create: if isLoggedIn() && isAdmin();
-      // O'yinchilar answeredCount, status yangilaydi:
+      // Faqat status va answeredCount yangilanadi:
       allow update: if isLoggedIn();
       allow delete: if isLoggedIn() && isAdmin();
 
       match /players/{uid} {
-        allow read:  if isLoggedIn();
+        allow read:   if isLoggedIn();
         allow create: if isLoggedIn() && isOwner(uid);
         allow update: if isLoggedIn() && isOwner(uid);
         allow delete: if isLoggedIn() && isAdmin();
@@ -109,20 +136,35 @@ service cloud.firestore {
       match /answers/{answerId} {
         allow read:   if isLoggedIn();
         allow create: if isLoggedIn();
-        allow update: if false;
+        allow update: if false; // Javoblar o'zgartirilmaydi!
         allow delete: if false;
       }
     }
 
-    // ─── CONTACTS ────────────────────────────────────────────────────────────
+    // ─── CONTACTS — spam himoyasi ─────────────────────────────────────────────
     match /contacts/{docId} {
-      allow create: if true;
+      // Tashqaridan ham yuborish mumkin (login talab qilinmaydi)
+      // LEKIN: validatsiya kerak
+      allow create: if (
+        request.resource.data.keys().hasAll(['name', 'message']) &&
+        isValidText(request.resource.data.name, 100) &&
+        isValidText(request.resource.data.message, 1000)
+      );
       allow read, update, delete: if isAdmin();
     }
 
-    // ─── HOMEWORK SUBMISSIONS ────────────────────────────────────────────────
+    // ─── HOMEWORK SUBMISSIONS ─────────────────────────────────────────────────
     match /homeworkSubmissions/{docId} {
-      allow read, write: if isLoggedIn();
+      // O'quvchi faqat o'z topshiriqlarini ko'radi va yuboradi
+      allow create: if isLoggedIn() &&
+        request.resource.data.userId == request.auth.uid;
+      allow read:   if isLoggedIn() && (
+        resource.data.userId == request.auth.uid ||
+        isAdminOrTeacher()
+      );
+      // O'qituvchi baho qo'yishi uchun update ruxsati
+      allow update: if isLoggedIn() && isAdminOrTeacher();
+      allow delete: if isLoggedIn() && isAdmin();
     }
 
   }

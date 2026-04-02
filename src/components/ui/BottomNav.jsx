@@ -8,24 +8,9 @@ import {
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 
-// ─── Main 4 tabs ──────────────────────────────────────────────────────────────
-const mainTabs = [
-    { icon: LayoutDashboard, label: 'Asosiy', path: '/dashboard' },
-    { icon: BookOpen, label: 'Darslar', path: '/darsliklar' },
-    { icon: Bot, label: 'AI Ustoz', path: '/dashboard', tabHint: 'ai-tutor' },
-    { icon: MoreHorizontal, label: "Ko'proq", action: 'openMore' },
-];
-
-// ─── Panel menu items (2×3 grid) ──────────────────────────────────────────────
-const menuItems = [
-    { label: 'Kutubxona', path: '/kutubxona', icon: Library, iconBg: 'bg-indigo-500/20', iconColor: 'text-indigo-400' },
-    { label: 'Missiyalar', path: '/missiyalar', icon: Target, iconBg: 'bg-violet-500/20', iconColor: 'text-violet-400' },
-    { label: 'Live Test', path: '/dashboard', icon: Trophy, iconBg: 'bg-yellow-500/20', iconColor: 'text-yellow-400', tabHint: 'tests' },
-    { label: 'Laboratoriya', path: '/laboratoriya', icon: FlaskConical, iconBg: 'bg-emerald-500/20', iconColor: 'text-emerald-400' },
-    { label: 'Uy Vazifasi', path: '/dashboard', icon: BookMarked, iconBg: 'bg-orange-500/20', iconColor: 'text-orange-400', tabHint: 'homework' },
-    { label: 'Profil', path: '/dashboard', icon: User, iconBg: 'bg-pink-500/20', iconColor: 'text-pink-400', tabHint: 'profile' },
-];
+// ─── Main 4 tabs (static keys, labels computed inside component) ───────────────
 
 // ─── Haptic helper ────────────────────────────────────────────────────────────
 function haptic(ms = 10) {
@@ -37,8 +22,27 @@ export default function BottomNav() {
     const navigate = useNavigate();
     const location = useLocation();
     const { userData } = useAuth();
+    const { t } = useLanguage();
     const [panelOpen, setPanelOpen] = useState(false);
     const isAdmin = userData?.role === 'admin';
+
+    // ─── Main 4 tabs ──────────────────────────────────────────────────────────
+    const mainTabs = [
+        { icon: LayoutDashboard, label: t('nav_dashboard') || 'Asosiy', path: '/dashboard' },
+        { icon: BookOpen, label: t('nav_lessons') || 'Darslar', path: '/darsliklar' },
+        { icon: Bot, label: t('nav_ai') || 'AI Ustoz', path: '/dashboard', tabHint: 'ai-tutor' },
+        { icon: MoreHorizontal, label: t('nav_more') || "Ko'proq", action: 'openMore' },
+    ];
+
+    // ─── Panel menu items (2×3 grid) ──────────────────────────────────────────
+    const menuItems = [
+        { label: t('nav_library') || 'Kutubxona', path: '/kutubxona', icon: Library, iconBg: 'bg-indigo-500/20', iconColor: 'text-indigo-400' },
+        { label: t('nav_missions') || 'Missiyalar', path: '/missiyalar', icon: Target, iconBg: 'bg-violet-500/20', iconColor: 'text-violet-400' },
+        { label: t('nav_livetest') || 'Live Test', path: '/dashboard', icon: Trophy, iconBg: 'bg-yellow-500/20', iconColor: 'text-yellow-400', tabHint: 'tests' },
+        { label: t('nav_lab') || 'Laboratoriya', path: '/laboratoriya', icon: FlaskConical, iconBg: 'bg-emerald-500/20', iconColor: 'text-emerald-400' },
+        { label: t('nav_homework') || 'Uy Vazifasi', path: '/dashboard', icon: BookMarked, iconBg: 'bg-orange-500/20', iconColor: 'text-orange-400', tabHint: 'homework' },
+        { label: t('nav_profile') || 'Profil', path: '/dashboard', icon: User, iconBg: 'bg-pink-500/20', iconColor: 'text-pink-400', tabHint: 'profile' },
+    ];
 
     // Close panel on route change
     useEffect(() => { setPanelOpen(false); }, [location.pathname]);
@@ -178,7 +182,7 @@ export default function BottomNav() {
                     {/* Panel header */}
                     <div className="flex items-center justify-between px-5 pt-2 pb-4">
                         <p className="text-slate-400 text-xs font-semibold tracking-widest uppercase">
-                            Barcha Bo'limlar
+                            {t('nav_all_sections') || "Barcha Bo'limlar"}
                         </p>
                         <button
                             onClick={() => setPanelOpen(false)}
@@ -258,7 +262,7 @@ export default function BottomNav() {
                             "
                         >
                             <Settings size={16} className="text-slate-400" />
-                            <span className="text-slate-300 text-sm font-medium">Sozlamalar</span>
+                            <span className="text-slate-300 text-sm font-medium">{t('nav_settings') || 'Sozlamalar'}</span>
                         </button>
 
                         <button
@@ -274,7 +278,7 @@ export default function BottomNav() {
                             "
                         >
                             <LogOut size={16} className="text-red-400" />
-                            <span className="text-red-400 text-sm font-medium">Chiqish</span>
+                            <span className="text-red-400 text-sm font-medium">{t('nav_logout') || 'Chiqish'}</span>
                         </button>
                     </div>
                 </div>

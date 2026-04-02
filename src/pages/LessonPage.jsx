@@ -43,7 +43,7 @@ export default function LessonPage() {
     // ── AI Ustoz holatini saqlash ──
     useEffect(() => {
         if (aiMessages.length === 0 && chapter?.name && lesson?.title) {
-            setAiMessages([{ role: 'ai', text: `Salom! Men NurFizika AI ustoziman. ⚛️\n"${chapter.name} — ${lesson.title}" mavzusidan savollaringiz bo'lsa bemalol so'rang!` }]);
+            setAiMessages([{ role: 'ai', text: (t('lesson_ai_greeting') || `Salom! Men NurFizika AI ustoziman. ⚛️\n{chapter} — {lesson} mavzusidan savollaringiz bo'lsa bemalol so'rang!`).replace('{chapter}', chapter.name).replace('{lesson}', lesson.title) }]);
         }
     }, [chapter?.name, lesson?.title, aiMessages.length]);
 
@@ -102,12 +102,12 @@ export default function LessonPage() {
                     <h1 className="text-3xl font-bold text-white">{lesson.title}</h1>
 
                     {/* Tabs */}
-                    <div className="flex space-x-2 border-b border-slate-700 pb-1 overflow-x-auto">
+                    <div className="flex gap-2 border-b border-slate-700 pb-1 overflow-x-auto custom-scrollbar">
                         {tabs.map(tab => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-2 px-5 py-3 rounded-t-xl font-medium transition-all whitespace-nowrap ${activeTab === tab.id
+                                className={`flex items-center gap-2 px-5 py-3 flex-shrink-0 rounded-t-xl font-medium transition-all whitespace-nowrap ${activeTab === tab.id
                                     ? 'text-blue-400 bg-slate-800 border-b-2 border-blue-500'
                                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
                                     }`}
@@ -346,7 +346,7 @@ export default function LessonPage() {
                             ) : (
                                 <div className="text-center text-slate-500 py-12">
                                     <FileText size={48} className="mx-auto mb-4 opacity-30" />
-                                    <p>Bu darsda misollar hali qo'shilmagan</p>
+                                    <p>{t('lesson_no_examples') || "Bu darsda misollar hali qo'shilmagan"}</p>
                                 </div>
                             )}
                         </div>
@@ -385,8 +385,8 @@ export default function LessonPage() {
                     >
                         <Star size={28} className="text-white fill-white" />
                         <div>
-                            <p className="text-white font-bold text-lg">+50 XP qo'shildi!</p>
-                            <p className="text-white/80 text-sm">Tabriklaymiz! 🎉</p>
+                            <p className="text-white font-bold text-lg">{t('lesson_xp_added') || "+50 XP qo'shildi!"}</p>
+                            <p className="text-white/80 text-sm">{t('lesson_congrats') || "Tabriklaymiz! 🎉"}</p>
                         </div>
                     </motion.div>
                 )}

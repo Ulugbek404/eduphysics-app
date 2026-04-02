@@ -10,6 +10,14 @@ import { useLanguage } from '../contexts/LanguageContext';
 // ─── Lab ma'lumotlari ─────────────────────────────────────────────────────────
 const labsData = [
     {
+        id: 'gaz', title: "Ideal Gaz Qonuni", chapter: "Molekulyar",
+        difficulty: "Qiyin", duration: "~18 daqiqa", xp: 100,
+        description: "Bosim, hajm va temperatura o'rtasidagi PV = nRT bog'liqligini simulyatsiya orqali tekshiring.",
+        gradient: "from-red-600 to-pink-500",
+        iconBg: "bg-red-500/20", icon: "🧪",
+        route: "/laboratoriya/gaz",
+    },
+    {
         id: 'ohm', title: "Om Qonuni", chapter: "Elektr",
         difficulty: "Oson", duration: "~10 daqiqa", xp: 50,
         description: "Tok kuchi, kuchlanish va qarshilik o'rtasidagi bog'liqlikni interaktiv tajriba orqali o'rganing.",
@@ -48,14 +56,6 @@ const labsData = [
         gradient: "from-yellow-500 to-orange-400",
         iconBg: "bg-yellow-500/20", icon: "🔭",
         route: "/laboratoriya/linza",
-    },
-    {
-        id: 'gaz', title: "Ideal Gaz Qonuni", chapter: "Molekulyar",
-        difficulty: "Qiyin", duration: "~18 daqiqa", xp: 100,
-        description: "Bosim, hajm va temperatura o'rtasidagi PV = nRT bog'liqligini simulyatsiya orqali tekshiring.",
-        gradient: "from-red-600 to-pink-500",
-        iconBg: "bg-red-500/20", icon: "🧪",
-        route: "/laboratoriya/gaz",
     },
 ];
 
@@ -271,7 +271,7 @@ export default function LaboratoriyaPage() {
                         <button
                             key={ch}
                             onClick={() => setActiveChapter(ch)}
-                            className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap border transition-all duration-200 ${activeChapter === ch
+                            className={`px-4 py-2 flex-shrink-0 rounded-xl text-sm font-semibold whitespace-nowrap border transition-all duration-200 ${activeChapter === ch
                                 ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20'
                                 : 'theme-card theme-border theme-muted hover:theme-text hover:border-slate-600'
                                 }`}

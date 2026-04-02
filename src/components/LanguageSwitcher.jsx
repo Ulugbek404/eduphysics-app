@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Globe, Check } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 /**
  * Language Switcher Component
@@ -9,6 +10,8 @@ import { useLanguage } from '../contexts/LanguageContext';
  */
 const LanguageSwitcher = ({ variant = 'default' }) => {
     const { language, setLanguage, languages } = useLanguage();
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -31,19 +34,25 @@ const LanguageSwitcher = ({ variant = 'default' }) => {
 
     const currentLanguage = languages.find(lang => lang.code === language);
 
-    // Variant styles
+    // Variant styles — tema aware
     const variants = {
         default: {
-            button: 'px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg border border-slate-700',
-            dropdown: 'bg-slate-800 border-slate-700'
+            button: isLight
+                ? 'px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-200'
+                : 'px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg border border-slate-700',
+            dropdown: isLight ? 'bg-white border-slate-200 shadow-lg' : 'bg-slate-800 border-slate-700'
         },
         navbar: {
-            button: 'px-3 py-2 bg-slate-800/50 hover:bg-slate-700/70 text-white rounded-lg border border-slate-700/50',
-            dropdown: 'bg-slate-800 border-slate-700'
+            button: isLight
+                ? 'px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-200'
+                : 'px-3 py-2 bg-slate-800/50 hover:bg-slate-700/70 text-white rounded-lg border border-slate-700/50',
+            dropdown: isLight ? 'bg-white border-slate-200 shadow-lg' : 'bg-slate-800 border-slate-700'
         },
         settings: {
-            button: 'w-full px-4 py-3 bg-slate-800/50 hover:bg-slate-700/70 text-white rounded-lg border border-slate-700/30',
-            dropdown: 'bg-slate-800 border-slate-700'
+            button: isLight
+                ? 'w-full px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-200'
+                : 'w-full px-4 py-3 bg-slate-800/50 hover:bg-slate-700/70 text-white rounded-lg border border-slate-700/30',
+            dropdown: isLight ? 'bg-white border-slate-200 shadow-lg' : 'bg-slate-800 border-slate-700'
         }
     };
 
@@ -115,10 +124,12 @@ const LanguageSwitcher = ({ variant = 'default' }) => {
                     flex items-center justify-between gap-3
                     transition-all duration-200
                     ${isActive
-                                            ? 'bg-blue-500/20 text-blue-400'
-                                            : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                                            ? 'bg-blue-500/20 text-blue-500'
+                                            : isLight
+                                                ? 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                                                : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
                                         }
-                    ${index !== languages.length - 1 ? 'border-b border-slate-700/50' : ''}
+                    ${index !== languages.length - 1 ? `border-b ${isLight ? 'border-slate-100' : 'border-slate-700/50'}` : ''}
                   `}
                                 >
                                     <div className="flex items-center gap-3">

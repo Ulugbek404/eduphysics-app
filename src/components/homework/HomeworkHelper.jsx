@@ -67,7 +67,7 @@ function FinalAnswer({ text, label = "Javob" }) {
 }
 
 // ─── TAB 1: Masala Yechish ─────────────────────────────────────────────────
-function SolverTab() {
+function SolverTab({ addNotification }) {
     const { t } = useLanguage();
     const [topic, setTopic] = useState('');
     const [problem, setProblem] = useState('');
@@ -80,6 +80,7 @@ function SolverTab() {
         try {
             const res = await solveProblem(problem, topic);
             if (res.success) setSolution(res.data);
+            else if (addNotification) addNotification(res.error, 'error');
         } finally { setLoading(false); }
     };
 
@@ -107,12 +108,50 @@ function SolverTab() {
 }
 
 // ─── TAB 2: Yechimni Tekshirish ────────────────────────────────────────────
-function CheckerTab() {
+function CheckerTab({ addNotification, addXP }) {
+    const { user } = useAuth();
     const { t } = useLanguage();
     const [problem, setProblem] = useState('');
     const [myAnswer, setMyAnswer] = useState('');
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
+
+    const handleClear = () => {
+        setProblem('');
+        setMyAnswer('');
+        setResult(null);
+    };
+
+    const handleSave = async () => {
+        if (!result || !user?.uid) return;
+        setSaving(true);
+        try {
+            const grade = result.score >= 90 ? 'A' : result.score >= 75 ? 'B' : result.score >= 60 ? 'C' : 'D';
+            
+            await setDoc(doc(db, 'homeworkSubmissions', `${user.uid}_${Date.now()}`), {
+                uid: user.uid,
+                userId: user.uid,
+                grade, score: result.score, xpEarned: result.score,
+                feedback: { 
+                    summary: result.feedback,
+                    mistakes: result.errors?.map(e => e.description) || [],
+                    tips: result.suggestions || []
+                },
+                submittedAt: serverTimestamp(), checked: true,
+            });
+
+            if (addXP) await addXP(result.score, `checker_${grade}`);
+            if (addNotification) addNotification(`Saqlandi! +${result.score} XP`, 'success');
+            
+            handleClear();
+        } catch (err) {
+            console.error(err);
+            if (addNotification) addNotification('Xatolik yuz berdi', 'error');
+        } finally {
+            setSaving(false);
+        }
+    };
 
     const handleCheck = async () => {
         if (!problem.trim() || !myAnswer.trim()) return;
@@ -120,6 +159,7 @@ function CheckerTab() {
         try {
             const res = await checkSolution(null, problem, myAnswer);
             if (res.success) setResult(res.data);
+            else if (addNotification) addNotification(res.error, 'error');
         } finally { setLoading(false); }
     };
 
@@ -137,8 +177,16 @@ function CheckerTab() {
                 <label className="text-slate-400 text-xs font-medium mb-2 block">{t('homework_your_solution_label') || "Sizning yechimingiz"}</label>
                 <Textarea value={myAnswer} onChange={setMyAnswer} placeholder={t('homework_your_solution_placeholder') || "Yechimingizni yozing..."} rows={5} />
             </div>
-            <ActionBtn onClick={handleCheck} disabled={!problem.trim() || !myAnswer.trim()} loading={loading}
-                label={t('homework_check') || "Tekshirish"} loadingLabel={t('homework_checking') || "Tekshirilmoqda..."} />
+            <div className="flex gap-3">
+                <ActionBtn onClick={handleCheck} disabled={!problem.trim() || !myAnswer.trim()} loading={loading}
+                    label={t('homework_check') || "Tekshirish"} loadingLabel={t('homework_checking') || "Tekshirilmoqda..."} />
+                {(problem.trim() || myAnswer.trim() || result) && (
+                    <button onClick={handleClear}
+                        className="p-3 bg-slate-800 border border-slate-700 rounded-xl text-red-400 hover:text-red-300 hover:bg-slate-700 transition-all shadow-lg">
+                        <Trash2 size={18} />
+                    </button>
+                )}
+            </div>
 
             {result && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
@@ -169,6 +217,10 @@ function CheckerTab() {
                         </div>
                     )}
                     {result.correctSolution?.finalAnswer && <FinalAnswer text={result.correctSolution.finalAnswer} label={t('admin_correct_answer') || "To'g'ri javob"} />}
+                    <button onClick={handleSave} disabled={saving}
+                        className="w-full mt-4 flex items-center justify-center gap-2 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold text-sm transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50">
+                        {saving ? <Loader size={18} className="animate-spin" /> : <span>💾 Natijani saqlash va {result.score} XP olish</span>}
+                    </button>
                 </motion.div>
             )}
         </div>
@@ -176,7 +228,8 @@ function CheckerTab() {
 }
 
 // ─── TAB 3: Amaliyot ───────────────────────────────────────────────────────
-function PracticeTab() {
+function PracticeTab({ addNotification, addXP }) {
+    const { user } = useAuth();
     const { t } = useLanguage();
     const [topic, setTopic] = useState('');
     const [difficulty, setDifficulty] = useState('medium');
@@ -185,6 +238,43 @@ function PracticeTab() {
     const [checkResult, setCheckResult] = useState(null);
     const [loading, setLoading] = useState(false);
     const [checking, setChecking] = useState(false);
+    const [saving, setSaving] = useState(false);
+
+    const handleClear = () => {
+        setProblem(null);
+        setMyAnswer('');
+        setCheckResult(null);
+    };
+
+    const handleSave = async () => {
+        if (!checkResult || !user?.uid) return;
+        setSaving(true);
+        try {
+            const grade = checkResult.score >= 90 ? 'A' : checkResult.score >= 75 ? 'B' : checkResult.score >= 60 ? 'C' : 'D';
+            
+            await setDoc(doc(db, 'homeworkSubmissions', `${user.uid}_${Date.now()}`), {
+                uid: user.uid,
+                userId: user.uid,
+                grade, score: checkResult.score, xpEarned: checkResult.score,
+                feedback: { 
+                    summary: checkResult.feedback,
+                    mistakes: [],
+                    tips: []
+                },
+                submittedAt: serverTimestamp(), checked: true,
+            });
+
+            if (addXP) await addXP(checkResult.score, `practice_${grade}`);
+            if (addNotification) addNotification(`Saqlandi! +${checkResult.score} XP`, 'success');
+            
+            handleClear();
+        } catch (err) {
+            console.error(err);
+            if (addNotification) addNotification('Xatolik yuz berdi', 'error');
+        } finally {
+            setSaving(false);
+        }
+    };
 
     const handleGenerate = async () => {
         if (!topic) return;
@@ -192,6 +282,7 @@ function PracticeTab() {
         try {
             const res = await generatePracticeProblem(null, topic, difficulty);
             if (res.success) setProblem(res.data);
+            else if (addNotification) addNotification(res.error, 'error');
         } finally { setLoading(false); }
     };
 
@@ -201,6 +292,7 @@ function PracticeTab() {
         try {
             const res = await checkSolution(null, problem.problem, myAnswer);
             if (res.success) setCheckResult(res.data);
+            else if (addNotification) addNotification(res.error, 'error');
         } finally { setChecking(false); }
     };
 
@@ -215,8 +307,16 @@ function PracticeTab() {
                     <option value="hard">🔴 {t('tests_hard')}</option>
                 </select>
             </div>
-            <ActionBtn onClick={handleGenerate} disabled={!topic} loading={loading}
-                label={t('homework_generate_btn') || "Masala Yaratish"} loadingLabel={t('homework_generating') || "Yaratilmoqda..."} />
+            <div className="flex gap-3">
+                <ActionBtn onClick={handleGenerate} disabled={!topic} loading={loading}
+                    label={t('homework_generate_btn') || "Masala Yaratish"} loadingLabel={t('homework_generating') || "Yaratilmoqda..."} />
+                {problem && (
+                    <button onClick={handleClear}
+                        className="p-3 bg-slate-800 border border-slate-700 rounded-xl text-red-400 hover:text-red-300 hover:bg-slate-700 transition-all shadow-lg">
+                        <Trash2 size={18} />
+                    </button>
+                )}
+            </div>
 
             {problem && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
@@ -239,11 +339,17 @@ function PracticeTab() {
                     <ActionBtn onClick={handleCheck} disabled={!myAnswer.trim()} loading={checking}
                         label={t('homework_check') || "Tekshirish"} loadingLabel={t('homework_checking') || "Tekshirilmoqda..."} />
                     {checkResult && (
-                        <div className={`rounded-xl border p-4 text-sm ${checkResult.score >= 70
-                            ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
-                            : 'border-red-500/30 bg-red-500/10 text-red-300'}`}>
-                            <p className="font-bold mb-1">{checkResult.score}/100 {t('live_score').toLowerCase()}</p>
-                            <p className="text-slate-400">{checkResult.feedback}</p>
+                        <div className="space-y-3">
+                            <div className={`rounded-xl border p-4 text-sm ${checkResult.score >= 70
+                                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
+                                : 'border-red-500/30 bg-red-500/10 text-red-300'}`}>
+                                <p className="font-bold mb-1">{checkResult.score}/100 {t('live_score')?.toLowerCase() || 'ball'}</p>
+                                <p className="text-slate-400">{checkResult.feedback}</p>
+                            </div>
+                            <button onClick={handleSave} disabled={saving}
+                                className="w-full mt-2 flex items-center justify-center gap-2 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold text-sm transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50">
+                                {saving ? <Loader size={18} className="animate-spin" /> : <span>💾 Natijani saqlash va {checkResult.score} XP olish</span>}
+                            </button>
                         </div>
                     )}
                 </motion.div>
@@ -253,7 +359,7 @@ function PracticeTab() {
 }
 
 // ─── TAB 4: Tushuntirish ───────────────────────────────────────────────────
-function ExplainerTab() {
+function ExplainerTab({ addNotification }) {
     const { t } = useLanguage();
     const [question, setQuestion] = useState('');
     const [context, setContext] = useState('');
@@ -266,6 +372,7 @@ function ExplainerTab() {
         try {
             const res = await explainConcept(null, question, context);
             if (res.success) setResult(res.data);
+            else if (addNotification) addNotification(res.error, 'error');
         } finally { setLoading(false); }
     };
 
@@ -274,8 +381,17 @@ function ExplainerTab() {
             <Textarea value={question} onChange={setQuestion}
                 placeholder={t('homework_explain_placeholder') || "Tushunmagan tushunchani yozing... Masalan: Impuls nima va u nima uchun saqlanadi?"} rows={3} />
             <Textarea value={context} onChange={setContext} placeholder={t('homework_context_placeholder') || "Qo'shimcha kontekst (ixtiyoriy)..."} rows={2} />
-            <ActionBtn onClick={handleExplain} disabled={!question.trim()} loading={loading}
-                label={t('homework_explain_btn') || "Tushuntir"} loadingLabel={t('homework_explaining') || "Tushuntirilmoqda..."} />
+            
+            <div className="flex gap-3">
+                <ActionBtn onClick={handleExplain} disabled={!question.trim()} loading={loading}
+                    label={t('homework_explain_btn') || "Tushuntir"} loadingLabel={t('homework_explaining') || "Tushuntirilmoqda..."} />
+                {(question.trim() || context.trim() || result) && (
+                    <button onClick={() => { setQuestion(''); setContext(''); setResult(null); }}
+                        className="p-3 bg-slate-800 border border-slate-700 rounded-xl text-red-400 hover:text-red-300 hover:bg-slate-700 transition-all shadow-lg">
+                        <Trash2 size={18} />
+                    </button>
+                )}
+            </div>
 
             {result && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
@@ -410,7 +526,7 @@ function PhotoSubmitTab() {
         try {
             await setDoc(doc(db, 'homeworkSubmissions', `${user.uid}_${Date.now()}`), {
                 uid: user.uid, 
-                // imageUrl, // Storage ga yuklamasdan o'tkazib yuboramiz
+                userId: user.uid,
                 grade: aiResult.grade, score: aiResult.score, xpEarned: aiResult.xpEarned,
                 feedback: { correct: aiResult.correct || [], mistakes: aiResult.mistakes || [], tips: aiResult.tips || [], summary: aiResult.summary || '' },
                 submittedAt: serverTimestamp(), checked: true,
@@ -426,7 +542,7 @@ function PhotoSubmitTab() {
         if (!user?.uid) return;
         setLoadingHistory(true);
         try {
-            const q = query(collection(db, 'homeworkSubmissions'), where('uid', '==', user.uid));
+            const q = query(collection(db, 'homeworkSubmissions'), where('userId', '==', user.uid));
             const snap = await getDocs(q);
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             data.sort((a, b) => (b.submittedAt?.toMillis?.() || 0) - (a.submittedAt?.toMillis?.() || 0));
@@ -629,17 +745,20 @@ export default function HomeworkHelper({ addNotification, addXP }) {
             </div>
 
             {/* Tab content */}
-            <AnimatePresence mode="wait">
-                <motion.div key={activeTab}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.15 }}
-                    className="rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur-sm p-5"
-                >
-                    {ActiveComponent && <ActiveComponent />}
-                </motion.div>
-            </AnimatePresence>
+            <div className="relative">
+                {TABS.map(tab => {
+                    const Component = tab.component;
+                    return (
+                        <div 
+                            key={tab.id}
+                            style={{ display: activeTab === tab.id ? 'block' : 'none' }}
+                            className="rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur-sm p-5"
+                        >
+                            <Component addNotification={addNotification} addXP={addXP} />
+                        </div>
+                    );
+                })}
+            </div>
         </div>
     );
 }

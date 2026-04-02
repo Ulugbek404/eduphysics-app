@@ -1,7 +1,9 @@
 
 import { Book, CheckCircle, Lock, Play, Pause, RotateCcw } from 'lucide-react';
 import { molekulyarLessons } from './molekulyarFizikaData';
-
+import { termodinamikaLessons } from './termodinamikaData';
+import { issiqlikDvigatellariLessons } from './issiqlikDvigatellariData';
+import { suyuqlikVaQattiqJismLessons } from './suyuqlikVaQattiqJismData';
 // GRADES DATA
 export const grades = [
   {
@@ -59,11 +61,25 @@ export const grades = [
 // 9-SINF CHAPTERS
 export const chapters = [
   {
+    id: '9-ch-02',
+    grade_id: 'grade-9',
+    name: 'MODDA TUZILISHINING MOLEKULYAR-KINETIK NAZARIYASI ASOSLARI',
+    description: 'Moddalarning molekulyar tuzilishi va issiqlik hodisalari',
+    order_number: 1,
+    icon: '🌡️',
+    lessons: [],
+    total_tests: 25,
+    total_labs: 4,
+    estimated_hours: 18,
+    color: 'orange',
+    recommended: true
+  },
+  {
     id: '9-ch-01',
     grade_id: 'grade-9',
-    name: 'Mexanika',
+    name: 'ICHKI ENERGIYA VA TERMODINAMIKA ELEMENTLARI',
     description: 'Jismlarning harakati, kuchlar, impuls va energiya',
-    order_number: 1,
+    order_number: 2,
     icon: '📖',
     lessons: [], // Will be filled below
     total_tests: 35,
@@ -72,22 +88,9 @@ export const chapters = [
     color: 'blue'
   },
   {
-    id: '9-ch-02',
-    grade_id: 'grade-9',
-    name: 'Molekulyar fizika',
-    description: 'Moddalarning molekulyar tuzilishi va issiqlik hodisalari',
-    order_number: 2,
-    icon: '🌡️',
-    lessons: [],
-    total_tests: 25,
-    total_labs: 4,
-    estimated_hours: 18,
-    color: 'orange'
-  },
-  {
     id: '9-ch-03',
     grade_id: 'grade-9',
-    name: 'Elektr va magnetizm',
+    name: 'ISSIQLIK DVIGATELLARI',
     description: 'Elektr zaryadi, elektr toki, magnit maydoni',
     order_number: 3,
     icon: '⚡',
@@ -100,7 +103,7 @@ export const chapters = [
   {
     id: '9-ch-04',
     grade_id: 'grade-9',
-    name: 'Tebranishlar',
+    name: 'SUYUQLIK VA QATTIQ JISMLARNING XOSSALARI',
     description: 'Mexanik tebranishlar, to\'lqinlar va tovush',
     order_number: 4,
     icon: '🌊',
@@ -112,115 +115,25 @@ export const chapters = [
   }
 ];
 
-// MEXANIKA LESSONS (9-ch-01)
-const mechanicsLessons = [
-  {
-    id: '9-l-01',
-    chapter_id: '9-ch-01',
-    title: 'Mexanik harakat tushunchasi',
-    description: 'Harakat nima? Sanoq sistemasi. Moddiy nuqta.',
-    order_number: 1,
-    duration_minutes: 12,
-    video_url: null,
-    has_lab: false,
-    test_count: 5,
-    difficulty: 'easy',
-    content: {
-      theory: `Mexanik harakat deb vaqt o‘tishi bilan jism vaziyatining boshqa jismlarga nisbatan o‘zgarishiga aytiladi.
-        
-Tabiatda mutlaq tinch turgan jism yo‘q. Hamma jismlar harakatda bo‘ladi. Masalan, Yer Quyosh atrofida, uyimiz Yer bilan birga aylanadi.
-        
-Sanoq sistemasi:
-1. Sanoq jismi
-2. Koordinatalar sistemasi
-3. Vaqtni o‘lchash asbobi (soat)
-        
-Moddiy nuqta deb berilgan sharoitda o‘lchamlarini hisobga olmasa bo‘ladigan jismga aytiladi.`,
-      formulas: [
-        { name: 'Tezlik', text: 'v = s / t' }
-      ]
-    }
-  },
-  {
-    id: '9-l-02',
-    chapter_id: '9-ch-01',
-    title: 'Yo\'l va ko\'chish',
-    description: 'Yo\'l va ko\'chish o\'rtasidagi farq. Traektoriya.',
-    order_number: 2,
-    duration_minutes: 10,
-    video_url: null,
-    has_lab: false,
-    test_count: 5,
-    difficulty: 'easy',
-    content: {
-      theory: 'Traektoriya - jism harakat davomida chizgan chizig‘i. Yo‘l - traektoriya uzunligi (skalyar). Ko‘chish - boshlang‘ich va oxirgi nuqtani tutashtiruvchi yo‘nalishli kesma (vektor).',
-    }
-  },
-  {
-    id: '9-l-03',
-    chapter_id: '9-ch-01',
-    title: 'Tezlik',
-    description: 'Tezlik tushunchasi. O\'rtacha va oniy tezlik.',
-    order_number: 3,
-    duration_minutes: 15,
-    video_url: null,
-    has_lab: false,
-    test_count: 8,
-    difficulty: 'easy'
-  },
-  {
-    id: '9-l-04',
-    chapter_id: '9-ch-01',
-    title: 'O\'rtacha tezlik',
-    description: 'O\'rtacha tezlik formulasi va misollar',
-    order_number: 4,
-    duration_minutes: 12,
-    video_url: null,
-    has_lab: false,
-    test_count: 6,
-    difficulty: 'easy'
-  },
-  {
-    id: '9-l-05',
-    chapter_id: '9-ch-01',
-    title: 'Tezlanish tushunchasi',
-    description: 'Tezlanish - tezlikning o\'zgarish tezligi',
-    order_number: 5,
-    duration_minutes: 18,
-    video_url: null,
-    has_lab: false,
-    test_count: 10,
-    difficulty: 'medium'
-  },
-  {
-    id: '9-l-06',
-    chapter_id: '9-ch-01',
-    title: 'Bir xilda tezlanuvchan harakat',
-    description: 'Tezlanuvchan harakatning formulalari',
-    order_number: 6,
-    duration_minutes: 20,
-    video_url: null,
-    has_lab: false,
-    test_count: 12,
-    difficulty: 'medium'
-  }
-];
-
-
-// Add lessons to chapters
-chapters[0].lessons = mechanicsLessons;
+// Add termodinamika lessons to chapter 2
+chapters[1].lessons = termodinamikaLessons;
+chapters[1].total_tests = 55;
+chapters[1].total_labs = 2;
+chapters[1].estimated_hours = 6;
 // Add full Molekulyar fizika lessons (14 dars)
-chapters[1].lessons = molekulyarLessons;
-chapters[1].total_tests = 83;
-chapters[1].total_labs = 4;
-chapters[1].estimated_hours = 30;
+chapters[0].lessons = molekulyarLessons;
+chapters[0].total_tests = 83;
+chapters[0].total_labs = 4;
+chapters[0].estimated_hours = 30;
 // Add dummy lessons for other chapters
-chapters[2].lessons = [
-  { id: '9-l-40', chapter_id: '9-ch-03', title: 'Elektr zaryadi', description: 'Zaryad tushunchasi', order_number: 1, duration_minutes: 15, test_count: 5, difficulty: 'easy', has_lab: false }
-];
-chapters[3].lessons = [
-  { id: '9-l-50', chapter_id: '9-ch-04', title: 'Tebranishlar', description: 'Mexanik tebranish', order_number: 1, duration_minutes: 12, test_count: 4, difficulty: 'easy', has_lab: false }
-];
+chapters[2].lessons = issiqlikDvigatellariLessons;
+chapters[2].total_tests = 35;
+chapters[2].total_labs = 0;
+chapters[2].estimated_hours = 3;
+chapters[3].lessons = suyuqlikVaQattiqJismLessons;
+chapters[3].total_tests = 75;
+chapters[3].total_labs = 2;
+chapters[3].estimated_hours = 8;
 
 
 // HELPER FUNCTIONS

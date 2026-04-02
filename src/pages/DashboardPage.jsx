@@ -56,6 +56,7 @@ const PDFViewer = lazy(() => import('../components/PDFViewer'));
 
 // --- LOADING SCREEN ---
 function LoadingScreen() {
+  const { t } = useLanguage();
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center">
       <div className="text-center space-y-4">
@@ -93,9 +94,9 @@ class ErrorBoundary extends React.Component {
           <div className="bg-red-900/50 p-8 rounded-2xl border border-red-500 max-w-2xl w-full">
             <h1 className="text-3xl font-bold mb-4 flex items-center gap-3">
               <AlertCircle size={32} className="text-red-400" />
-              {t('error_title') || 'Xatolik yuz berdi'}
+              {this.props.t ? this.props.t('error_title') : 'Xatolik yuz berdi'}
             </h1>
-            <p className="text-slate-300 mb-6">{t('error_desc') || "Dasturni yuklashda muammo bo'ldi. Iltimos, quyidagi xatoni administratorga yuboring:"}</p>
+            <p className="text-slate-300 mb-6">{this.props.t ? this.props.t('error_desc') : "Dasturni yuklashda muammo bo'ldi. Iltimos, quyidagi xatoni administratorga yuboring:"}</p>
             <pre className="bg-black/50 p-4 rounded-lg overflow-auto font-mono text-sm text-red-200 border border-red-500/30">
               {this.state.error?.toString()}
             </pre>
@@ -103,7 +104,7 @@ class ErrorBoundary extends React.Component {
               onClick={() => window.location.reload()}
               className="mt-6 px-6 py-3 bg-red-600 hover:bg-red-500 rounded-xl font-bold transition-colors w-full"
             >
-              {t('common_refresh') || 'Sahifani yangilash'}
+              {this.props.t ? this.props.t('common_refresh') : 'Sahifani yangilash'}
             </button>
           </div>
         </div>
@@ -128,6 +129,7 @@ function EduPhysicsAppContent() {
 
   // --- NAV STATE ---
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [targetChapter, setTargetChapter] = useState(null);
 
   // --- PROGRESS STATE ---
   const [userXP, setUserXP] = useState(0);
@@ -399,7 +401,7 @@ function EduPhysicsAppContent() {
   // Render content function
   const renderContent = () => {
     switch (activeTab) {
-      case 'dashboard': return <Dashboard setActiveTab={setActiveTab} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} completedLessons={completedLessons} totalLessons={lessonsData.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0)} assessmentResults={assessmentResults} showAssessment={showAssessment} onAssessmentComplete={handleAssessmentComplete} onAssessmentSkip={handleAssessmentSkip} announcements={announcements} dismissAnnouncement={dismissAnnouncement} />;
+      case 'dashboard': return <Dashboard setActiveTab={setActiveTab} setTargetChapter={setTargetChapter} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} completedLessons={completedLessons} totalLessons={lessonsData.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0)} assessmentResults={assessmentResults} showAssessment={showAssessment} onAssessmentComplete={handleAssessmentComplete} onAssessmentSkip={handleAssessmentSkip} announcements={announcements} dismissAnnouncement={dismissAnnouncement} />;
 
       case 'assessment': return (
         <AssessmentTest
@@ -408,41 +410,22 @@ function EduPhysicsAppContent() {
         />
       );
 
-      case 'menu': return (
-        <MobileMenu
-          setActiveTab={setActiveTab}
-          onMenuClick={(action) => {
-            if (action === 'settings') navigate('/settings');
-            else if (action === 'logout') logout();
-            else if (action === 'ai') setActiveTab('ai-tutor');
-          }}
-          setShowSettings={() => navigate('/settings')}
-          logout={logout}
-          setAiModalOpen={() => setActiveTab('ai-tutor')}
-        />
-      );
+      case 'menu': setActiveTab('dashboard'); return <Dashboard setActiveTab={setActiveTab} setTargetChapter={setTargetChapter} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} completedLessons={completedLessons} totalLessons={lessonsData.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0)} assessmentResults={assessmentResults} showAssessment={showAssessment} onAssessmentComplete={handleAssessmentComplete} onAssessmentSkip={handleAssessmentSkip} announcements={announcements} dismissAnnouncement={dismissAnnouncement} />;
 
       case 'ai-tutor': return (
         <AITutorModule setActiveTab={setActiveTab} messages={aiMessages} setMessages={setAiMessages} />
       );
 
-      case 'lessons': return (
-        <div className="space-y-6">
-          <PageHeader title={t('dashboard_lessons') || 'Darslar'} onBack={() => setActiveTab('menu')} />
-          <LessonsModule completedLessons={completedLessons} completeLesson={completeLesson} theme={theme} />
-        </div>
-      );
-
       case 'homework': return (
         <div className="space-y-6">
-          <PageHeader title={t('dashboard_homework') || 'Uy Vazifasi'} />
+          <PageHeader title={t('dashboard.homework') || 'Uy Vazifasi'} />
           <HomeworkHelper setShowSettings={() => navigate('/settings')} addNotification={addNotification} addXP={addXP} theme={theme} />
         </div>
       );
 
       case 'lab': return (
         <div className="space-y-6">
-          <PageHeader title={t('dashboard_lab') || 'Virtual Laboratoriya'} onBack={() => setActiveTab('menu')} />
+          <PageHeader title={t('dashboard.lab') || 'Tajribalar'} onBack={() => setActiveTab('dashboard')} />
           <VirtualLab addNotification={addNotification} setShowSettings={() => navigate('/settings')} theme={theme} updateStats={updateUserStats} />
         </div>
       );
@@ -571,7 +554,7 @@ function EduPhysicsAppContent() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-white font-medium text-sm truncate">
-                {displayUser?.displayName || 'Foydalanuvchi'}
+                {displayUser?.displayName || (t('dash_profile_default_user') || 'Foydalanuvchi')}
               </p>
               <p className="text-slate-400 text-xs truncate">
                 {displayUser?.email || 'email@example.com'}
@@ -593,15 +576,15 @@ function EduPhysicsAppContent() {
               onClick={() => { navigate('/settings'); setSidebarOpen(false); }}
               className="w-full flex items-center gap-3 px-4 py-2.5 bg-slate-800 hover:bg-slate-800 rounded-lg transition-all duration-200 text-slate-300 hover:text-white group border border-slate-700"
             >
-              <Settings size={18} className="flex-shrink-0 group-hover:rotate-90 transition-transform duration-300" />
-              <span className="text-sm font-medium">{t('nav_settings') || 'Sozlamalar'}</span>
+              <Settings size={18} className="flex-shrink-0 self-center group-hover:rotate-90 transition-transform duration-300" />
+              <span className="text-sm font-medium self-center leading-none">{t('nav_settings') || 'Sozlamalar'}</span>
             </button>
             <button
               onClick={logout}
               className="w-full flex items-center gap-3 px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-all duration-200 text-red-400 hover:text-red-300 group border border-red-500/20"
             >
-              <LogOut size={18} className="flex-shrink-0" />
-              <span className="text-sm font-medium">{t('nav_logout') || 'Chiqish'}</span>
+              <LogOut size={18} className="flex-shrink-0 self-center" />
+              <span className="text-sm font-medium self-center leading-none">{t('nav_logout') || 'Chiqish'}</span>
             </button>
           </div>
         </div>
@@ -619,9 +602,12 @@ function EduPhysicsAppContent() {
             <Menu size={22} />
           </button>
           <div className="flex items-center gap-2">
-            <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-1.5 rounded-lg">
-              <Atom size={18} className="text-white" />
-            </div>
+            <img
+              src="/assets/nurfizika.jpg"
+              alt="NurFizika Logo"
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-cover"
+              style={{ filter: 'drop-shadow(0 2px 5px rgba(255, 215, 0, 0.3))' }}
+            />
             <span className="text-white font-bold text-base">NurFizika</span>
           </div>
           <div className="w-10 h-10 rounded-full border-2 border-blue-500/40 overflow-hidden bg-slate-800 flex items-center justify-center">
@@ -665,14 +651,14 @@ function EduPhysicsAppContent() {
               }`}
           >
             <BarChart2 size={20} />
-            <span className="text-[10px] font-medium">Bosh</span>
+            <span className="text-[10px] font-medium">{t('nav_dashboard') || 'Asosiy'}</span>
           </button>
           <button
             onClick={() => handleNavNavigate('/darsliklar')}
             className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 text-slate-400 hover:text-slate-300"
           >
             <BookOpen size={20} />
-            <span className="text-[10px] font-medium">Darslar</span>
+            <span className="text-[10px] font-medium">{t('nav_lessons') || 'Darslar'}</span>
           </button>
           <button
             onClick={() => handleTabChange('quiz')}
@@ -680,7 +666,7 @@ function EduPhysicsAppContent() {
               }`}
           >
             <Brain size={20} />
-            <span className="text-[10px] font-medium">Test</span>
+            <span className="text-[10px] font-medium">{t('nav_tests') || 'Testlar'}</span>
           </button>
           <button
             onClick={() => handleTabChange('ai-tutor')}
@@ -688,7 +674,7 @@ function EduPhysicsAppContent() {
               }`}
           >
             <Zap size={20} />
-            <span className="text-[10px] font-medium">AI</span>
+            <span className="text-[10px] font-medium">{t('nav_ai_tutor') || 'AI Ustoz'}</span>
           </button>
           <button
             onClick={() => handleTabChange('profile')}
@@ -696,7 +682,7 @@ function EduPhysicsAppContent() {
               }`}
           >
             <User size={20} />
-            <span className="text-[10px] font-medium">Profil</span>
+            <span className="text-[10px] font-medium">{t('nav_profile') || 'Profil'}</span>
           </button>
         </div>
       </nav>
@@ -794,7 +780,7 @@ function AIAssistant({ apiKey, setShowSettings, isOpen: externalIsOpen, setIsOpe
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Bot className="text-white" size={20} />
-              <h3 className="font-bold text-white">AI Fizik Ustoz</h3>
+              <h3 className="font-bold text-white">{t("dash_ai_tutor") || "AI Fizik Ustoz"}</h3>
             </div>
             <button onClick={() => setIsOpen(false)} className="text-white/80 hover:text-white"><X size={18} /></button>
           </div>
@@ -830,7 +816,7 @@ function AIAssistant({ apiKey, setShowSettings, isOpen: externalIsOpen, setIsOpe
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="Savol bering..."
+              placeholder={t("dash_ai_placeholder") || "Savol bering..."}
               className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors"
             />
             <button
@@ -862,6 +848,7 @@ function AIAssistant({ apiKey, setShowSettings, isOpen: externalIsOpen, setIsOpe
 // 3. MUKAMMAL VIRTUAL LABORATORIYA (AI Tahlil bilan)
 // 3. MUKAMMAL VIRTUAL LABORATORIYA (Modulli)
 function VirtualLab({ addNotification, setShowSettings, updateStats }) {
+  const { t } = useLanguage();
   const [activeModule, setActiveModule] = useState('home'); // home, ohm, newton
 
   // Module Selection Screen
@@ -871,7 +858,7 @@ function VirtualLab({ addNotification, setShowSettings, updateStats }) {
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold flex items-center gap-2 text-white">
             <Zap className="text-yellow-400" />
-            Virtual Laboratoriya
+            {t("dash_lab_title") || "Virtual Laboratoriya"}
           </h2>
         </div>
 
@@ -890,7 +877,7 @@ function VirtualLab({ addNotification, setShowSettings, updateStats }) {
               <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-4 text-blue-400">
                 <Zap size={24} />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Elektr Toki (Om Qonuni)</h3>
+              <h3 className="text-xl font-bold text-white mb-2">{t("dash_lab_ohm_title") || "Elektr Toki (Om Qonuni)"}</h3>
               <p className="text-slate-400 text-sm mb-4">
                 Tok kuchi, kuchlanish va qarshilik orasidagi bog'liqlikni o'rganing.
               </p>
@@ -914,7 +901,7 @@ function VirtualLab({ addNotification, setShowSettings, updateStats }) {
               <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-4 text-green-400">
                 <Activity size={24} />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Mexanika (Nyuton Qonuni)</h3>
+              <h3 className="text-xl font-bold text-white mb-2">{t('dash_lab_newton_title') || "Mexanika (Nyuton Qonuni)"}</h3>
               <p className="text-slate-400 text-sm mb-4">
                 Kuch, massa va tezlanish. Harakat qonunlarini interaktiv o'rganing.
               </p>
@@ -929,7 +916,7 @@ function VirtualLab({ addNotification, setShowSettings, updateStats }) {
             <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mb-4 text-purple-400">
               <Sparkles size={24} />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Optika</h3>
+            <h3 className="text-xl font-bold text-white mb-2">{t('dash_lab_optics_title') || "Optika"}</h3>
             <p className="text-slate-400 text-sm mb-4">
               Yorug'lik, linzalar va ko'zgular. Tez kunda...
             </p>
@@ -946,7 +933,7 @@ function VirtualLab({ addNotification, setShowSettings, updateStats }) {
         className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-2"
       >
         <ArrowRight className="rotate-180" size={20} />
-        Barcha tajribalar
+        {t("dash_lab_all") || "Barcha tajribalar"}
       </button>
 
       {activeModule === 'ohm' && (
@@ -969,6 +956,7 @@ function VirtualLab({ addNotification, setShowSettings, updateStats }) {
 
 // --- VIDEO CONTENT COMPONENT ---
 function VideoContent({ url }) {
+  const { t } = useLanguage();
   if (!url) {
     return (
       <div className="w-full aspect-video bg-slate-800 rounded-xl flex items-center justify-center border border-slate-700 animate-fadeIn">
@@ -976,7 +964,7 @@ function VideoContent({ url }) {
           <div className="bg-slate-800 p-4 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
             <Video size={32} className="text-slate-400" />
           </div>
-          <h3 className="text-white font-bold mb-2">Video dars tez orada yuklanadi</h3>
+          <h3 className="text-white font-bold mb-2">{t("dash_video_loading") || "Video dars tez orada yuklanadi"}</h3>
           <p className="text-slate-400 text-sm max-w-xs mx-auto">
             Ushbu mavzu bo'yicha maxsus video dars tayyorlanmoqda. Tez orada bu yerda tomosha qilishingiz mumkin bo'ladi.
           </p>
@@ -997,225 +985,9 @@ function VideoContent({ url }) {
   );
 }
 
-// --- CHAPTER GRID COMPONENT ---
-function ChapterGrid({ onSelect, completedLessons }) {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeIn pb-24">
-      {lessonsData.chapters.map((chapter) => {
-        const progress = calculateChapterProgress(chapter, completedLessons);
-        return (
-          <button
-            key={chapter.id}
-            onClick={() => onSelect(chapter)}
-            className="group relative bg-slate-800 rounded-2xl p-6 text-left border border-slate-700 hover:border-blue-500 transition-all hover:shadow-2xl hover:shadow-blue-500/20 active:scale-95 overflow-hidden"
-          >
-            <div className="relative z-10">
-              <div className="flex justify-between items-start mb-4">
-                <span className="text-4xl shadow-sm">{chapter.icon}</span>
-                <div className="bg-slate-900 px-2 py-1 rounded-lg text-xs font-mono text-slate-400 border border-slate-700">
-                  {chapter.lessons.length} Dars
-                </div>
-              </div>
-
-              <h3 className="text-xl font-bold text-white mb-2 leading-tight group-hover:text-blue-400 transition-colors">
-                {chapter.title}
-              </h3>
-              <p className="text-slate-400 text-sm mb-6 line-clamp-2">
-                {chapter.description}
-              </p>
-
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs font-medium">
-                  <span className="text-slate-400">Progress</span>
-                  <span className="text-blue-400">{progress}%</span>
-                </div>
-                <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                  <div
-                    className="bg-gradient-to-r from-blue-500 to-purple-500 h-full rounded-full transition-all duration-1000 ease-out"
-                    style={{ width: `${progress}% ` }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-// Lesson List Component
-function LessonList({ chapter, onBack, onSelect, completedLessons }) {
-  console.log('LessonList received chapter:', chapter);
-  console.log('Chapter lessons:', chapter?.lessons);
-
-  return (
-    <div className="space-y-6 animate-fadeIn">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-        {/* Desktop: Qaytish tugmasi chap tomonda */}
-        <button
-          onClick={onBack}
-          className="hidden md:flex p-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-xl transition-all shadow-lg text-white"
-        >
-          <ChevronRight className="rotate-180" size={24} />
-        </button>
-
-        {/* Content */}
-        <div className="flex-1 w-full">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <span className="text-4xl">{chapter.icon}</span>
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold">{chapter.title}</h2>
-                <p className="text-slate-400 text-sm">{chapter.description}</p>
-              </div>
-            </div>
-
-            {/* Mobile: Qaytish tugmasi o'ng tomonda */}
-            <button
-              onClick={onBack}
-              className="md:hidden flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-xl transition-all shadow-lg text-white"
-            >
-              <ChevronRight className="rotate-180 text-white" size={18} />
-              <span className="text-sm font-medium">Orqaga</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Lessons */}
-      <div className="space-y-4">
-        {chapter.lessons && Array.isArray(chapter.lessons) ? (
-          chapter.lessons.map((lesson, index) => (
-            <LessonCard
-              key={lesson.id}
-              lesson={lesson}
-              index={index}
-              onClick={() => onSelect(lesson)}
-              isCompleted={completedLessons.includes(lesson.id)}
-            />
-          ))
-        ) : (
-          <div className="text-red-500">Error: No lessons found</div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function LessonCard({ lesson, index, onClick, isCompleted }) {
-  if (!lesson) return null;
-
-  return (
-    <button
-      onClick={onClick}
-      className="w-full p-4 rounded-xl text-left bg-slate-800 border border-slate-700 hover:border-blue-500"
-    >
-      <div className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center font-bold text-sm text-white">
-          {index + 1}
-        </div>
-        <div>
-          <h4 className="font-bold text-white">
-            {lesson.title || 'Untitled'}
-          </h4>
-          <p className="text-xs text-slate-400">
-            {lesson.description || ''}
-          </p>
-        </div>
-      </div>
-    </button>
-  )
-}
-
-function LessonDetail({ lesson, onBack, onComplete, isCompleted }) {
-  if (!lesson) return <div>Loading...</div>;
-
-  return (
-    <div className="space-y-8 pb-24">
-      {/* Header */}
-      <button onClick={onBack} className="text-slate-400 hover:text-white">
-        ← Mavzularga qaytish
-      </button>
-
-      <div>
-        <h1 className="text-3xl font-bold text-white mb-4">{lesson.title || 'Untitled'}</h1>
-        <p className="text-slate-400">{lesson.description || ''}</p>
-      </div>
-
-      {/* PDF Kitob */}
-      {lesson.hasPdf && (
-        <PDFViewer
-          pdfUrl="/fizika-kitob.pdf"
-          page={lesson.pdfPage}
-          pageEnd={lesson.pdfPageEnd}
-          title={lesson.title}
-        />
-      )}
-
-      {/* Content */}
-      <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 text-slate-300">
-        <div className="whitespace-pre-wrap">
-          {lesson.content?.theory || 'Kontent yuklanmoqda...'}
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className="flex justify-between items-center bg-slate-800 p-6 rounded-2xl border border-slate-700">
-        <div className="text-slate-400 text-sm">
-          Mavzuni o'zlashtirdingizmi?
-        </div>
-        <button
-          onClick={() => onComplete(lesson.id)}
-          disabled={isCompleted}
-          className={`px - 8 py - 3 rounded - xl font - bold ${isCompleted ? 'bg-green-600' : 'bg-blue-600 hover:bg-blue-500'} text - white`}
-        >
-          {isCompleted ? 'Bajarildi' : 'Mavzuni Yakunlash'}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// LESSONS MODULE
-function LessonsModule({ completedLessons, completeLesson }) {
-  const [selectedChapter, setSelectedChapter] = useState(null);
-  const [selectedLesson, setSelectedLesson] = useState(null);
-
-  // Agar dars tanlangan bo'lsa
-  if (selectedLesson) {
-    return (
-      <LessonDetail
-        lesson={selectedLesson}
-        onBack={() => setSelectedLesson(null)}
-        onComplete={(id) => completeLesson(id)}
-        isCompleted={completedLessons.includes(selectedLesson.id)}
-      />
-    );
-  }
-
-  // Agar bob tanlangan bo'lsa
-  if (selectedChapter) {
-    return (
-      <LessonList
-        chapter={selectedChapter}
-        onBack={() => setSelectedChapter(null)}
-        onSelect={setSelectedLesson}
-        completedLessons={completedLessons}
-      />
-    );
-  }
-
-  // Boblar ro'yxati
-  return <ChapterGrid onSelect={setSelectedChapter} completedLessons={completedLessons} />;
-}
-
-
-
-
-// 4. MUKAMMAL AI TEST TUZUVCHI (Quiz)
+// --- MUKAMMAL AI TEST TUZUVCHI (Quiz) ---
 function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }) {
+  const { t } = useLanguage();
   const API_KEYS = [
     import.meta.env.VITE_GEMINI_API_KEY_1 || "AIzaSyBy1_ST87s7uMpMWvM9Iq06eTVM8imBaao",
     import.meta.env.VITE_GEMINI_API_KEY_2 || "AIzaSyB5McpyvgDYOu3GodFsw025i1UYvEB1Jqo",
@@ -1243,7 +1015,7 @@ function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }
   // AI quiz — faqat UI logikasi bu yerda, AI mantiq hook ichida
   const generateQuiz = useCallback(async () => {
     if (!topic.trim()) {
-      addNotification("Iltimos, test mavzusini yozing!", "warning");
+      addNotification(t('dash_quiz_notif_empty') || "Iltimos, test mavzusini yozing!", "warning");
       return;
     }
     const newQuestions = await aiGenerateQuiz(topic);
@@ -1253,9 +1025,9 @@ function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }
       setCurrentQ(0);
       setScore(0);
       setShowResult(false);
-      addNotification("Test muvaffaqiyatli tuzildi!", "success");
+      addNotification(t('dash_quiz_notif_success') || "Test muvaffaqiyatli tuzildi!", "success");
     } else {
-      addNotification("Test tuzishda xatolik. Qaytadan urinib ko'ring.", "error");
+      addNotification(t('dash_quiz_notif_error') || "Test tuzishda xatolik. Qaytadan urinib ko'ring.", "error");
     }
   }, [topic, aiGenerateQuiz, addNotification]);
 
@@ -1273,7 +1045,7 @@ function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }
         const finalScore = isCorrect ? score + 1 : score;
         const bonusXP = finalScore * 50;
         setUserXP(prev => prev + bonusXP);
-        addNotification(`Tabriklaymiz! +${bonusXP} XP qo'shildi!`, 'success');
+        addNotification(t('dash_quiz_notif_xp')?.replace('{xp}', bonusXP) || `Tabriklaymiz! +${bonusXP} XP qo'shildi!`, 'success');
 
         if (updateStats) {
           const percentage = Math.round((finalScore / questions.length) * 100);
@@ -1301,8 +1073,8 @@ function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }
           <div className="w-20 h-20 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-2xl mx-auto flex items-center justify-center shadow-xl">
             <Brain size={40} className="text-white" />
           </div>
-          <h2 className="text-3xl font-bold text-white">AI Test Tuzuvchi</h2>
-          <p className="text-slate-400">Sun'iy intellekt yordamida o'zingiz istagan mavzuda bilimingizni sinang.</p>
+          <h2 className="text-3xl font-bold text-white">{t("dash_quiz_ai_builder") || "AI Test Tuzuvchi"}</h2>
+          <p className="text-slate-400">{t('dash_quiz_ai_desc') || "Sun'iy intellekt yordamida o'zingiz istagan mavzuda bilimingizni sinang."}</p>
         </div>
 
         <div className="bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl relative overflow-hidden">
@@ -1310,26 +1082,33 @@ function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }
             <Sparkles size={120} />
           </div>
 
-          <label className="block text-sm font-medium text-slate-300 mb-3 ml-1">Mavzuni kiriting (yoki tanlang)</label>
+          <label className="block text-sm font-medium text-slate-300 mb-3 ml-1">{t("dash_quiz_input_label") || "Mavzuni kiriting (yoki tanlang)"}</label>
           <div className="relative mb-6">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
             <input
               type="text"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
-              placeholder="Masalan: Optika, Atom fizikasi, Magnit..."
+              placeholder={t("dash_quiz_input_placeholder") || "Masalan: Optika, Atom fizikasi, Magnit..."}
               className="w-full bg-slate-900 border border-slate-700 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
             />
           </div>
 
           <div className="flex flex-wrap gap-2 mb-8">
-            {["Kinematika", "Dinamika", "Molekulyar fizika", "Tok qonunlari", "Yorug'lik", "Kvant fizikasi"].map(tag => (
+            {[
+              { id: "Kinematika", label: t("topic_kinematics") || "Kinematika" },
+              { id: "Dinamika", label: t("topic_dynamics") || "Dinamika" },
+              { id: "Molekulyar fizika", label: t("topic_molecular_physics") || "Molekulyar fizika" },
+              { id: "Tok qonunlari", label: t("topic_laws_of_current") || "Tok qonunlari" },
+              { id: "Yorug'lik", label: t("topic_optics") || "Yorug'lik" },
+              { id: "Kvant fizikasi", label: t("topic_quantum_physics") || "Kvant fizikasi" }
+            ].map(tag => (
               <button
-                key={tag}
-                onClick={() => setTopic(tag)}
+                key={tag.id}
+                onClick={() => setTopic(tag.id)}
                 className="px-3 py-1 bg-slate-800 hover:bg-slate-600 rounded-lg text-sm text-slate-300 transition-colors"
               >
-                {tag}
+                {tag.label}
               </button>
             ))}
           </div>
@@ -1342,12 +1121,12 @@ function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }
             {isGenerating ? (
               <>
                 <Loader className="animate-spin" />
-                <span className="animate-pulse">AI savollar tuzmoqda...</span>
+                <span className="animate-pulse">{t("dash_quiz_ai_generating") || "AI savollar tuzmoqda..."}</span>
               </>
             ) : (
               <>
                 <Sparkles />
-                Testni Boshlash
+                {t('dash_quiz_start_btn') || "Testni Boshlash"}
               </>
             )}
           </button>
@@ -1367,23 +1146,23 @@ function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }
         </div>
 
         <div>
-          <h2 className="text-4xl font-bold text-white mb-2">Natija: {percentage}%</h2>
-          <p className="text-slate-400">Siz {questions.length} ta savoldan {score} tasiga to'g'ri javob berdingiz.</p>
+          <h2 className="text-4xl font-bold text-white mb-2">{t("dash_quiz_result_label") || "Natija:"} {percentage}%</h2>
+          <p className="text-slate-400">{t("dash_quiz_result_desc")?.replace("{total}", questions.length).replace("{score}", score) || `Siz ${questions.length} ta savoldan ${score} tasiga to'g'ri javob berdingiz.`}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
           <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
             <div className="text-green-400 font-bold text-xl">+{score * 50}</div>
-            <div className="text-xs text-slate-400 uppercase">XP Points</div>
+            <div className="text-xs text-slate-400 uppercase">{t("dash_quiz_xp_points") || "XP Points"}</div>
           </div>
           <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
             <div className="text-blue-400 font-bold text-xl">{score}</div>
-            <div className="text-xs text-slate-400 uppercase">To'g'ri Javob</div>
+            <div className="text-xs text-slate-400 uppercase">{t('dash_quiz_correct_ans') || "To'g'ri Javob"}</div>
           </div>
         </div>
 
         <button onClick={resetQuiz} className="flex items-center space-x-2 px-8 py-3 bg-blue-600 hover:bg-blue-50 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-600/30 hover:-translate-y-1">
-          <RotateCcw size={18} /> <span>Boshqa Test Yechish</span>
+          <RotateCcw size={18} /> <span>{t("dash_quiz_retry") || "Boshqa Test Yechish"}</span>
         </button>
       </div>
     );
@@ -1394,7 +1173,7 @@ function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }
     <div className="max-w-3xl mx-auto mt-6 animate-fadeIn">
       <div className="mb-8">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-slate-400 font-medium">Mavzu: <span className="text-white">{topic || "Umumiy Fizika"}</span></span>
+          <span className="text-sm text-slate-400 font-medium">{t("dash_quiz_topic") || "Mavzu: "}<span className="text-white">{topic || t("dash_quiz_general") || "Umumiy Fizika"}</span></span>
           <span className="font-mono font-bold text-blue-400">{currentQ + 1}/{questions.length}</span>
         </div>
         <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
@@ -1440,7 +1219,7 @@ function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }
       </div>
 
       <div className="mt-4 text-center">
-        <button onClick={resetQuiz} className="text-slate-400 hover:text-white text-sm underline">Testni to'xtatish</button>
+        <button onClick={resetQuiz} className="text-slate-400 hover:text-white text-sm underline">{t("dash_quiz_stop") || "Testni to'xtatish"}</button>
       </div>
     </div>
   );
@@ -1448,6 +1227,7 @@ function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }
 
 // 5. PROFIL
 function UserProfile({ user, userXP, userLevel, userStats = { timeSpent: 0, testsSolved: 0, totalScore: 0 }, completedLessons = [], totalLessons = 24 }) {
+  const { t } = useLanguage();
   const getInitials = (name) => {
     if (!name) return "U";
     const parts = name.trim().split(' ');
@@ -1511,7 +1291,7 @@ function UserProfile({ user, userXP, userLevel, userStats = { timeSpent: 0, test
             <span className="text-xs font-bold text-slate-400 bg-slate-900 px-2 py-1 rounded-lg">LEVEL {userLevel}</span>
           </div>
           <div className="text-3xl font-bold text-white mb-1">{userXP}</div>
-          <div className="text-sm text-slate-400">Umumiy XP ballar</div>
+          <div className="text-sm text-slate-400">{t("dash_profile_tot_xp") || "Umumiy XP ballar"}</div>
         </div>
         <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-green-500/50 transition-colors">
           <div className="flex justify-between items-start mb-4">
@@ -1519,7 +1299,7 @@ function UserProfile({ user, userXP, userLevel, userStats = { timeSpent: 0, test
             <span className="text-xs font-bold text-slate-400 bg-slate-900 px-2 py-1 rounded-lg">6 BOB</span>
           </div>
           <div className="text-3xl font-bold text-white mb-1">{progressPercent}%</div>
-          <div className="text-sm text-slate-400">Kurs progressi</div>
+          <div className="text-sm text-slate-400">{t("dash_profile_progress") || "Kurs progressi"}</div>
         </div>
         <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-purple-500/50 transition-colors">
           <div className="flex justify-between items-start mb-4">
@@ -1527,7 +1307,7 @@ function UserProfile({ user, userXP, userLevel, userStats = { timeSpent: 0, test
             <span className="text-xs font-bold text-slate-400 bg-slate-900 px-2 py-1 rounded-lg">LAB</span>
           </div>
           <div className="text-3xl font-bold text-white mb-1">{labCount}</div>
-          <div className="text-sm text-slate-400">Bajarilgan lablar</div>
+          <div className="text-sm text-slate-400">{t("dash_profile_labs_done") || "Bajarilgan lablar"}</div>
         </div>
         <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-yellow-500/50 transition-colors">
           <div className="flex justify-between items-start mb-4">
@@ -1535,13 +1315,13 @@ function UserProfile({ user, userXP, userLevel, userStats = { timeSpent: 0, test
             <span className="text-xs font-bold text-slate-400 bg-slate-900 px-2 py-1 rounded-lg">YUTUQLAR</span>
           </div>
           <div className="text-3xl font-bold text-white mb-1">{unlockedCount}/10</div>
-          <div className="text-sm text-slate-400">Ochilgan yutuqlar</div>
+          <div className="text-sm text-slate-400">{t("dash_profile_achievs_done") || "Ochilgan yutuqlar"}</div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 bg-slate-800 rounded-2xl p-6 border border-slate-700">
-          <h3 className="text-xl font-bold mb-6 flex items-center gap-2"><Trophy className="text-yellow-500" /> Yutuqlarim</h3>
+          <h3 className="text-xl font-bold mb-6 flex items-center gap-2"><Trophy className="text-yellow-500" />{t("dash_profile_my_achievs") || " Yutuqlarim"}</h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {achievements.map(ach => (
               <AchievementCard key={ach.id} title={ach.title} icon={ach.icon} unlocked={ach.unlocked} />
@@ -1549,18 +1329,18 @@ function UserProfile({ user, userXP, userLevel, userStats = { timeSpent: 0, test
           </div>
         </div>
         <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
-          <h3 className="text-xl font-bold mb-6">Statistika</h3>
+          <h3 className="text-xl font-bold mb-6">{t("dash_profile_stats") || "Statistika"}</h3>
           <ul className="space-y-4">
-            <StatRow label="O'qilgan vaqt" value={(function (s) {
+            <StatRow label={t("dash_profile_time_spent") || "O'qilgan vaqt"} value={(function (s) {
               if (!s) return "0m";
               const h = Math.floor(s / 3600);
               const m = Math.floor((s % 3600) / 60);
               if (h > 0) return `${h}s ${m}m`;
               return `${m}m`;
             })(userStats.timeSpent)} />
-            <StatRow label="Yechilgan testlar" value={`${userStats.testsSolved || 0} ta`} />
+            <StatRow label={t("dash_profile_tests_solved") || "Yechilgan testlar"} value={`${userStats.testsSolved || 0} ta`} />
             <StatRow
-              label="O'rtacha baho"
+              label={t("dash_profile_avg_score") || "O'rtacha baho"}
               value={`${userStats.testsSolved ? Math.round(userStats.totalScore / userStats.testsSolved) : 0}%`}
               color={
                 (userStats.testsSolved ? Math.round(userStats.totalScore / userStats.testsSolved) : 0) >= 80 ? "text-green-400" :
@@ -1594,7 +1374,8 @@ function StatRow({ label, value, color = "text-white" }) {
 
 
 // --- DASHBOARD COMPONENT ---
-function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLessons = [], totalLessons = 24, assessmentResults, showAssessment, onAssessmentComplete, onAssessmentSkip }) {
+function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStats, completedLessons = [], totalLessons = 24, assessmentResults, showAssessment, onAssessmentComplete, onAssessmentSkip }) {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const { totalXP } = useXP();
   const navigate = useNavigate();
@@ -1652,9 +1433,9 @@ function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLesson
   // Get greeting based on time
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return "Xayrli tong";
-    if (hour < 18) return "Xayrli kun";
-    return "Xayrli kech";
+    if (hour < 12) return t("dash_greeting_morning") || "Xayrli tong";
+    if (hour < 18) return t("dash_greeting_day") || "Xayrli kun";
+    return t("dash_greeting_evening") || "Xayrli kech";
   };
 
   // Recent activities — real-time from xpLogs Firestore
@@ -1711,14 +1492,46 @@ function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLesson
 
   return (
     <div className="space-y-8 pb-8">
-      {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-slate-800/50 to-slate-800/30 backdrop-blur-sm rounded-2xl p-6 border border-slate-700">
-        <h2 className="text-3xl font-bold text-white mb-2">
-          {getGreeting()}! 👋
-        </h2>
-        <p className="text-slate-400">
-          Bugun {todayLessons} ta dars tugatdingiz - ajoyib ish!
-        </p>
+      {/* Welcome Header — modern gradient banner */}
+      <div className="relative overflow-hidden rounded-3xl p-6 md:p-8 border border-blue-500/20 bg-gradient-to-br from-blue-600/10 via-slate-800/60 to-purple-600/10 backdrop-blur-md shadow-xl">
+        {/* decorative orbs */}
+        <div className="absolute -top-12 -right-12 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-1 tracking-tight">
+              {getGreeting()}! 👋
+            </h2>
+            <p className="text-slate-400 text-sm md:text-base">
+              {t("dash_lessons_done_1") || "Bugun"}{" "}
+              <span className="text-white font-semibold">{todayLessons}</span>{" "}
+              {t("dash_lessons_done_2") || "ta dars tugatdingiz - ajoyib ish!"}
+            </p>
+          </div>
+
+          {/* Level + XP progress */}
+          <div className="sm:text-right shrink-0 min-w-[160px]">
+            <div className="flex items-center sm:justify-end gap-2 mb-2">
+              <div className="px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs font-bold shadow-lg">
+                Level {userLevel}
+              </div>
+              <span className="text-slate-300 font-bold text-sm">{totalXP.toLocaleString()} XP</span>
+            </div>
+            {/* XP progress bar towards next level */}
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-1000"
+                  style={{ width: `${Math.min(((totalXP % 1000) / 1000) * 100, 100)}%` }}
+                />
+              </div>
+              <span className="text-xs text-slate-500 whitespace-nowrap">
+                {1000 - (totalXP % 1000)} XP
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Assessment Test Card (if not completed) */}
@@ -1734,27 +1547,27 @@ function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLesson
             </div>
             <div className="flex-1">
               <h3 className="text-2xl font-bold text-white mb-2">
-                🎯 Bilim Darajangizni Aniqlang!
+                {t("dash_assess_title") || "🎯 Bilim Darajangizni Aniqlang!"}
               </h3>
               <p className="text-slate-300 mb-4">
-                15 ta savol orqali fizika bo'yicha bilimingizni baholaymiz va sizga mos o'quv rejasini tayyorlaymiz.
+                {t('dash_assess_desc') || "15 ta savol orqali fizika bo'yicha bilimingizni baholaymiz va sizga mos o'quv rejasini tayyorlaymiz."}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
                 <div className="flex items-center gap-2 text-sm text-slate-300">
                   <CheckCircle className="text-green-400" size={18} />
-                  <span>15 ta savol - barcha mavzulardan</span>
+                  <span>{t("dash_assess_f1") || "15 ta savol - barcha mavzulardan"}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-slate-300">
                   <Clock className="text-blue-400" size={18} />
-                  <span>~10 daqiqa - vaqt cheklanmagan</span>
+                  <span>{t("dash_assess_f2") || "~10 daqiqa - vaqt cheklanmagan"}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-slate-300">
                   <TrendingUp className="text-purple-400" size={18} />
-                  <span>Shaxsiy o'quv rejasi</span>
+                  <span>{t('dash_assess_f3') || "Shaxsiy o'quv rejasi"}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-slate-300">
                   <Sparkles className="text-yellow-400" size={18} />
-                  <span>AI tavsiyalar</span>
+                  <span>{t("dash_assess_f4") || "AI tavsiyalar"}</span>
                 </div>
               </div>
               <div className="flex flex-wrap gap-3">
@@ -1763,13 +1576,13 @@ function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLesson
                   className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 rounded-xl font-bold transition-all shadow-lg shadow-purple-600/20 flex items-center gap-2"
                 >
                   <Brain size={20} />
-                  Testni Boshlash
+                  {t("dash_assess_start") || "Testni Boshlash"}
                 </button>
                 <button
                   onClick={onAssessmentSkip}
                   className="px-6 py-3 bg-slate-800 hover:bg-slate-600 rounded-xl font-medium transition-colors"
                 >
-                  Keyinroq
+                  {t("dash_assess_later") || "Keyinroq"}
                 </button>
               </div>
             </div>
@@ -1813,11 +1626,14 @@ function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLesson
 
       {/* Today's Statistics */}
       <div>
-        <h3 className="text-xl font-bold text-white mb-4">Bugungi Statistika</h3>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-1 h-6 rounded-full bg-gradient-to-b from-blue-400 to-cyan-400" />
+          <h3 className="text-xl font-bold text-white">{t("dash_today_stats") || "Bugungi Statistika"}</h3>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
             icon={Zap}
-            label="Bugun qo'shildi"
+            label={t("dash_added_today") || "Bugun qo'shildi"}
             value={`${todayXP}`}
             subtitle="XP"
             trend={`+${todayXP}`}
@@ -1825,24 +1641,24 @@ function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLesson
           />
           <StatsCard
             icon={CheckCircle}
-            label="Tugatilgan"
+            label={t("dash_completed") || "Tugatilgan"}
             value={todayLessons}
-            subtitle="dars"
+            subtitle={t("dash_lessons_label") || "dars"}
             color="green"
           />
           <StatsCard
             icon={BarChart2}
-            label="O'qish vaqti"
+            label={t("dash_study_time") || "O'qish vaqti"}
             value={formatTime(todayTime)}
-            subtitle="bugun"
+            subtitle={t("dash_today_label") || "bugun"}
             trend="+2s"
             color="orange"
           />
           <StatsCard
             icon={Flame}
-            label="Seriya"
+            label={t("dash_streak") || "Seriya"}
             value={`${currentStreak} kun`}
-            subtitle="ketma-ket"
+            subtitle={t("dash_consec_days") || "ketma-ket"}
             color="yellow"
           />
         </div>
@@ -1850,47 +1666,50 @@ function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLesson
 
       {/* Quick Actions */}
       <div>
-        <h3 className="text-xl font-bold text-white mb-4">Tezkor Harakatlar</h3>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-1 h-6 rounded-full bg-gradient-to-b from-purple-400 to-pink-400" />
+          <h3 className="text-xl font-bold text-white">{t("dash_quick_actions") || "Tezkor Harakatlar"}</h3>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           <QuickActionCard
             icon={BookOpen}
-            title="Darsliklar"
-            description="Fizika mavzularini o'rgan"
+            title={t("nav_lessons") || "Darsliklar"}
+            description={t('dash_qa_lessons_desc') || "Fizika mavzularini o'rgan"}
             color="blue"
             onClick={() => navigate('/darsliklar')}
           />
           <QuickActionCard
             icon={Library}
-            title="Kutubxona"
-            description="Qo'shimcha materiallar"
+            title={t("nav_library") || "Kutubxona"}
+            description={t("dash_qa_lib_desc") || "Qo'shimcha materiallar"}
             color="indigo"
             onClick={() => navigate('/kutubxona')}
           />
           <QuickActionCard
             icon={Zap}
-            title="Laboratoriya"
-            description="Virtual tajribalar o'tkazing"
+            title={t("nav_lab") || "Laboratoriya"}
+            description={t('dash_qa_lab_desc') || "Virtual tajribalar o'tkazing"}
             color="yellow"
             onClick={() => navigate('/laboratoriya')}
           />
           <QuickActionCard
             icon={Trophy}
-            title="Live Test"
-            description="Realtime musobaqa"
+            title={t("nav_livetest") || "Live Test"}
+            description={t("dash_qa_test_desc") || "Realtime musobaqa"}
             color="orange"
             onClick={() => navigate('/testlar')}
           />
           <QuickActionCard
             icon={Target}
-            title="Missiyalar"
-            description="Kunlik vazifalarni bajaring"
+            title={t("nav_missions") || "Missiyalar"}
+            description={t("dash_qa_missions_desc") || "Kunlik vazifalarni bajaring"}
             color="green"
             onClick={() => navigate('/missiyalar')}
           />
           <QuickActionCard
             icon={MessageSquare}
-            title="AI Ustoz"
-            description="Savollaringizga javob oling"
+            title={t("dash_ai_tutor") || "AI Ustoz"}
+            description={t("dash_qa_ai_desc") || "Savollaringizga javob oling"}
             color="purple"
             onClick={() => setActiveTab('ai-tutor')}
           />
@@ -1899,10 +1718,13 @@ function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLesson
 
       {/* Recent Activity */}
       <div>
-        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-          <BarChart2 className="text-blue-400" />
-          So'nggi Faoliyat
-        </h3>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-1 h-6 rounded-full bg-gradient-to-b from-emerald-400 to-teal-400" />
+          <h3 className="text-xl font-bold text-white flex items-center gap-2">
+            <BarChart2 size={18} className="text-emerald-400" />
+            {t('dash_recent_activity') || "So'nggi Faoliyat"}
+          </h3>
+        </div>
         <div className="space-y-3">
           {recentActivities.map((activity, index) => (
             <ActivityItem
@@ -1919,40 +1741,12 @@ function Dashboard({ setActiveTab, userXP, userLevel, userStats, completedLesson
         </div>
       </div>
 
-      {/* Next Steps */}
-      <div>
-        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-          <ArrowRight className="text-purple-400" />
-          Keyingi Qadam
-        </h3>
-        <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 border border-blue-500/20 rounded-2xl p-6">
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-blue-500/10 rounded-xl">
-              <Sparkles className="text-blue-400" size={24} />
-            </div>
-            <div className="flex-1">
-              <h4 className="text-lg font-bold text-white mb-2">
-                AI Tavsiya: "Energiya saqlanish qonuni"ni boshlang
-              </h4>
-              <p className="text-slate-400 text-sm mb-4">
-                Sizning darajangizga mos keladi va oldingi mavzular bilan bog'liq
-              </p>
-              <button
-                onClick={() => setActiveTab('lessons')}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-xl font-medium text-white transition-colors flex items-center gap-2"
-              >
-                Boshlash <ChevronRight size={18} />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* AI Recommendations */}
       <div>
         <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
           <Sparkles className="text-purple-500" />
-          AI Shaxsiy Tavsiyalar
+          {t("dash_ai_recs") || "AI Shaxsiy Tavsiyalar"}
         </h3>
         <AIRecommendations
           userStats={userStats}
@@ -2007,8 +1801,9 @@ function SidebarItem({ icon, label, id, active, set }) {
 
 // --- DASHBOARD PAGE EXPORT ---
 export default function DashboardPage() {
+  const { t } = useLanguage();
   return (
-    <ErrorBoundary>
+    <ErrorBoundary t={t}>
       <EduPhysicsAppContent />
     </ErrorBoundary>
   );

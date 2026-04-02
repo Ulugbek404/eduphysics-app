@@ -2,15 +2,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function BreadcrumbNav({ items }) {
+    const { t } = useLanguage();
     return (
         <nav className="flex" aria-label="Breadcrumb">
             <ol className="inline-flex items-center space-x-1 md:space-x-3">
                 <li className="inline-flex items-center">
                     <Link to="/darsliklar" className="inline-flex items-center text-sm font-medium text-slate-400 hover:text-white transition-colors">
                         <Home className="w-4 h-4 mr-2" />
-                        Darsliklar
+                        {t('nav_lessons') || 'Darsliklar'}
                     </Link>
                 </li>
                 {items.map((item, index) => (

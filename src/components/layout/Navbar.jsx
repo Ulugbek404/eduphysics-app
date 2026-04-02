@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Atom, Menu, X, LogIn, UserPlus } from 'lucide-react';
+import { Atom, Menu, X, LogIn, UserPlus, Sun, Moon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import LanguageSwitcher from '../LanguageSwitcher';
 
 const Navbar = () => {
@@ -10,6 +11,7 @@ const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
     const { t } = useLanguage();
+    const { theme, toggleTheme } = useTheme();
 
     // Handle scroll effect
     useEffect(() => {
@@ -38,10 +40,8 @@ const Navbar = () => {
     ];
 
     const scrollToSection = (sectionId) => {
-        // First, navigate to home if not already there
         if (window.location.pathname !== '/') {
             navigate('/');
-            // Wait for navigation to complete, then scroll
             setTimeout(() => {
                 performScroll(sectionId);
             }, 100);
@@ -53,13 +53,10 @@ const Navbar = () => {
     const performScroll = (sectionId) => {
         const element = document.getElementById(sectionId);
         if (element) {
-            // Get the main scroll container
             const mainContainer = document.querySelector('main');
             if (mainContainer) {
-                // Scroll the main container, not the window
                 element.scrollIntoView({ behavior: 'smooth', block: 'start' });
             } else {
-                // Fallback to window scroll
                 const navbarHeight = 80;
                 const elementPosition = element.getBoundingClientRect().top;
                 const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
@@ -71,7 +68,7 @@ const Navbar = () => {
             }
             setIsMobileMenuOpen(false);
         } else {
-            console.warn(`Section "${sectionId}" not found. Make sure you're on the landing page.`);
+            console.warn(`Section "${sectionId}" not found.`);
         }
     };
 
@@ -83,14 +80,22 @@ const Navbar = () => {
         }
     };
 
+    const isLight = theme === 'light';
+
     return (
         <>
             <motion.nav
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
-                className="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-lg border-b border-slate-800 shadow-2xl transition-all duration-300"
+                className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-lg border-b transition-all duration-300 ${
+                    isLight
+                        ? 'bg-white/95 border-slate-200 shadow-sm'
+                        : 'bg-slate-900/95 border-slate-800 shadow-2xl'
+                }`}
                 style={{
-                    boxShadow: '0 2px 20px rgba(0, 0, 0, 0.3)'
+                    boxShadow: isLight
+                        ? '0 1px 12px rgba(0,0,0,0.08)'
+                        : '0 2px 20px rgba(0, 0, 0, 0.3)'
                 }}
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -104,8 +109,10 @@ const Navbar = () => {
                                 style={{ filter: 'drop-shadow(0 4px 10px rgba(255, 215, 0, 0.3))' }}
                             />
                             <div className="flex flex-col items-start">
-                                <span className="text-xl md:text-2xl font-bold text-white">{t('app_name')}</span>
-                                <span className="text-xs text-yellow-300 italic">{t('hero_slogan')}</span>
+                                <span className={`text-xl md:text-2xl font-bold ${isLight ? 'text-slate-800' : 'text-white'}`}>
+                                    {t('app_name')}
+                                </span>
+                                <span className="text-xs text-yellow-500 italic">{t('hero_slogan')}</span>
                             </div>
                         </button>
 
@@ -115,19 +122,65 @@ const Navbar = () => {
                                 <button
                                     key={index}
                                     onClick={() => handleNavClick(link)}
-                                    className="text-slate-300 hover:text-white transition-colors font-medium"
+                                    className={`transition-colors font-medium ${
+                                        isLight
+                                            ? 'text-slate-600 hover:text-slate-900'
+                                            : 'text-slate-300 hover:text-white'
+                                    }`}
                                 >
                                     {link.label}
                                 </button>
                             ))}
                         </div>
 
-                        {/* Desktop Auth Buttons & Language Switcher */}
-                        <div className="hidden md:flex items-center space-x-4">
+                        {/* Desktop Auth Buttons, Language Switcher & Theme Toggle */}
+                        <div className="hidden md:flex items-center space-x-3">
+                            {/* Theme Toggle Button */}
+                            <motion.button
+                                onClick={toggleTheme}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className={`relative p-2 rounded-lg border transition-all duration-300 ${
+                                    isLight
+                                        ? 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
+                                        : 'bg-slate-800/50 border-slate-700/50 text-yellow-400 hover:bg-slate-700/70'
+                                }`}
+                                title={isLight ? "Tun rejimi" : "Kun rejimi"}
+                                aria-label="Tema o'zgartirish"
+                            >
+                                <AnimatePresence mode="wait" initial={false}>
+                                    {isLight ? (
+                                        <motion.span
+                                            key="moon"
+                                            initial={{ rotate: -90, opacity: 0 }}
+                                            animate={{ rotate: 0, opacity: 1 }}
+                                            exit={{ rotate: 90, opacity: 0 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <Moon size={18} />
+                                        </motion.span>
+                                    ) : (
+                                        <motion.span
+                                            key="sun"
+                                            initial={{ rotate: 90, opacity: 0 }}
+                                            animate={{ rotate: 0, opacity: 1 }}
+                                            exit={{ rotate: -90, opacity: 0 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <Sun size={18} />
+                                        </motion.span>
+                                    )}
+                                </AnimatePresence>
+                            </motion.button>
+
                             <LanguageSwitcher variant="navbar" />
                             <button
                                 onClick={() => navigate('/login')}
-                                className="flex items-center space-x-2 px-4 py-2 text-white hover:text-blue-400 transition-colors font-medium"
+                                className={`flex items-center space-x-2 px-4 py-2 transition-colors font-medium ${
+                                    isLight
+                                        ? 'text-slate-700 hover:text-blue-600'
+                                        : 'text-white hover:text-blue-400'
+                                }`}
                             >
                                 <LogIn size={18} />
                                 <span>{t('nav_login')}</span>
@@ -141,13 +194,31 @@ const Navbar = () => {
                             </button>
                         </div>
 
-                        {/* Mobile Menu Button */}
-                        <button
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="md:hidden p-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
-                        >
-                            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                        </button>
+                        {/* Mobile: theme toggle + menu button */}
+                        <div className="md:hidden flex items-center gap-2">
+                            <motion.button
+                                onClick={toggleTheme}
+                                whileTap={{ scale: 0.9 }}
+                                className={`p-2 rounded-lg border transition-all duration-300 ${
+                                    isLight
+                                        ? 'bg-slate-100 border-slate-200 text-slate-700'
+                                        : 'bg-slate-800 border-slate-700 text-yellow-400'
+                                }`}
+                                aria-label="Tema o'zgartirish"
+                            >
+                                {isLight ? <Moon size={20} /> : <Sun size={20} />}
+                            </motion.button>
+                            <button
+                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                className={`p-2 rounded-lg transition-colors ${
+                                    isLight
+                                        ? 'text-slate-700 hover:bg-slate-100'
+                                        : 'text-white hover:bg-slate-800'
+                                }`}
+                            >
+                                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </motion.nav>
@@ -171,22 +242,32 @@ const Navbar = () => {
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
                             transition={{ type: 'tween', duration: 0.3 }}
-                            className="fixed top-0 right-0 bottom-0 w-80 bg-slate-900 border-l border-slate-800 z-50 md:hidden overflow-y-auto"
+                            className={`fixed top-0 right-0 bottom-0 w-80 border-l z-50 md:hidden overflow-y-auto ${
+                                isLight
+                                    ? 'bg-white border-slate-200'
+                                    : 'bg-slate-900 border-slate-800'
+                            }`}
                         >
                             {/* Header */}
-                            <div className="flex items-center justify-between p-4 border-b border-slate-800">
+                            <div className={`flex items-center justify-between p-4 border-b ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
                                 <div className="flex items-center space-x-2">
                                     <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg">
                                         <Atom size={20} className="text-white" />
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-lg font-bold text-white">{t('app_name')}</span>
-                                        <span className="text-xs text-yellow-300 italic">{t('hero_slogan')}</span>
+                                        <span className={`text-lg font-bold ${isLight ? 'text-slate-800' : 'text-white'}`}>
+                                            {t('app_name')}
+                                        </span>
+                                        <span className="text-xs text-yellow-500 italic">{t('hero_slogan')}</span>
                                     </div>
                                 </div>
                                 <button
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                                    className={`p-2 rounded-lg transition-colors ${
+                                        isLight
+                                            ? 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                                            : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                                    }`}
                                 >
                                     <X size={20} />
                                 </button>
@@ -198,7 +279,11 @@ const Navbar = () => {
                                     <button
                                         key={index}
                                         onClick={() => handleNavClick(link)}
-                                        className="w-full text-left px-4 py-3 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors font-medium"
+                                        className={`w-full text-left px-4 py-3 rounded-lg transition-colors font-medium ${
+                                            isLight
+                                                ? 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+                                                : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                                        }`}
                                     >
                                         {link.label}
                                     </button>
@@ -206,13 +291,17 @@ const Navbar = () => {
                             </div>
 
                             {/* Auth Buttons */}
-                            <div className="p-4 space-y-3 border-t border-slate-800">
+                            <div className={`p-4 space-y-3 border-t ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
                                 <button
                                     onClick={() => {
                                         navigate('/login');
                                         setIsMobileMenuOpen(false);
                                     }}
-                                    className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors font-medium"
+                                    className={`w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-lg transition-colors font-medium ${
+                                        isLight
+                                            ? 'text-slate-700 bg-slate-100 hover:bg-slate-200'
+                                            : 'text-white bg-slate-800 hover:bg-slate-700'
+                                    }`}
                                 >
                                     <LogIn size={18} />
                                     <span>{t('nav_login')}</span>

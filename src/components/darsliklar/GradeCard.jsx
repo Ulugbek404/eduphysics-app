@@ -2,8 +2,10 @@ import React from 'react';
 import { Lock, ChevronRight, BookOpen, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function GradeCard({ grade }) {
+    const { t } = useLanguage();
     const { id, name, description, total_hours, is_active, icon, color } = grade;
 
     if (!is_active) {
@@ -23,11 +25,11 @@ export default function GradeCard({ grade }) {
 
                 <div className="flex items-center gap-2 text-slate-500 text-sm border-t border-slate-700/50 pt-4">
                     <Clock size={16} />
-                    <span>{total_hours} soat</span>
+                    <span>{(t('courses_hours') || '{n} soat').replace('{n}', total_hours)}</span>
                 </div>
 
                 <div className="absolute top-3 right-3 px-2 py-1 bg-slate-700/50 rounded text-[10px] font-bold text-slate-400 border border-slate-600">
-                    TEZ KUNDA
+                    {t('courses_coming_soon') || 'TEZ KUNDA'}
                 </div>
             </motion.div>
         );
@@ -46,7 +48,7 @@ export default function GradeCard({ grade }) {
                 <div className="absolute top-0 right-0 p-4">
                     <div className="px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full flex items-center gap-1.5 shadow-lg shadow-green-900/20">
                         <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                        <span className="text-xs font-bold text-green-400">Faol</span>
+                        <span className="text-xs font-bold text-green-400">{t('courses_active') || 'Faol'}</span>
                     </div>
                 </div>
 
@@ -67,11 +69,11 @@ export default function GradeCard({ grade }) {
                     <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-700/50 group-hover:border-slate-600/50 transition-colors">
                         <span className="flex items-center gap-2 text-sm font-medium text-slate-400">
                             <BookOpen size={16} className="text-blue-500" />
-                            {total_hours} soat
+                            {(t('courses_hours') || '{n} soat').replace('{n}', total_hours)}
                         </span>
 
                         <div className="flex items-center gap-1 text-blue-400 font-medium text-sm opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
-                            Boshlash <ChevronRight size={16} />
+                            {t('common_start') || 'Boshlash'} <ChevronRight size={16} />
                         </div>
                     </div>
                 </div>

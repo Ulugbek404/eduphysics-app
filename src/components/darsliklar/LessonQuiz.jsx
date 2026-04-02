@@ -1,8 +1,10 @@
 
 import React, { useState } from 'react';
 import { CheckCircle, XCircle, RefreshCw, Trophy } from 'lucide-react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function LessonQuiz({ lessonId, onComplete, questions: lessonQuestions }) {
+    const { t } = useLanguage();
     // Use lesson-specific questions if available, otherwise fallback to defaults
     const defaultQuestions = [
         {
@@ -75,8 +77,8 @@ export default function LessonQuiz({ lessonId, onComplete, questions: lessonQues
                 <div className="w-20 h-20 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Trophy className={finalPercentage >= 80 ? 'text-yellow-400' : 'text-slate-400'} size={40} />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Test Yakunlandi!</h3>
-                <p className="text-slate-400 mb-6">Sizning natijangiz:</p>
+                <h3 className="text-2xl font-bold text-white mb-2">{t('quiz_finished') || 'Test Yakunlandi!'}</h3>
+                <p className="text-slate-400 mb-6">{t('quiz_result') || 'Sizning natijangiz:'}</p>
                 <div className="text-4xl font-bold text-blue-400 mb-8">{finalPercentage}%</div>
                 <div className="flex gap-4 justify-center">
                     <button
@@ -84,7 +86,7 @@ export default function LessonQuiz({ lessonId, onComplete, questions: lessonQues
                         className="flex items-center gap-2 px-6 py-3 bg-slate-700 hover:bg-slate-600 rounded-xl transition-colors text-white"
                     >
                         <RefreshCw size={20} />
-                        Qayta ishlash
+                        {t('quiz_retry') || 'Qayta ishlash'}
                     </button>
                 </div>
             </div>
@@ -97,8 +99,8 @@ export default function LessonQuiz({ lessonId, onComplete, questions: lessonQues
         <div className="max-w-2xl mx-auto">
             {/* Progress */}
             <div className="flex justify-between items-center mb-6">
-                <span className="text-slate-400 text-sm">Savol {currentQuestion + 1} / {questions.length}</span>
-                <span className="text-slate-400 text-sm">Ball: {score}</span>
+                <span className="text-slate-400 text-sm">{t('quiz_question') || 'Savol'} {currentQuestion + 1} / {questions.length}</span>
+                <span className="text-slate-400 text-sm">{t('common_score') || 'Ball'}: {score}</span>
             </div>
 
             {/* Question */}
@@ -140,7 +142,7 @@ export default function LessonQuiz({ lessonId, onComplete, questions: lessonQues
                         : 'bg-red-500/10 border border-red-500/20'
                         }`}>
                         <p className="text-sm text-slate-300">
-                            <span className="font-bold block mb-1">Izoh:</span>
+                            <span className="font-bold block mb-1">{t('quiz_explanation') || 'Izoh:'}</span>
                             {question.explanation}
                         </p>
                     </div>
@@ -149,7 +151,7 @@ export default function LessonQuiz({ lessonId, onComplete, questions: lessonQues
                         onClick={nextQuestion}
                         className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-colors shadow-lg shadow-blue-500/20"
                     >
-                        {currentQuestion < questions.length - 1 ? 'Keyingi savol' : 'Natijani ko\'rish'}
+                        {currentQuestion < questions.length - 1 ? (t('quiz_next') || 'Keyingi savol') : (t('quiz_see_results') || "Natijani ko'rish")}
                     </button>
                 </div>
             )}
@@ -163,7 +165,7 @@ export default function LessonQuiz({ lessonId, onComplete, questions: lessonQues
                         : 'bg-slate-800 text-slate-500 cursor-not-allowed'
                         }`}
                 >
-                    Tekshirish
+                    {t('quiz_check') || 'Tekshirish'}
                 </button>
             )}
         </div>

@@ -1,8 +1,10 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { PlayCircle, CheckCircle, Lock, Clock, Trophy, ChevronRight, Star } from 'lucide-react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function LessonItem({ lesson, index, isLocked, isCompleted }) {
+    const { t } = useLanguage();
     const { id, chapter_id, title, description, duration_minutes, test_count, difficulty } = lesson;
     const params = useParams();
 
@@ -11,9 +13,9 @@ export default function LessonItem({ lesson, index, isLocked, isCompleted }) {
 
     // Difficulty badge colors
     const difficultyConfig = {
-        easy: { label: 'Oson', bg: 'bg-green-500/10', text: 'text-green-400', border: 'border-green-500/20' },
-        medium: { label: "O'rta", bg: 'bg-yellow-500/10', text: 'text-yellow-400', border: 'border-yellow-500/20' },
-        hard: { label: 'Qiyin', bg: 'bg-red-500/10', text: 'text-red-400', border: 'border-red-500/20' },
+        easy: { label: t('difficulty_easy') || 'Oson', bg: 'bg-green-500/10', text: 'text-green-400', border: 'border-green-500/20' },
+        medium: { label: t('difficulty_medium') || "O'rta", bg: 'bg-yellow-500/10', text: 'text-yellow-400', border: 'border-yellow-500/20' },
+        hard: { label: t('difficulty_hard') || 'Qiyin', bg: 'bg-red-500/10', text: 'text-red-400', border: 'border-red-500/20' },
     };
     const diffConfig = difficultyConfig[difficulty] || difficultyConfig.easy;
 
@@ -35,7 +37,7 @@ export default function LessonItem({ lesson, index, isLocked, isCompleted }) {
                         </div>
                     </div>
                     <span className="text-xs font-medium text-slate-600 bg-slate-800/40 px-3 py-1.5 rounded-lg">
-                        🔒 Ochilmagan
+                        🔒 {t('locked') || 'Ochilmagan'}
                     </span>
                 </div>
             </div>
@@ -62,11 +64,11 @@ export default function LessonItem({ lesson, index, isLocked, isCompleted }) {
                     <div className="flex items-center gap-2 mb-1">
                         <span className={`text-xs font-bold px-2 py-0.5 rounded-md ${isCompleted ? 'bg-green-500/15 text-green-400' : 'bg-blue-500/10 text-blue-400'
                             }`}>
-                            Dars {index + 1}
+                            {t('common_lesson') || 'Dars'} {index + 1}
                         </span>
                         {isCompleted && (
                             <span className="flex items-center gap-1 text-[10px] font-bold text-green-400 bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20">
-                                <Star size={10} /> TUGATILDI
+                                <Star size={10} /> {(t('completed_word') || 'TUGATILDI').toUpperCase()}
                             </span>
                         )}
                     </div>
@@ -77,11 +79,11 @@ export default function LessonItem({ lesson, index, isLocked, isCompleted }) {
 
                     <div className="flex items-center gap-3 mt-1.5 text-xs text-slate-400">
                         <span className="flex items-center gap-1">
-                            <Clock size={12} className="text-slate-500" /> {duration_minutes} daqiqa
+                            <Clock size={12} className="text-slate-500" /> {duration_minutes} {t('common_minutes') || 'daqiqa'}
                         </span>
                         {test_count > 0 && (
                             <span className="flex items-center gap-1">
-                                <Trophy size={12} className="text-yellow-500/70" /> {test_count} test
+                                <Trophy size={12} className="text-yellow-500/70" /> {test_count} {t('common_tests') || 'test'}
                             </span>
                         )}
                         {difficulty && (
@@ -95,7 +97,7 @@ export default function LessonItem({ lesson, index, isLocked, isCompleted }) {
                 {/* Right Side */}
                 {isCompleted ? (
                     <div className="hidden sm:flex flex-col items-center gap-1 bg-green-500/10 px-3 py-2 rounded-xl border border-green-500/20">
-                        <span className="text-xs text-slate-500">Ball</span>
+                        <span className="text-xs text-slate-500">{t('common_score') || 'Ball'}</span>
                         <span className="text-lg font-bold text-green-400">{lesson.score || 90}%</span>
                     </div>
                 ) : (

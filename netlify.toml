@@ -11,6 +11,63 @@
   to = "/index.html"
   status = 200
 
-[context.production.environment]
-  GEMINI_API_KEY_1 = "AIzaSyCC8uEzh1px6KKsXP8FEkh_JS_3F1ErtDQ"
-  GEMINI_API_KEY_2 = "AIzaSyBUzgU8ARMbZX1OYGv0f_cIqQJqaWdlGVM"
+# ─── Security Headers ──────────────────────────────────────────────────────────
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Clickjacking himoyasi
+    X-Frame-Options = "DENY"
+
+    # MIME sniffing himoyasi
+    X-Content-Type-Options = "nosniff"
+
+    # XSS filter (eski brauzerlar uchun)
+    X-XSS-Protection = "1; mode=block"
+
+    # Referrer siyosati
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+    # HSTS — HTTPS majburlash (1 yil)
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+
+    # Permissions Policy — keraksiz brauzер API larni o'chirish
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+
+    # Content Security Policy
+    Content-Security-Policy = """
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval'
+        https://apis.google.com
+        https://*.firebaseapp.com
+        https://*.googleapis.com
+        https://www.gstatic.com;
+      style-src 'self' 'unsafe-inline'
+        https://fonts.googleapis.com;
+      font-src 'self'
+        https://fonts.gstatic.com;
+      img-src 'self' data: blob:
+        https://*.googleapis.com
+        https://*.firebasestorage.app
+        https://firebasestorage.googleapis.com
+        https://lh3.googleusercontent.com;
+      connect-src 'self'
+        https://*.googleapis.com
+        https://*.firebaseio.com
+        https://*.firebaseapp.com
+        https://firestore.googleapis.com
+        https://identitytoolkit.googleapis.com
+        https://generativelanguage.googleapis.com
+        wss://*.firebaseio.com;
+      frame-src 'self'
+        https://*.firebaseapp.com
+        https://accounts.google.com;
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';
+    """
+
+# ─── Static assets: uzoq muddatli kesh ────────────────────────────────────────
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

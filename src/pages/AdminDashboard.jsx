@@ -870,11 +870,14 @@ function AdminSettingsTab({ showToast }) {
                                     <p className="text-slate-500 text-xs font-medium mt-0.5">{desc}</p>
                                 </div>
                             </div>
-                            <button onClick={() => setForm(p => ({ ...p, [key]: !p[key] }))}
-                                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 shadow-inner
+                            <div
+                                role="switch"
+                                aria-checked={form[key]}
+                                onClick={() => setForm(p => ({ ...p, [key]: !p[key] }))}
+                                className={`relative cursor-pointer inline-flex flex-shrink-0 h-7 w-12 items-center rounded-full transition-all duration-300 shadow-inner
                                     ${form[key] ? 'bg-violet-500 ring-2 ring-violet-500/30' : 'bg-slate-700/80 border border-slate-600'}`}>
                                 <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300 shadow-md ${form[key] ? 'translate-x-6' : 'translate-x-1'}`} />
-                            </button>
+                            </div>
                         </div>
                     ))}
                     <div className="px-6 py-5">
@@ -1006,7 +1009,7 @@ function LiveTestTab({ showToast }) {
     };
 
     return (
-        <div className="animate-fadeIn grid grid-cols-[1fr_1fr] gap-6">
+        <div className="animate-fadeIn grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Form */}
             <div className="space-y-4">
                 <div className="bg-slate-900/40 border border-slate-700/50 backdrop-blur-md rounded-2xl p-6 shadow-xl space-y-5">
@@ -1202,8 +1205,13 @@ export default function AdminDashboard() {
                     <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors">
                         <Menu size={20} />
                     </button>
-                    <div className="p-2.5 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl shadow-lg shadow-indigo-500/20 ring-1 ring-white/10">
-                        <Atom size={22} className="text-white" />
+                    <div className="relative rounded-xl shadow-[0_0_15px_rgba(99,102,241,0.4)] ring-1 ring-white/20 overflow-hidden group flex-shrink-0">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 pointer-events-none"></div>
+                        <img 
+                            src="/assets/nurfizika.jpg" 
+                            alt="NurFizika Logo" 
+                            className="w-11 h-11 object-cover transform group-hover:scale-110 transition-transform duration-500"
+                        />
                     </div>
                     <div>
                         <h1 className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 tracking-tight">{t('admin_title') || 'NurFizika Admin'}</h1>

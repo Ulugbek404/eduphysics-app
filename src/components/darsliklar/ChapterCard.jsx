@@ -1,8 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Book, Trophy, FlaskConical, Clock, ChevronRight, Sparkles } from 'lucide-react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function ChapterCard({ chapter, progress = 0 }) {
+    const { t } = useLanguage();
     const { id, grade_id, name, description, icon, total_lessons, total_tests, total_labs, estimated_hours, color } = chapter;
     const lessonsCount = chapter.lessons?.length || total_lessons || 0;
 
@@ -30,11 +32,21 @@ export default function ChapterCard({ chapter, progress = 0 }) {
                         <div className={`p-3.5 rounded-2xl bg-gradient-to-br ${colors.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                             <span className="text-2xl">{icon}</span>
                         </div>
-                        {progress > 0 && (
-                            <div className={`${colors.light} px-3 py-1.5 rounded-full border border-slate-700/50`}>
-                                <span className={`text-xs font-bold ${colors.text}`}>{progress}%</span>
-                            </div>
-                        )}
+                        <div className="flex flex-col items-end gap-2">
+                            {chapter.recommended && (
+                                <div className="px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full shadow-lg shadow-orange-500/20 border border-orange-400/50 flex items-center gap-1.5">
+                                    <Sparkles size={12} className="text-white" />
+                                    <span className="text-xs font-bold text-white tracking-wide drop-shadow-md">
+                                        {t('chapter_recommended') || 'Tavsiya etamiz'}
+                                    </span>
+                                </div>
+                            )}
+                            {progress > 0 && (
+                                <div className={`${colors.light} px-3 py-1.5 rounded-full border border-slate-700/50`}>
+                                    <span className={`text-xs font-bold ${colors.text}`}>{progress}%</span>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Content */}
@@ -51,22 +63,22 @@ export default function ChapterCard({ chapter, progress = 0 }) {
                     <div className="grid grid-cols-3 gap-2 mb-5">
                         <div className="flex items-center gap-1.5 text-slate-400 text-xs bg-slate-900/40 p-2.5 rounded-xl">
                             <Book size={13} className="text-blue-400 flex-shrink-0" />
-                            <span>{lessonsCount} dars</span>
+                            <span>{lessonsCount} {t('lessons_count_word') || 'ta dars'}</span>
                         </div>
                         <div className="flex items-center gap-1.5 text-slate-400 text-xs bg-slate-900/40 p-2.5 rounded-xl">
                             <Trophy size={13} className="text-yellow-400 flex-shrink-0" />
-                            <span>{total_tests || 0} test</span>
+                            <span>{total_tests || 0} {t('tests_count_word') || 'ta test'}</span>
                         </div>
                         <div className="flex items-center gap-1.5 text-slate-400 text-xs bg-slate-900/40 p-2.5 rounded-xl">
                             <FlaskConical size={13} className="text-purple-400 flex-shrink-0" />
-                            <span>{total_labs || 0} lab</span>
+                            <span>{total_labs || 0} {t('labs_count_word') || 'ta tajriba'}</span>
                         </div>
                     </div>
 
                     {/* Progress Bar */}
                     <div className="mb-5">
                         <div className="flex justify-between items-center mb-2">
-                            <span className="text-xs text-slate-500">Progress</span>
+                            <span className="text-xs text-slate-500">{t('common_progress') || 'Progress'}</span>
                             <span className={`text-xs font-bold ${colors.text}`}>{progress}%</span>
                         </div>
                         <div className="w-full bg-slate-700/40 h-2 rounded-full overflow-hidden">
@@ -82,16 +94,16 @@ export default function ChapterCard({ chapter, progress = 0 }) {
                         {progress === 0 ? (
                             <>
                                 <Sparkles size={16} />
-                                <span>Boshlash</span>
+                                <span>{t('chapter_start') || 'Boshlash'}</span>
                             </>
                         ) : progress === 100 ? (
                             <>
-                                <span>Qayta ko'rish</span>
+                                <span>{t('chapter_review') || "Qayta ko'rish"}</span>
                                 <ChevronRight size={16} />
                             </>
                         ) : (
                             <>
-                                <span>Davom etish</span>
+                                <span>{t('chapter_continue') || "Davom etish"}</span>
                                 <ChevronRight size={16} />
                             </>
                         )}

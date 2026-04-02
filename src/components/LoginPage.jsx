@@ -9,12 +9,15 @@ import { useSystemSettings } from '../hooks/useSystemSettings';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function LoginPage() {
     const navigate = useNavigate();
     const { loginWithGoogle, loginWithEmail, signUpWithEmailAndRole, resetPassword, error } = useAuth();
     const settings = useSystemSettings();
     const { t } = useLanguage();
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
     const [activeTab, setActiveTab] = useState('signin'); // 'signin' | 'signup'
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -178,32 +181,32 @@ export default function LoginPage() {
     );
 
     return (
-        <div className="h-screen overflow-y-auto bg-slate-900">
+        <div className={`h-screen overflow-y-auto transition-colors duration-300 ${isLight ? 'bg-slate-50' : 'bg-slate-900'}`}>
             {/* Dynamic Background */}
             <div className="fixed inset-0 pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/20 rounded-full blur-[120px] animate-pulse" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[120px] animate-pulse delay-1000" />
+                <div className={`absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] animate-pulse ${isLight ? 'bg-blue-400/15' : 'bg-blue-600/20'}`} />
+                <div className={`absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] animate-pulse delay-1000 ${isLight ? 'bg-purple-400/15' : 'bg-purple-600/20'}`} />
             </div>
 
             <div className="relative z-10 w-full max-w-md space-y-6 mx-auto px-4 py-8 pb-16">
                 {/* Logo Section */}
                 <div className="text-center space-y-2 animate-fadeIn">
                     <div className="inline-flex relative mb-4">
-                        <div className="absolute inset-0 bg-blue-500 blur-2xl opacity-40 animate-pulse" />
-                        <div className="relative bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 p-4 rounded-3xl shadow-2xl">
+                        <div className="absolute inset-0 bg-blue-500 blur-2xl opacity-30 animate-pulse" />
+                        <div className={`relative border p-4 rounded-3xl shadow-2xl ${isLight ? 'bg-white border-slate-200' : 'bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700'}`}>
                             <Atom size={48} className="text-blue-500 animate-spin-slow" />
                         </div>
                     </div>
                     <div>
-                        <h1 className="text-4xl font-extrabold bg-gradient-to-r from-blue-400 via-purple-400 to-white bg-clip-text text-transparent tracking-tight mb-3">
+                        <h1 className={`text-4xl font-extrabold tracking-tight mb-3 ${isLight ? 'text-slate-800' : 'bg-gradient-to-r from-blue-400 via-purple-400 to-white bg-clip-text text-transparent'}`}>
                             {t('app_name')}
                         </h1>
-                        <p className="text-sm text-yellow-300 italic font-medium mb-2">
+                        <p className="text-sm text-yellow-500 italic font-medium mb-2">
                             {t('hero_slogan')}
                         </p>
-                        <p className="text-slate-400 flex items-center justify-center gap-2 font-medium">
+                        <p className={`flex items-center justify-center gap-2 font-medium ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>
                             {t('hero_badge')}
-                            <Sparkles size={16} className="text-yellow-400" />
+                            <Sparkles size={16} className="text-yellow-500" />
                         </p>
                     </div>
                 </div>
@@ -219,14 +222,14 @@ export default function LoginPage() {
                 )}
 
                 {/* Main Card */}
-                <Card variant="glass" className="w-full backdrop-blur-3xl shadow-2xl shadow-blue-900/10 animate-slideInUp">
+                <Card variant="glass" className={`w-full backdrop-blur-3xl shadow-2xl animate-slideInUp ${isLight ? 'shadow-slate-300/30 bg-white border border-slate-200' : 'shadow-blue-900/10'}`}>
                     {/* Tabs */}
-                    <div className="flex bg-slate-900 p-1 rounded-xl mb-6 border border-slate-700">
+                    <div className={`flex p-1 rounded-xl mb-6 border ${isLight ? 'bg-slate-100 border-slate-200' : 'bg-slate-900 border-slate-700'}`}>
                         <button
                             onClick={() => { setActiveTab('signin'); setMessage(''); }}
                             className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-300 ${activeTab === 'signin'
                                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                                : isLight ? 'text-slate-500 hover:text-slate-700 hover:bg-slate-200' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
                                 }`}
                         >
                             {t('auth_login')}
@@ -235,7 +238,7 @@ export default function LoginPage() {
                             onClick={() => { setActiveTab('signup'); setMessage(''); }}
                             className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-300 ${activeTab === 'signup'
                                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                                : isLight ? 'text-slate-500 hover:text-slate-700 hover:bg-slate-200' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
                                 }`}
                         >
                             {t('auth_register')}
@@ -350,28 +353,28 @@ export default function LoginPage() {
                                 />
 
                                 {/* Admin Toggle */}
-                                <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl bg-slate-800 border border-slate-700 hover:border-violet-500/40 transition-all duration-200">
+                                <label className={`flex items-center gap-3 cursor-pointer p-3 rounded-xl border hover:border-violet-500/40 transition-all duration-200 ${isLight ? 'bg-slate-50 border-slate-200' : 'bg-slate-800 border-slate-700'}`}>
                                     <input
                                         type="checkbox"
                                         checked={isAdmin}
                                         onChange={e => setIsAdmin(e.target.checked)}
                                         className="w-4 h-4 accent-violet-500 rounded"
                                     />
-                                    <span className="text-slate-300 text-sm">👑 Men adminman</span>
+                                    <span className={`text-sm ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>👑 Men adminman</span>
                                 </label>
 
                                 {/* Admin Code Input — animated */}
                                 <div className={`overflow-hidden transition-all duration-300 ${isAdmin ? 'max-h-24 opacity-100' : 'max-h-0 opacity-0'}`}>
                                     <div className="space-y-1">
-                                        <label className="text-slate-400 text-sm block">Admin kodi *</label>
+                                        <label className={`text-sm block ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>Admin kodi *</label>
                                         <input
                                             type="password"
                                             placeholder="Maxsus admin kodini kiriting"
                                             value={adminCode}
                                             onChange={e => setAdminCode(e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-700 focus:border-violet-500 rounded-xl px-4 py-3 text-white text-sm outline-none transition-colors duration-200"
+                                            className={`w-full border focus:border-violet-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors duration-200 ${isLight ? 'bg-slate-50 border-slate-300 text-slate-800' : 'bg-slate-800 border-slate-700 text-white'}`}
                                         />
-                                        <p className="text-slate-400 text-xs">* Faqat tizim administratori uchun</p>
+                                        <p className={`text-xs ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>* Faqat tizim administratori uchun</p>
                                     </div>
                                 </div>
 
@@ -389,10 +392,10 @@ export default function LoginPage() {
                         {/* Divider */}
                         <div className="relative py-2">
                             <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-slate-700"></div>
+                                <div className={`w-full border-t ${isLight ? 'border-slate-200' : 'border-slate-700'}`}></div>
                             </div>
                             <div className="relative flex justify-center text-xs uppercase">
-                                <span className="bg-slate-900 px-2 text-slate-400 backdrop-blur-sm">{t('common_or')}</span>
+                                <span className={`px-2 backdrop-blur-sm ${isLight ? 'bg-white text-slate-500' : 'bg-slate-900 text-slate-400'}`}>{t('common_or')}</span>
                             </div>
                         </div>
 
@@ -408,12 +411,12 @@ export default function LoginPage() {
                         </Button>
                     </div>
 
-                        <p className="text-[10px] text-slate-400 text-center mt-6">
-                            {t('auth_terms_agree')} <span className="text-blue-400 cursor-pointer hover:underline">{t('auth_terms')}</span> {t('common_and')} <span className="text-blue-400 cursor-pointer hover:underline">{t('auth_privacy')}</span>
+                        <p className={`text-[10px] text-center mt-6 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+                            {t('auth_terms_agree')} <span className="text-blue-500 cursor-pointer hover:underline">{t('auth_terms')}</span> {t('common_and')} <span className="text-blue-500 cursor-pointer hover:underline">{t('auth_privacy')}</span>
                         </p>
                 </Card>
 
-                <p className="text-center text-xs text-slate-600 font-medium">
+                <p className={`text-center text-xs font-medium ${isLight ? 'text-slate-500' : 'text-slate-600'}`}>
                     © 2026 NurFizika. Barcha huquqlar himoyalangan.
                 </p>
             </div>

@@ -9,9 +9,9 @@ const LanguageContext = createContext();
 
 // Supported languages
 export const LANGUAGES = [
-    { code: 'uz', name: "O'zbekcha", flag: '🇺🇿' },
-    { code: 'ru', name: 'Русский', flag: '🇷🇺' },
-    { code: 'en', name: 'English', flag: '🇺🇸' }
+    { code: 'uz', name: "O'zbekcha", flag: 'UZ' },
+    { code: 'ru', name: 'Русский', flag: 'RU' },
+    { code: 'en', name: 'English', flag: 'ENG' }
 ];
 
 // Translation data

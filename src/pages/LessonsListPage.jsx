@@ -8,8 +8,10 @@ import LessonItem from '../components/darsliklar/LessonItem';
 import BreadcrumbNav from '../components/darsliklar/BreadcrumbNav';
 import { ArrowLeft, BookOpen, ClipboardList, FlaskConical } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function LessonsListPage() {
+    const { t } = useLanguage();
     const { gradeId, chapterId } = useParams();
     const navigate = useNavigate();
 
@@ -27,7 +29,7 @@ export default function LessonsListPage() {
 
     if (!grade || !chapter) {
         console.warn('[LessonsListPage] Missing data!', { grade, chapter }); // DEBUG
-        return <div className="p-8 text-center text-slate-400">Ma'lumot topilmadi</div>;
+        return <div className="p-8 text-center text-slate-400">{t('error_not_found') || "Ma'lumot topilmadi"}</div>;
     }
 
     const completedCount = lessons.filter(l => l.status === 'completed').length;
@@ -81,7 +83,7 @@ export default function LessonsListPage() {
                             <div className="flex-1">
                                 <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-4 py-1.5 mb-4 border border-white/20">
                                     <span className="text-xl">{chapter.icon}</span>
-                                    <span className="text-sm font-semibold text-white/90">Bob {chapter.order_number || ''}</span>
+                                    <span className="text-sm font-semibold text-white/90">{t('chapter_word') || 'Bob'} {chapter.order_number || ''}</span>
                                 </div>
 
                                 <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">{chapter.name}</h1>
@@ -91,16 +93,16 @@ export default function LessonsListPage() {
                                 <div className="flex flex-wrap items-center gap-3">
                                     <div className="flex items-center gap-1.5 bg-white/15 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/10">
                                         <BookOpen size={14} className="text-white/80" />
-                                        <span className="text-sm font-medium text-white">{lessons.length} ta dars</span>
+                                        <span className="text-sm font-medium text-white">{lessons.length} {t('lessons_count_word') || 'ta dars'}</span>
                                     </div>
                                     <div className="flex items-center gap-1.5 bg-white/15 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/10">
                                         <ClipboardList size={14} className="text-white/80" />
-                                        <span className="text-sm font-medium text-white">{chapter.total_tests || 0} ta test</span>
+                                        <span className="text-sm font-medium text-white">{chapter.total_tests || 0} {t('tests_count_word') || 'ta test'}</span>
                                     </div>
                                     {chapter.total_labs > 0 && (
                                         <div className="flex items-center gap-1.5 bg-white/15 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/10">
                                             <FlaskConical size={14} className="text-white/80" />
-                                            <span className="text-sm font-medium text-white">{chapter.total_labs} ta tajriba</span>
+                                            <span className="text-sm font-medium text-white">{chapter.total_labs} {t('labs_count_word') || 'ta tajriba'}</span>
                                         </div>
                                     )}
                                 </div>
@@ -122,7 +124,7 @@ export default function LessonsListPage() {
                                         <span className="text-xl font-bold text-white">{progress}%</span>
                                     </div>
                                 </div>
-                                <span className="text-white/50 text-xs font-medium">{completedCount}/{lessons.length} tugatildi</span>
+                                <span className="text-white/50 text-xs font-medium">{completedCount}/{lessons.length} {t('completed_word') || 'tugatildi'}</span>
                             </div>
                         </div>
                     </div>
@@ -130,8 +132,8 @@ export default function LessonsListPage() {
 
                 {/* Section Title */}
                 <div className="flex items-center justify-between mb-5">
-                    <h2 className="text-lg font-bold text-white">Darslar ro'yxati</h2>
-                    <span className="text-sm text-slate-500">{completedCount}/{lessons.length} tugatildi</span>
+                    <h2 className="text-lg font-bold text-white">{t('common_lessons_list') || "Darslar ro'yxati"}</h2>
+                    <span className="text-sm text-slate-500">{completedCount}/{lessons.length} {t('completed_word') || 'tugatildi'}</span>
                 </div>
 
                 {/* Lessons List */}

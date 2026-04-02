@@ -6,7 +6,7 @@ import {
     Clock, Zap, Target, MessageSquare, BarChart2, Flame,
     CheckCircle, AlertCircle, FileText, Trash2, AlertTriangle,
     ChevronLeft, ChevronRight, Settings, Lock, Download, Printer,
-    Search, BookOpen, User, TrendingUp, Camera
+    Search, BookOpen, User, TrendingUp, Camera, ArrowLeft
 } from 'lucide-react';
 import {
     EmailAuthProvider,
@@ -22,45 +22,39 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { getUserProgress } from '../services/userService';
+import { sanitizeProfileForm } from '../utils/sanitize';
+import { checkRateLimit, rateLimiters } from '../utils/rateLimiter';
 
 // ─── Tabs config ──────────────────────────────────────────────────────────────
 const getTabs = (t) => [
     {
         id: 'profile',
-        label: "Ma'lumotlar",
-        desc: "Shaxsiy ma'lumotlar",
+        label: t('settings_profile'),
+        desc: t('settings_profile_sub'),
         icon: User,
         iconBg: 'bg-indigo-500/20',
         iconColor: 'text-indigo-400',
     },
     {
         id: 'appearance',
-        label: "Ko'rinish",
-        desc: 'Tema va ranglar',
+        label: t('settings_mode_lang'),
+        desc: t('settings_mode_lang_sub'),
         icon: Palette,
         iconBg: 'bg-violet-500/20',
         iconColor: 'text-violet-400',
     },
     {
         id: 'notifications',
-        label: 'Bildirishnomalar',
-        desc: 'Eslatmalar sozlash',
+        label: t('settings_notifications'),
+        desc: t('settings_notifications_sub'),
         icon: Bell,
         iconBg: 'bg-yellow-500/20',
         iconColor: 'text-yellow-400',
     },
     {
-        id: 'language',
-        label: 'Til',
-        desc: "O'zbek / Rus / Eng",
-        icon: Globe,
-        iconBg: 'bg-emerald-500/20',
-        iconColor: 'text-emerald-400',
-    },
-    {
         id: 'security',
-        label: 'Xavfsizlik',
-        desc: 'Parol va himoya',
+        label: t('settings_security'),
+        desc: t('settings_security_sub'),
         icon: Shield,
         iconBg: 'bg-red-500/20',
         iconColor: 'text-red-400',
@@ -112,6 +106,7 @@ function SectionHeader({ tab }) {
 // ─── TAB 1 — PROFIL (MA'LUMOTLAR) ────────────────────────────────────────────────
 const ProfileTab = ({ showToast }) => {
     const { user, userData, logout } = useAuth();
+    const { t } = useLanguage();
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -169,7 +164,7 @@ const ProfileTab = ({ showToast }) => {
         if (!file) return;
 
         if (file.size > 2 * 1024 * 1024) {
-            if (showToast) showToast("Rasm hajmi 2MB dan katta bo'lmasligi kerak", 'error');
+            if (showToast) showToast(t('settings_photo_size_error'), 'error');
             return;
         }
 
@@ -209,10 +204,10 @@ const ProfileTab = ({ showToast }) => {
                 window.dispatchEvent(new Event('avatarUpdated'));
             } catch (e) { }
 
-            if (showToast) showToast("Profil rasmi yangilandi! ✅", 'success');
+            if (showToast) showToast(t('settings_photo_updated'), 'success');
         } catch (error) {
             console.error("Rasm yuklash xatosi:", error);
-            if (showToast) showToast("Rasm yuklashda xatolik yuz berdi", 'error');
+            if (showToast) showToast(t('settings_photo_error'), 'error');
         } finally {
             setUploadingPhoto(false);
             if (fileInputRef.current) fileInputRef.current.value = '';
@@ -221,15 +216,22 @@ const ProfileTab = ({ showToast }) => {
 
     const handleSave = async () => {
         if (!user?.uid) return;
+        // Rate limiting: 5 daqiqada max 3 ta marta saqlash
+        if (!checkRateLimit(rateLimiters.generalForm, user.uid)) {
+            if (showToast) showToast(t('settings_rate_limit'), 'error');
+            return;
+        }
         setSaving(true);
         try {
+            // Sanitize: XSS va injection oldini olish
+            const cleaned = sanitizeProfileForm(form);
             const dataToSave = {
-                displayName: form.displayName || '',
-                phone: form.phone || '',
-                school: form.school || '',
-                region: form.region || '',
-                grade: form.grade || '9',
-                bio: form.bio || '',
+                displayName: cleaned.displayName,
+                phone: cleaned.phone,
+                school: cleaned.school,
+                region: cleaned.region,
+                grade: cleaned.grade,
+                bio: cleaned.bio,
                 updatedAt: serverTimestamp(),
             };
 
@@ -265,7 +267,7 @@ const ProfileTab = ({ showToast }) => {
 
             setSaved(true);
             setIsEditing(false);
-            if (showToast) showToast("Ma'lumotlar saqlandi ✅", 'success');
+            if (showToast) showToast(t('settings_data_saved'), 'success');
             setTimeout(() => setSaved(false), 3000);
         } catch (err) {
             console.error("Save error details:", err);
@@ -285,9 +287,9 @@ const ProfileTab = ({ showToast }) => {
             a.download = `nurfizika_${user.uid.slice(0, 8)}.json`;
             a.click();
             URL.revokeObjectURL(url);
-            if (showToast) showToast("Ma'lumotlar yuklab olindi ✅", 'success');
+            if (showToast) showToast(t('settings_data_downloaded'), 'success');
         } catch {
-            if (showToast) showToast("Yuklab olishda xatolik!", 'error');
+            if (showToast) showToast(t('settings_data_download_error'), 'error');
         }
     };
 
@@ -363,30 +365,30 @@ const ProfileTab = ({ showToast }) => {
 
             const printWindow = window.open('', '_blank', 'width=900,height=700');
             if (!printWindow) {
-                if (showToast) showToast("Pop-up bloklangan! Ruxsat bering.", 'error');
+                if (showToast) showToast(t('settings_popup_blocked'), 'error');
                 return;
             }
             printWindow.document.write(reportHTML);
             printWindow.document.close();
             setTimeout(() => { printWindow.focus(); printWindow.print(); }, 500);
-            if (showToast) showToast('Hisobot tayyorlandi ✅', 'success');
+            if (showToast) showToast(t('settings_data_report_ready'), 'success');
         } catch {
             if (showToast) showToast("Hisobotni chiqarishda xato!", 'error');
         }
     };
 
     const handleDelete = async () => {
-        if (!delPassword) return showToast ? showToast("Parolni kiriting!", 'error') : null;
+        if (!delPassword) return showToast ? showToast(t('settings_enter_password'), 'error') : null;
         setDelLoading(true);
         try {
             const cred = EmailAuthProvider.credential(user.email, delPassword);
             await reauthenticateWithCredential(user, cred);
             await deleteDoc(doc(db, 'users', user.uid));
             await deleteUser(user);
-            if (showToast) showToast("Akkaunt o'chirildi", 'success');
+            if (showToast) showToast(t('settings_data_deleted'), 'success');
             logout();
         } catch (e) {
-            if (showToast) showToast(e.code === 'auth/wrong-password' ? "Noto'g'ri parol!" : "Xatolik yuz berdi", 'error');
+            if (showToast) showToast(e.code === 'auth/wrong-password' ? t('settings_data_wrong_password') : t('settings_save_error'), 'error');
         } finally {
             setDelLoading(false);
         }
@@ -398,10 +400,10 @@ const ProfileTab = ({ showToast }) => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-800 border border-slate-700 p-5 rounded-2xl gap-4">
                 <div>
                     <h2 className="text-white font-bold text-xl mb-1">
-                        Shaxsiy Ma'lumotlar
+                        {t('settings_profile_title')}
                     </h2>
                     <p className="text-slate-400 text-sm leading-relaxed">
-                        Ma'lumotlaringiz leaderboard va missiyalarda ko'rsatiladi.
+                        {t('settings_profile_subtitle')}
                     </p>
                 </div>
                 {!isEditing && (
@@ -411,7 +413,7 @@ const ProfileTab = ({ showToast }) => {
                             px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border border-indigo-500/30
                             flex items-center justify-center gap-2 flex-shrink-0"
                     >
-                        <Settings size={16} /> Tahrirlash
+                        <Settings size={16} /> {t('common.edit')}
                     </button>
                 )}
             </div>
@@ -453,7 +455,7 @@ const ProfileTab = ({ showToast }) => {
                         />
                     </div>
                     <div>
-                        <p className="text-white font-medium text-lg">{form.displayName || "Ism kiritilmagan"}</p>
+                        <p className="text-white font-medium text-lg">{form.displayName || t('settings_no_name')}</p>
                         <p className="text-slate-400 text-sm">{user?.email}</p>
                     </div>
                 </div>
@@ -462,13 +464,13 @@ const ProfileTab = ({ showToast }) => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div className="sm:col-span-2">
                             <label className="text-slate-300 text-sm font-medium mb-1.5 block">
-                                To'liq ism *
+                                {t('settings_fullname')} *
                             </label>
                             <input
                                 disabled={!isEditing}
                                 value={form.displayName}
                                 onChange={e => setForm({ ...form, displayName: e.target.value })}
-                                placeholder="Ismingiz va familiyangiz"
+                                placeholder={t('settings_fullname_placeholder')}
                                 className="w-full bg-slate-900 border border-slate-700
                            rounded-xl px-4 py-3 text-white text-sm
                            focus:outline-none focus:border-indigo-500 
@@ -477,7 +479,7 @@ const ProfileTab = ({ showToast }) => {
                         </div>
                         <div>
                             <label className="text-slate-300 text-sm font-medium mb-1.5 block">
-                                Telefon raqam
+                                {t('settings_phone')}
                             </label>
                             <input
                                 disabled={!isEditing}
@@ -492,13 +494,13 @@ const ProfileTab = ({ showToast }) => {
                         </div>
                         <div>
                             <label className="text-slate-300 text-sm font-medium mb-1.5 block">
-                                Maktab
+                                {t('settings_school')}
                             </label>
                             <input
                                 disabled={!isEditing}
                                 value={form.school}
                                 onChange={e => setForm({ ...form, school: e.target.value })}
-                                placeholder="Masalan: 45-maktab"
+                                placeholder={t('settings_school_placeholder')}
                                 className="w-full bg-slate-900 border border-slate-700
                            rounded-xl px-4 py-3 text-white text-sm
                            focus:outline-none focus:border-indigo-500 
@@ -507,9 +509,9 @@ const ProfileTab = ({ showToast }) => {
                         </div>
                         <div className="sm:col-span-2">
                             <label className="text-slate-300 text-sm font-medium mb-1.5 block">
-                                Hudud (viloyat) *
+                                {t('settings_region')} *
                                 <span className="text-indigo-400 text-xs ml-2">
-                                    — leaderboard filtri uchun 🏆
+                                    — {t('settings_region_hint')}
                                 </span>
                             </label>
                             <select
@@ -520,7 +522,7 @@ const ProfileTab = ({ showToast }) => {
                            rounded-xl px-4 py-3 text-white text-sm
                            focus:outline-none focus:border-indigo-500 
                            transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
-                                <option value="" disabled>Viloyatni tanlang</option>
+                                <option value="" disabled>{t('settings_region_select')}</option>
                                 {regions.map(r => (
                                     <option key={r} value={r}>{r}</option>
                                 ))}
@@ -528,7 +530,7 @@ const ProfileTab = ({ showToast }) => {
                         </div>
                         <div className="sm:col-span-2">
                             <label className="text-slate-300 text-sm font-medium mb-1.5 block">
-                                Sinf
+                                {t('settings_grade')}
                             </label>
                             <select
                                 disabled={!isEditing}
@@ -546,13 +548,13 @@ const ProfileTab = ({ showToast }) => {
                     </div>
                     <div>
                         <label className="text-slate-300 text-sm font-medium mb-1.5 block">
-                            O'zingiz haqingizda
+                            {t('settings_bio')}
                         </label>
                         <textarea
                             disabled={!isEditing}
                             value={form.bio}
                             onChange={e => setForm({ ...form, bio: e.target.value })}
-                            placeholder="Qisqacha o'zingiz haqingizda (qiziqishlaringiz, maqsadlaringiz)..."
+                            placeholder={t('settings_bio_placeholder')}
                             rows={3}
                             className="w-full bg-slate-900 border border-slate-700
                            rounded-xl px-4 py-3 text-white text-sm
@@ -570,7 +572,7 @@ const ProfileTab = ({ showToast }) => {
                                 transition-all flex items-center justify-center gap-2
                                 bg-slate-800 hover:bg-slate-600 text-white"
                         >
-                            Bekor qilish
+                            {t('common.cancel')}
                         </button>
                         <button
                             onClick={handleSave}
@@ -588,9 +590,9 @@ const ProfileTab = ({ showToast }) => {
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                                 </svg>
                             ) : saved ? (
-                                <><CheckCircle size={18} /> Saqlandi!</>
+                                <><CheckCircle size={18} /> {t('settings_saved')}</>
                             ) : (
-                                <><Database size={18} /> O'zgarishlarni Saqlash</>
+                                <><Database size={18} /> {t('settings_save_changes')}</>
                             )}
                         </button>
                     </div>
@@ -603,15 +605,15 @@ const ProfileTab = ({ showToast }) => {
                     <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center mb-3">
                         <Printer size={20} className="text-blue-400" />
                     </div>
-                    <h3 className="text-white font-semibold text-sm mb-1">Progress Hisoboti</h3>
-                    <p className="text-slate-400 text-xs mb-4 leading-relaxed">O'quv natijalaringizni chop eting</p>
+                    <h3 className="text-white font-semibold text-sm mb-1">{t('settings_data_report')}</h3>
+                    <p className="text-slate-400 text-xs mb-4 leading-relaxed">{t('settings_data_report_desc')}</p>
                     <button
                         onClick={handlePrint}
                         className="w-full bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30
                             text-blue-400 rounded-xl py-2.5 text-xs font-semibold
                             transition-all flex items-center justify-center gap-2"
                     >
-                        <Printer size={13} /> Chop Etish
+                        <Printer size={13} /> {t('settings_data_print')}
                     </button>
                 </div>
 
@@ -619,15 +621,15 @@ const ProfileTab = ({ showToast }) => {
                     <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-3">
                         <Download size={20} className="text-emerald-400" />
                     </div>
-                    <h3 className="text-white font-semibold text-sm mb-1">JSON Eksport</h3>
-                    <p className="text-slate-400 text-xs mb-4 leading-relaxed">Barcha ma'lumotlaringizni saqlang</p>
+                    <h3 className="text-white font-semibold text-sm mb-1">{t('settings_data_export')}</h3>
+                    <p className="text-slate-400 text-xs mb-4 leading-relaxed">{t('settings_data_export_desc')}</p>
                     <button
                         onClick={handleExport}
                         className="w-full bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30
                             text-emerald-400 rounded-xl py-2.5 text-xs font-semibold
                             transition-all flex items-center justify-center gap-2"
                     >
-                        <Download size={13} /> Yuklab Olish
+                        <Download size={13} /> {t('settings_data_download')}
                     </button>
                 </div>
             </div>
@@ -638,10 +640,9 @@ const ProfileTab = ({ showToast }) => {
                         <AlertTriangle size={20} className="text-red-400" />
                     </div>
                     <div>
-                        <h3 className="text-red-400 font-semibold">Akkauntni O'chirish</h3>
+                        <h3 className="text-red-400 font-semibold">{t('settings_data_delete_btn')}</h3>
                         <p className="text-slate-400 text-sm mt-1 leading-relaxed">
-                            Akkauntni o'chirsangiz barcha progress, XP va ma'lumotlar abadiy yo'qoladi.
-                            Bu amalni ortga qaytarib bo'lmaydi!
+                            {t('settings_data_danger_desc')}
                         </p>
                     </div>
                 </div>
@@ -654,17 +655,17 @@ const ProfileTab = ({ showToast }) => {
                             transition-all flex items-center justify-center gap-2"
                     >
                         <Trash2 size={15} />
-                        O'chirish
+                        {t('common.delete')}
                     </button>
                 ) : (
                     <div className="space-y-3">
-                        <p className="text-red-400 text-sm font-medium">Tasdiqlash uchun parolingizni kiriting:</p>
+                        <p className="text-red-400 text-sm font-medium">{t('settings_data_confirm_msg')}</p>
                         <div className="relative">
                             <input
                                 type={showDelPass ? 'text' : 'password'}
                                 value={delPassword}
                                 onChange={e => setDelPassword(e.target.value)}
-                                placeholder="Parolingiz"
+                                placeholder={t('settings_data_confirm_placeholder')}
                                 className="w-full bg-slate-900 border border-red-800/60 rounded-xl
                                     px-4 py-3 text-white placeholder-slate-600 text-sm
                                     focus:border-red-500 outline-none transition-all"
@@ -679,7 +680,7 @@ const ProfileTab = ({ showToast }) => {
                                 onClick={() => { setConfirmDelete(false); setDelPassword(''); }}
                                 className="flex-1 bg-slate-800 hover:bg-slate-600 text-slate-300 py-2.5 rounded-xl text-sm font-medium transition-all"
                             >
-                                Bekor qilish
+                                {t('common.cancel')}
                             </button>
                             <button
                                 onClick={handleDelete}
@@ -720,78 +721,36 @@ function XavfsizlikTab({ showToast }) {
     };
     const strength = getStrength(fields.newPass);
 
-    const strengthLabel = ['Parol kiriting', '🔴 Juda zaif', '🟡 O\'rtacha', '🔵 Yaxshi', '🟢 Kuchli'][strength];
+    const strengthLabel = [t('settings_password_enter'), '🔴 '+t('settings_password_weak'), '🟡 '+t('settings_password_medium'), '🔵 '+t('settings_password_good'), '🟢 '+t('settings_password_strong')][strength];
     const barColors = ['', 'bg-red-500', 'bg-yellow-500', 'bg-blue-500', 'bg-emerald-500'];
 
-    const handlePhotoUpload = async (e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        if (file.size > 2 * 1024 * 1024) {
-            if (showToast) showToast("Rasm hajmi 2MB dan katta bo'lmasligi kerak", 'error');
-            return;
-        }
-
-        setUploadingPhoto(true);
-        try {
-            const photoRef = ref(storage, `users/${user.uid}/profile_${Date.now()}`);
-            await uploadBytes(photoRef, file);
-            const downloadURL = await getDownloadURL(photoRef);
-
-            if (auth.currentUser) {
-                await updateProfile(auth.currentUser, { photoURL: downloadURL });
-            }
-
-            await setDoc(doc(db, "users", user.uid), {
-                photoURL: downloadURL,
-                updatedAt: serverTimestamp()
-            }, { merge: true });
-
-            try {
-                await setDoc(doc(db, "leaderboard", "global", "users", user.uid), {
-                    uid: user.uid,
-                    photoURL: downloadURL
-                }, { merge: true });
-                if (form.region) {
-                    await setDoc(doc(db, "leaderboard", form.region, "users", user.uid), {
-                        uid: user.uid,
-                        photoURL: downloadURL
-                    }, { merge: true });
-                }
-            } catch (e) { console.error("Leaderboardga rasm saqlashda xato", e); }
-
-            setForm(prev => ({ ...prev, photoURL: downloadURL }));
-            if (showToast) showToast("Profil rasmi yangilandi! ✅", 'success');
-        } catch (error) {
-            console.error("Rasm yuklash xatosi:", error);
-            if (showToast) showToast("Rasm yuklashda xatolik yuz berdi", 'error');
-        } finally {
-            setUploadingPhoto(false);
-            if (fileInputRef.current) fileInputRef.current.value = '';
-        }
-    };
 
     const handleSave = async () => {
-        if (fields.newPass !== fields.confirm) return showToast("Parollar mos kelmadi!", 'error');
-        if (fields.newPass.length < 6) return showToast("Parol kamida 6 ta belgi bo'lishi kerak!", 'error');
+        if (fields.newPass !== fields.confirm) return showToast(t('settings_password_mismatch'), 'error');
+        if (fields.newPass.length < 6) return showToast(t('settings_password_short'), 'error');
+        // Rate limiting: 15 daqiqada max 3 ta urinish
+        if (!checkRateLimit(rateLimiters.passwordChange, user?.uid)) {
+            showToast(t('settings_rate_limit_password'), 'error');
+            return;
+        }
         setLoading(true);
         try {
             const cred = EmailAuthProvider.credential(user.email, fields.current);
             await reauthenticateWithCredential(user, cred);
             await updatePassword(user, fields.newPass);
-            showToast("Parol muvaffaqiyatli yangilandi! ✅", 'success');
+            showToast(t('settings_password_updated'), 'success');
             setFields({ current: '', newPass: '', confirm: '' });
         } catch (e) {
-            showToast(e.code === 'auth/wrong-password' ? "Joriy parol noto'g'ri!" : "Xatolik yuz berdi.", 'error');
+            showToast(e.code === 'auth/wrong-password' ? t('settings_password_wrong') : t('settings_save_error'), 'error');
         } finally {
             setLoading(false);
         }
     };
 
     const inputs = [
-        { key: 'current', label: 'Joriy parol', placeholder: '••••••••' },
-        { key: 'newPass', label: 'Yangi parol', placeholder: 'Kamida 6 belgi' },
-        { key: 'confirm', label: 'Tasdiqlash', placeholder: 'Yangi parolni qayta kiriting' },
+        { key: 'current', label: t('settings_current_password'), placeholder: '••••••••' },
+        { key: 'newPass', label: t('settings_new_password'), placeholder: t('settings_password_min') },
+        { key: 'confirm', label: t('settings_confirm_password'), placeholder: t('settings_confirm_password_placeholder') },
     ];
 
     return (
@@ -801,7 +760,7 @@ function XavfsizlikTab({ showToast }) {
                 <div className="bg-slate-800 border border-slate-700 rounded-2xl p-5">
                     <div className="flex items-center gap-2 mb-3">
                         <Lock size={14} className="text-slate-400" />
-                        <span className="text-xs text-slate-400 font-medium">Parol kuchi</span>
+                        <span className="text-xs text-slate-400 font-medium">{t('settings_password_strength')}</span>
                     </div>
                     <div className="flex gap-1.5 mb-2">
                         {[1, 2, 3, 4].map(i => (
@@ -849,96 +808,98 @@ function XavfsizlikTab({ showToast }) {
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                         </svg>
                     ) : <Shield size={16} />}
-                    Parolni Yangilash
+                    {t('settings_password_update')}
                 </button>
             </div>
         </div>
     );
 }
 
-// ─── TAB 2 — KO'RINISH ────────────────────────────────────────────────────────
-function KorinishTab() {
-    const { t } = useLanguage();
+// ─── TAB 2 — REJIM VA TIL ────────────────────────────────────────────────────────
+function RejimVaTilTab({ showToast }) {
+    const { t, language: lang, setLanguage: setLang } = useLanguage();
     const { theme } = useTheme();
-    const [accent, setAccentLocal] = useState(() => localStorage.getItem('nf_accent') || 'indigo');
 
     const themes = [
         {
             id: 'dark', label: 'Dark', emoji: '🌙',
-            desc: "Ko'zni kam charchatadi",
+            desc: t('settings_theme_dark_desc'),
             available: true,
             preview: { bg: '#020617', surface: '#0f172a', accent: '#6366f1' }
         },
         {
             id: 'light', label: 'White', emoji: '☀️',
-            desc: 'Klassik yorug\' interfeys',
+            desc: t('settings_theme_light_desc'),
             available: false,
             preview: { bg: '#f8fafc', surface: '#ffffff', accent: '#4f46e5' }
         },
         {
             id: 'black', label: 'Black', emoji: '🌑',
-            desc: 'OLED ekranlar uchun ideal',
+            desc: t('settings_theme_black_desc'),
             available: false,
             preview: { bg: '#000000', surface: '#141414', accent: '#818cf8' }
         },
     ];
 
-    const accents = [
-        { id: 'indigo', color: '#6366f1', bg: 'bg-indigo-500' },
-        { id: 'violet', color: '#8b5cf6', bg: 'bg-violet-500' },
-        { id: 'blue', color: '#3b82f6', bg: 'bg-blue-500' },
-        { id: 'emerald', color: '#10b981', bg: 'bg-emerald-500' },
-        { id: 'rose', color: '#f43f5e', bg: 'bg-rose-500' },
+    const langs = [
+        { id: 'uz', flag: '🇺🇿', label: t('lang_uz'), desc: t('lang_uz_sub'), code: 'UZ' },
+        { id: 'ru', flag: '🇷🇺', label: t('lang_ru'), desc: t('lang_ru_sub'), code: 'RU' },
+        { id: 'en', flag: '🇬🇧', label: t('lang_en'), desc: t('lang_en_sub'), code: 'EN' },
     ];
 
+    const handleSelectLang = (id) => {
+        if (setLang) setLang(id);
+        if (showToast) showToast(t('settings_lang_changed'), 'success');
+    };
+
     return (
-        <div className="space-y-6 animate-fadeIn">
-            {/* Tema */}
+        <div className="space-y-8 animate-fadeIn mb-20">
+            {/* Tema - Rejimlar */}
             <div>
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Interfeys Temasi</p>
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">{t('settings_theme_title')}</p>
                 <div className="grid grid-cols-1 xs:grid-cols-3 sm:grid-cols-3 gap-3">
-                    {themes.map(t => (
-                        <div key={t.id} className={`
+                    {themes.map(thm => (
+                        <div key={thm.id} className={`
                             relative p-4 rounded-2xl border-2 cursor-pointer
                             transition-all duration-300 hover:scale-[1.03] text-left
-                            ${theme === t.id && t.available
+                            ${theme === thm.id && thm.available
                                 ? 'border-indigo-500 shadow-lg shadow-indigo-500/20'
-                                : t.available
+                                : thm.available
                                     ? 'border-slate-700 hover:border-slate-700'
                                     : 'border-slate-700 opacity-50 cursor-not-allowed'
                             } bg-slate-800
                         `}>
                             {/* Mini preview */}
                             <div className="w-full h-20 rounded-xl mb-3 overflow-hidden"
-                                style={{ background: t.preview.bg }}>
+                                style={{ background: thm.preview.bg }}>
                                 <div className="flex h-full">
-                                    <div className="w-8 h-full" style={{ background: t.preview.surface }} />
+                                    <div className="w-8 h-full" style={{ background: thm.preview.surface }} />
                                     <div className="flex-1 p-2 flex flex-col gap-1.5">
                                         <div className="h-2 rounded-full w-3/4"
-                                            style={{ background: t.preview.accent, opacity: 0.8 }} />
+                                            style={{ background: thm.preview.accent, opacity: 0.8 }} />
                                         <div className="h-1.5 rounded-full w-1/2"
-                                            style={{ background: t.preview.surface }} />
+                                            style={{ background: thm.preview.surface }} />
                                         <div className="h-1.5 rounded-full w-2/3"
-                                            style={{ background: t.preview.surface }} />
+                                            style={{ background: thm.preview.surface }} />
                                     </div>
                                 </div>
                             </div>
                             {/* Label */}
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-white font-semibold text-sm">{t.emoji} {t.label}</p>
-                                    <p className="text-slate-400 text-xs mt-0.5">{t.desc}</p>
+                                    <p className="text-white font-semibold text-sm">{thm.emoji} {thm.label}</p>
+                                    <p className="text-slate-400 text-xs mt-0.5">{thm.desc}</p>
                                 </div>
-                                {theme === t.id && t.available && (
+                                {theme === thm.id && thm.available && (
                                     <div className="w-5 h-5 bg-indigo-500 rounded-full flex items-center justify-center flex-shrink-0">
                                         <Check size={11} className="text-white" />
                                     </div>
                                 )}
                             </div>
                             {/* Coming soon */}
-                            {!t.available && (
+                            {!thm.available && (
                                 <span className="absolute top-2 right-2 text-[9px] font-semibold bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full border border-slate-700">
-                                    Tez kunda
+                                    {t('settings_coming_soon')}
                                 </span>
                             )}
                         </div>
@@ -946,26 +907,35 @@ function KorinishTab() {
                 </div>
             </div>
 
-            {/* Accent rang */}
-            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-5">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Asosiy Rang</p>
-                <div className="flex items-center gap-3">
-                    {accents.map(a => (
+            {/* Til */}
+            <div>
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">{t('settings_language')}</p>
+                <div className="space-y-3">
+                    {langs.map(l => (
                         <button
-                            key={a.id}
-                            onClick={() => { setAccentLocal(a.id); localStorage.setItem('nf_accent', a.id); }}
-                            title={a.id}
-                            className={`w-9 h-9 rounded-full ${a.bg} transition-all duration-200
-                                ${accent === a.id
-                                    ? 'ring-2 ring-offset-2 ring-offset-slate-800 ring-white scale-110'
-                                    : 'opacity-60 hover:opacity-100 hover:scale-105'
-                                }`}
-                        />
+                            key={l.id}
+                            onClick={() => handleSelectLang(l.id)}
+                            className={`
+                                flex items-center gap-4 w-full p-4 rounded-2xl border-2
+                                transition-all duration-200 hover:scale-[1.02] text-left
+                                ${lang === l.id
+                                    ? 'border-indigo-500 bg-indigo-500/10 shadow-lg shadow-indigo-500/10'
+                                    : 'border-slate-700 hover:border-slate-700 bg-slate-800'
+                                }
+                            `}
+                        >
+                            <span className="text-4xl">{l.flag}</span>
+                            <div className="flex-1">
+                                <p className="text-white font-semibold">{l.label}</p>
+                                <p className="text-slate-400 text-sm mt-0.5">{l.desc}</p>
+                            </div>
+                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
+                                ${lang === l.id ? 'border-indigo-500 bg-indigo-500' : 'border-slate-700'}`}>
+                                {lang === l.id && <Check size={12} className="text-white" />}
+                            </div>
+                        </button>
                     ))}
                 </div>
-                <p className="text-xs text-slate-600 mt-3">
-                    Tanlangan: <span className="text-slate-400 capitalize font-medium">{accent}</span>
-                </p>
             </div>
         </div>
     );
@@ -989,70 +959,23 @@ function BildirishnomaTab({ showToast }) {
 
     const groups = [
         {
-            title: "O'quv Jarayoni",
+            title: t('settings_notif_study'),
             items: [
-                { id: 'dailyReminder', icon: Clock, iconBg: 'bg-blue-500/20', iconColor: 'text-blue-400', title: 'Kunlik eslatma', desc: 'Har kuni o\'qishga undovchi eslatma' },
-                { id: 'streakReminder', icon: Flame, iconBg: 'bg-orange-500/20', iconColor: 'text-orange-400', title: 'Streak eslatmasi', desc: 'Ketma-ketlikni yo\'qotmaslik uchun' },
-                { id: 'missionComplete', icon: Target, iconBg: 'bg-purple-500/20', iconColor: 'text-purple-400', title: 'Missiya tugallandi', desc: 'Missiya bajarilganda xabar' },
+                { id: 'dailyReminder', icon: Clock, iconBg: 'bg-blue-500/20', iconColor: 'text-blue-400', title: t('settings_notif_daily'), desc: t('settings_notif_daily_desc') },
+                { id: 'streakReminder', icon: Flame, iconBg: 'bg-orange-500/20', iconColor: 'text-orange-400', title: t('settings_notif_streak'), desc: t('settings_notif_streak_desc') },
+                { id: 'missionComplete', icon: Target, iconBg: 'bg-purple-500/20', iconColor: 'text-purple-400', title: t('settings_notif_mission'), desc: t('settings_notif_mission_desc') },
             ]
         },
         {
-            title: 'Tizim',
+            title: t('settings_notif_system'),
             items: [
-                { id: 'xpUpdates', icon: Zap, iconBg: 'bg-yellow-500/20', iconColor: 'text-yellow-400', title: 'XP yangilanishlari', desc: 'XP qo\'shilganda bildirishnoma' },
-                { id: 'teacherMessages', icon: MessageSquare, iconBg: 'bg-emerald-500/20', iconColor: 'text-emerald-400', title: 'O\'qituvchi xabarlari', desc: 'O\'qituvchidan yangi xabar kelganda' },
-                { id: 'weeklyReport', icon: BarChart2, iconBg: 'bg-indigo-500/20', iconColor: 'text-indigo-400', title: 'Haftalik hisobot', desc: 'Har dushanba o\'quv natijalari' },
+                { id: 'xpUpdates', icon: Zap, iconBg: 'bg-yellow-500/20', iconColor: 'text-yellow-400', title: t('settings_notif_xp'), desc: t('settings_notif_xp_desc') },
+                { id: 'teacherMessages', icon: MessageSquare, iconBg: 'bg-emerald-500/20', iconColor: 'text-emerald-400', title: t('settings_notif_teacher'), desc: t('settings_notif_teacher_desc') },
+                { id: 'weeklyReport', icon: BarChart2, iconBg: 'bg-indigo-500/20', iconColor: 'text-indigo-400', title: t('settings_notif_weekly'), desc: t('settings_notif_weekly_desc') },
             ]
         },
     ];
 
-    const handlePhotoUpload = async (e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        if (file.size > 2 * 1024 * 1024) {
-            if (showToast) showToast("Rasm hajmi 2MB dan katta bo'lmasligi kerak", 'error');
-            return;
-        }
-
-        setUploadingPhoto(true);
-        try {
-            const photoRef = ref(storage, `users/${user.uid}/profile_${Date.now()}`);
-            await uploadBytes(photoRef, file);
-            const downloadURL = await getDownloadURL(photoRef);
-
-            if (auth.currentUser) {
-                await updateProfile(auth.currentUser, { photoURL: downloadURL });
-            }
-
-            await setDoc(doc(db, "users", user.uid), {
-                photoURL: downloadURL,
-                updatedAt: serverTimestamp()
-            }, { merge: true });
-
-            try {
-                await setDoc(doc(db, "leaderboard", "global", "users", user.uid), {
-                    uid: user.uid,
-                    photoURL: downloadURL
-                }, { merge: true });
-                if (form.region) {
-                    await setDoc(doc(db, "leaderboard", form.region, "users", user.uid), {
-                        uid: user.uid,
-                        photoURL: downloadURL
-                    }, { merge: true });
-                }
-            } catch (e) { console.error("Leaderboardga rasm saqlashda xato", e); }
-
-            setForm(prev => ({ ...prev, photoURL: downloadURL }));
-            if (showToast) showToast("Profil rasmi yangilandi! ✅", 'success');
-        } catch (error) {
-            console.error("Rasm yuklash xatosi:", error);
-            if (showToast) showToast("Rasm yuklashda xatolik yuz berdi", 'error');
-        } finally {
-            setUploadingPhoto(false);
-            if (fileInputRef.current) fileInputRef.current.value = '';
-        }
-    };
 
     const handleSave = async () => {
         setLoading(true);
@@ -1060,9 +983,9 @@ function BildirishnomaTab({ showToast }) {
             if (user?.uid) {
                 await updateDoc(doc(db, 'users', user.uid), { notificationSettings: settings });
             }
-            showToast('Bildirishnoma sozlamalari saqlandi ✅', 'success');
+            showToast(t('settings_notif_saved'), 'success');
         } catch {
-            showToast('Saqlashda xatolik yuz berdi', 'error');
+            showToast(t('settings_save_error'), 'error');
         } finally {
             setLoading(false);
         }
@@ -1089,14 +1012,16 @@ function BildirishnomaTab({ showToast }) {
                                             <p className="text-xs text-slate-400 mt-0.5">{item.desc}</p>
                                         </div>
                                     </div>
-                                    <button
+                                    <div
                                         onClick={() => toggleItem(item.id)}
-                                        className={`relative w-11 h-6 rounded-full transition-all duration-300 flex-shrink-0
+                                        role="switch"
+                                        aria-checked={settings[item.id]}
+                                        className={`relative w-11 h-6 rounded-full transition-all duration-300 flex-shrink-0 cursor-pointer
                                             ${settings[item.id] ? 'bg-indigo-600' : 'bg-slate-800'}`}
                                     >
                                         <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-300
                                             ${settings[item.id] ? 'left-5' : 'left-0.5'}`} />
-                                    </button>
+                                    </div>
                                 </div>
                             );
                         })}
@@ -1111,53 +1036,8 @@ function BildirishnomaTab({ showToast }) {
                     flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-indigo-500/25"
             >
                 {loading ? <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg> : <Bell size={16} />}
-                Saqlash
+                {t('common.save')}
             </button>
-        </div>
-    );
-}
-
-// ─── TAB 4 — TIL ──────────────────────────────────────────────────────────────
-function TilTab({ showToast }) {
-    const { language: lang, setLanguage: setLang, t } = useLanguage();
-
-    const langs = [
-        { id: 'uz', flag: '🇺🇿', label: "O'zbekcha", desc: "Barcha matnlar o'zbek tilida", code: 'UZ' },
-        { id: 'ru', flag: '🇷🇺', label: 'Русский', desc: 'Все тексты на русском', code: 'RU' },
-        { id: 'en', flag: '🇬🇧', label: 'English', desc: 'All texts in English', code: 'EN' },
-    ];
-
-    const handleSelect = (id) => {
-        if (setLang) setLang(id);
-        showToast('Til muvaffaqiyatli o\'zgartirildi ✅', 'success');
-    };
-
-    return (
-        <div className="space-y-3 animate-fadeIn">
-            {langs.map(l => (
-                <button
-                    key={l.id}
-                    onClick={() => handleSelect(l.id)}
-                    className={`
-                        flex items-center gap-4 w-full p-4 rounded-2xl border-2
-                        transition-all duration-200 hover:scale-[1.02] text-left
-                        ${lang === l.id
-                            ? 'border-indigo-500 bg-indigo-500/10 shadow-lg shadow-indigo-500/10'
-                            : 'border-slate-700 hover:border-slate-700 bg-slate-800'
-                        }
-                    `}
-                >
-                    <span className="text-4xl">{l.flag}</span>
-                    <div className="flex-1">
-                        <p className="text-white font-semibold">{l.label}</p>
-                        <p className="text-slate-400 text-sm mt-0.5">{l.desc}</p>
-                    </div>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
-                        ${lang === l.id ? 'border-indigo-500 bg-indigo-500' : 'border-slate-700'}`}>
-                        {lang === l.id && <Check size={12} className="text-white" />}
-                    </div>
-                </button>
-            ))}
         </div>
     );
 }
@@ -1180,9 +1060,8 @@ export default function SettingsPage() {
     const renderContent = () => {
         switch (activeTab) {
             case 'profile': return <ProfileTab showToast={showToast} />;
-            case 'appearance': return <KorinishTab />;
+            case 'appearance': return <RejimVaTilTab showToast={showToast} />;
             case 'notifications': return <BildirishnomaTab showToast={showToast} />;
-            case 'language': return <TilTab showToast={showToast} />;
             case 'security': return <XavfsizlikTab showToast={showToast} />;
             default: return null;
         }
@@ -1199,18 +1078,20 @@ export default function SettingsPage() {
 
             {/* Top bar */}
             <div className="flex-shrink-0 flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 border-b border-slate-700 bg-slate-900 backdrop-blur-sm">
-                <div className="flex items-center gap-2 sm:gap-3">
+                <div className="flex items-center gap-4 sm:gap-6">
                     <button
                         onClick={() => navigate(-1)}
-                        className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
+                        className="flex items-center gap-2 text-slate-400 hover:text-white hover:text-indigo-400 transition-colors"
                     >
-                        <ChevronLeft size={20} />
+                        <ArrowLeft size={20} />
+                        <span className="font-medium text-sm sm:text-base hidden sm:inline-block">{t('nav_back') || 'Ortga'}</span>
                     </button>
+                    <div className="h-6 w-px bg-slate-700 hidden sm:block"></div>
                     <div className="flex items-center gap-2">
-                        <div className="p-1.5 sm:p-2 bg-slate-800 rounded-xl">
-                            <Settings size={16} className="text-slate-300" />
+                        <div className="p-1.5 sm:p-2 bg-slate-800 rounded-xl flex items-center justify-center">
+                            <Settings size={16} className="text-slate-300 block" />
                         </div>
-                        <h1 className="text-base sm:text-lg font-bold">Sozlamalar</h1>
+                        <h1 className="text-base sm:text-lg font-bold leading-none">{t('settings_title')}</h1>
                     </div>
                 </div>
 
@@ -1223,7 +1104,7 @@ export default function SettingsPage() {
                         autoComplete="off"
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        placeholder="Qidirish..."
+                        placeholder={t('settings_search')}
                         className="w-full bg-slate-800 border border-slate-700 rounded-xl
                             pl-9 pr-4 py-2 text-sm text-white placeholder-slate-500
                             focus:border-indigo-500/50 focus:outline-none transition-all"
@@ -1266,7 +1147,7 @@ export default function SettingsPage() {
                                 key={tab.id}
                                 onClick={() => { setActiveTab(tab.id); setSearch(''); }}
                                 className={`
-                                    w-full flex items-center gap-3 p-3 rounded-xl
+                                    w-full p-3 rounded-xl
                                     transition-all duration-200 text-left group
                                     ${active
                                         ? 'bg-indigo-600/20 border border-indigo-500/40'
@@ -1274,23 +1155,23 @@ export default function SettingsPage() {
                                     }
                                 `}
                             >
-                                <div className={`p-2.5 rounded-xl ${tab.iconBg} flex-shrink-0 transition-transform group-hover:scale-110`}>
-                                    <Icon size={18} className={tab.iconColor} />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className={`text-sm font-semibold truncate ${active ? 'text-white' : 'text-slate-300'}`}>
+                                <div className="flex items-center gap-3">
+                                    <div className={`p-2 rounded-xl border border-white/5 ${tab.iconBg} flex-shrink-0 transition-transform group-hover:scale-110`}>
+                                        <Icon size={18} className={tab.iconColor} />
+                                    </div>
+                                    <p className={`flex-1 text-[15px] font-semibold truncate ${active ? 'text-white' : 'text-slate-300'}`}>
                                         {tab.label}
                                     </p>
-                                    <p className="text-xs text-slate-400 truncate mt-0.5">{tab.desc}</p>
+                                    {active && <ChevronRight size={16} className="text-indigo-400 flex-shrink-0" />}
                                 </div>
-                                {active && <ChevronRight size={14} className="text-indigo-400 flex-shrink-0" />}
+                                <p className="text-xs text-slate-500 truncate pl-[46px] mt-0.5">{tab.desc}</p>
                             </button>
                         );
                     })}
 
                     {filteredTabs.length === 0 && (
                         <div className="text-center py-10">
-                            <p className="text-slate-600 text-sm">Hech narsa topilmadi</p>
+                            <p className="text-slate-600 text-sm">{t('settings_not_found')}</p>
                         </div>
                     )}
                 </aside>

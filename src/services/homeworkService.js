@@ -11,11 +11,17 @@ const MODEL_NAME = "gemini-2.5-flash";
 let currentKeyIndex = 0;
 
 const safeParseJSON = (text) => {
-    const codeMatch = text.match(/```(?:json)?\n?([\s\S]*?)\n?```/);
-    const raw = codeMatch ? codeMatch[1] : text;
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return null;
-    try { return JSON.parse(jsonMatch[0]); } catch { return null; }
+    let cleanText = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+    try {
+        return JSON.parse(cleanText);
+    } catch (e) {
+        const match = text.match(/\{[\s\S]*\}/);
+        if (match) {
+            try { return JSON.parse(match[0]); } catch { return 'INVALID_JSON'; }
+        }
+        if (cleanText.startsWith('{')) return 'INVALID_JSON';
+        return null;
+    }
 };
 
 const generateWithFallback = async (prompt) => {
@@ -25,7 +31,11 @@ const generateWithFallback = async (prompt) => {
             const genAI = new GoogleGenerativeAI(key);
             const model = genAI.getGenerativeModel({
                 model: MODEL_NAME,
-                generationConfig: { temperature: 0.7, maxOutputTokens: 4096 }
+                generationConfig: { 
+                    temperature: 0.7, 
+                    maxOutputTokens: 4096,
+                    responseMimeType: "application/json" 
+                }
             });
             const result = await model.generateContent(prompt);
             return result.response.text();
@@ -52,7 +62,9 @@ FAQAT quyidagi JSON formatida javob ber, boshqa hech narsa yozma:
   "topic": "${topic}"
 }`;
         const text = await generateWithFallback(prompt);
-        const data = safeParseJSON(text) || parseTextSolution(text);
+        const parsed = safeParseJSON(text);
+        if (parsed === 'INVALID_JSON') throw new Error("AI yechimni to'liq shakllantira olmadi. Qaytadan urining.");
+        const data = parsed || parseTextSolution(text);
         return { success: true, data };
     } catch (error) {
         return { success: false, error: "AI bilan ulanishda xato: " + error.message, data: null };
@@ -65,7 +77,8 @@ export async function checkSolution(apiKeyIgnored, problemText, studentSolution)
 MASALA: ${problemText}
 O'QUVCHI YECHIMI: ${studentSolution}
 
-FAQAT quyidagi JSON formatida javob ber:
+Ma'lumot uchun, status faqat: "correct", "incorrect", yoki "partial" bo'lishi mumkin.
+FAQAT quyidagi JSON formatida javob ber, boshqa hech qanday so'z yozma:
 {
   "status": "correct",
   "score": 85,
@@ -73,10 +86,11 @@ FAQAT quyidagi JSON formatida javob ber:
   "errors": [{"type": "Xato turi", "description": "...", "suggestion": "..."}],
   "correctSolution": {"steps": [], "finalAnswer": "To'g'ri javob..."},
   "suggestions": ["Maslahat 1"]
-}
-status: "correct" yoki "incorrect" yoki "partial"`;
+}`;
         const text = await generateWithFallback(prompt);
-        const data = safeParseJSON(text) || parseTextFeedback(text);
+        const parsed = safeParseJSON(text);
+        if (parsed === 'INVALID_JSON') throw new Error("AI testni tekshira olmadi. Qaytadan urining.");
+        const data = parsed || parseTextFeedback(text);
         return { success: true, data };
     } catch (error) {
         return { success: false, error: "AI bilan ulanishda xato: " + error.message, data: null };
@@ -99,7 +113,9 @@ FAQAT quyidagi JSON formatida javob ber:
   "hints": ["Maslahat 1", "Maslahat 2"]
 }`;
         const text = await generateWithFallback(prompt);
-        const data = safeParseJSON(text) || parseTextProblem(text);
+        const parsed = safeParseJSON(text);
+        if (parsed === 'INVALID_JSON') throw new Error("AI masalani tuzishda xatolikka yo'l qo'ydi. Qaytadan urining.");
+        const data = parsed || parseTextProblem(text);
         return { success: true, data };
     } catch (error) {
         return { success: false, error: "AI bilan ulanishda xato: " + error.message, data: null };
@@ -122,7 +138,9 @@ FAQAT quyidagi JSON formatida javob ber:
   "tips": ["Maslahat"]
 }`;
         const text = await generateWithFallback(prompt);
-        const data = safeParseJSON(text) || { explanation: text };
+        const parsed = safeParseJSON(text);
+        if (parsed === 'INVALID_JSON') throw new Error("AI tushuntirishda xatoga yo'l qo'ydi. Qaytadan urining.");
+        const data = parsed || { explanation: text };
         return { success: true, data };
     } catch (error) {
         return { success: false, error: "AI bilan ulanishda xato: " + error.message, data: null };

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const ThemeContext = createContext();
 
@@ -8,37 +8,33 @@ export const useTheme = () => {
   return context;
 };
 
-// Faqat dark tema CSS o'zgaruvchilari
-function applyDarkTheme() {
-  const root = document.documentElement;
-  root.classList.remove('dark', 'light', 'black');
-  root.classList.add('dark');
-
-  const vars = {
-    '--bg-primary': '#020617',
-    '--bg-surface': '#0f172a',
-    '--bg-card': '#1e293b',
-    '--border-color': '#334155',
-    '--text-primary': '#f8fafc',
-    '--text-muted': '#94a3b8',
-    '--accent': '#6366f1',
-  };
-  Object.entries(vars).forEach(([key, val]) => {
-    root.style.setProperty(key, val);
-  });
-}
-
 export const ThemeProvider = ({ children }) => {
-  // Hozircha faqat dark tema
-  const theme = 'dark';
+  const [theme, setThemeState] = useState(() => {
+    return localStorage.getItem('nurfizika-theme') || 'dark';
+  });
 
   useEffect(() => {
-    applyDarkTheme();
-  }, []);
+    const root = document.documentElement;
+    // Tailwind dark: modifikatori uchun 'dark' klassini qo'shamiz/olamiz
+    if (theme === 'dark') {
+      root.classList.add('dark');
+      root.classList.remove('light');
+    } else {
+      root.classList.remove('dark');
+      root.classList.add('light');
+    }
+    localStorage.setItem('nurfizika-theme', theme);
+  }, [theme]);
 
-  // setTheme — kelajak uchun (hozir hech narsa o'zgartirmaydi)
-  const setTheme = () => { };
-  const toggleTheme = setTheme;
+  const setTheme = (newTheme) => {
+    if (newTheme === 'dark' || newTheme === 'light') {
+      setThemeState(newTheme);
+    }
+  };
+
+  const toggleTheme = () => {
+    setThemeState(prev => prev === 'dark' ? 'light' : 'dark');
+  };
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
