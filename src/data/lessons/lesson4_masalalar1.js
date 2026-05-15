@@ -6,7 +6,7 @@ export const lesson4 = {
     description: "Molekula massasi, Avogadro soni va modda miqdori bo'yicha amaliy masalalar.",
     order_number: 4,
     duration_minutes: 50,
-    video_url: 'https://www.youtube.com/embed/WCbZcje5mMY',
+    video_url: '',
     has_lab: false,
     test_count: 6,
     difficulty: 'medium',
@@ -21,7 +21,7 @@ export const lesson4 = {
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-ASOSIY FORMULALAR TAKRORLASH
+Asosiy formulalar takrorlash
 
 1. Bir molekulaning massasi: m₀ = M / NA
 2. Molekulalar soni: N = (m × NA) / M
@@ -39,7 +39,7 @@ Bu yerda:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-MASALA YECHISH QOIDALARI
+Masala yechish qoidalari
 
 1. Berilganlarni yozing — barcha ma'lum kattaliklar
 2. Topish kerak — nimani hisoblash kerak?
@@ -56,7 +56,7 @@ KENG TARQALGAN XATOLAR:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-OSON MASALALAR
+Oson masalalar
 
 Oson masalalar bitta formula bilan yechiladi. Chunki faqat bitta noma'lum kattalik bor.
 
@@ -69,7 +69,7 @@ Javob: m₀ ≈ 9.3 × 10⁻²⁶ kg
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-O'RTA MASALALAR
+O'rta masalalar
 
 O'rta masalalar 2-3 qadam talab qiladi. Avval bitta kattalikni topib, keyin uni boshqa formulaga qo'yish kerak.
 
@@ -82,7 +82,7 @@ Javob: N ≈ 3.01 × 10²⁴ ta molekula
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-QIYIN MASALALAR
+Qiyin masalalar
 
 Qiyin masalalar bir nechta formulani birlashtirish va birliklarni konvertatsiya qilishni talab qiladi.
 
@@ -99,7 +99,7 @@ Javob: L ≈ 36.7 m
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-MUSTAQIL ISHLASH UCHUN MASALALAR
+Mustaqil ishlash uchun masalalar
 
 1. 100 g oltin (Au, M = 197 g/mol) da nechta atom bor?
 2. 5 mol azot (N₂) ning massasi qancha?
@@ -109,7 +109,7 @@ MUSTAQIL ISHLASH UCHUN MASALALAR
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-XULOSA
+Xulosa
 
 Masalalar yechishda eng muhim: formulani to'g'ri tanlash, birliklarni to'g'ri ishlatish va javobni mantiqiy tekshirish.
 

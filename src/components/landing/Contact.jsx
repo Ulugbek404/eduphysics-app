@@ -185,9 +185,9 @@ const Contact = () => {
                                         <div className={`text-sm mb-1 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
                                             {t('contact_email_label')}
                                         </div>
-                                        <a href="mailto:ulugbekroziboyev05@gmail.com"
+                                        <a href="mailto:nurfizikasupport@gmail.com"
                                             className={`transition-colors ${isLight ? 'text-slate-800 hover:text-blue-600' : 'text-white hover:text-blue-400'}`}>
-                                            ulugbekroziboyev05@gmail.com
+                                            nurfizikasupport@gmail.com
                                         </a>
                                     </div>
                                 </div>
@@ -231,21 +231,20 @@ const Contact = () => {
 
                             <div className="grid grid-cols-2 gap-3">
                                 {[
-                                    { icon: <Facebook className="w-5 h-5" />, name: "Facebook", url: "https://facebook.com", color: "blue" },
-                                    { icon: <Instagram className="w-5 h-5" />, name: "Instagram", url: "https://instagram.com", color: "pink" },
-                                    { icon: <Youtube className="w-5 h-5" />, name: "YouTube", url: "https://youtube.com", color: "red" },
-                                    { icon: <TelegramIcon className="w-5 h-5" />, name: "Telegram", url: "https://t.me/Ulugbek1434", color: "blue" }
+                                    { icon: <Facebook className="w-5 h-5" />, name: "Facebook", url: "https://www.facebook.com/share/18bRKT6BbK/", color: "blue" },
+                                    { icon: <Instagram className="w-5 h-5" />, name: "Instagram", url: "https://www.instagram.com/nurfizika", color: "pink" },
+                                    { icon: <Youtube className="w-5 h-5" />, name: "YouTube", url: "https://www.youtube.com/@NurFizika", color: "red" },
+                                    { icon: <TelegramIcon className="w-5 h-5" />, name: "Telegram", url: "https://t.me/+sRohecqH4KVlYjli", color: "blue" }
                                 ].map((social, index) => (
                                     <a
                                         key={index}
                                         href={social.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className={`flex items-center gap-2 p-3 rounded-xl transition-all group border ${
-                                            isLight
-                                                ? 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
-                                                : `bg-${social.color}-500/10 border-${social.color}-500/20 hover:bg-${social.color}-500/20`
-                                        }`}
+                                        className={`flex items-center gap-2 p-3 rounded-xl transition-all group border ${isLight
+                                            ? 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
+                                            : `bg-${social.color}-500/10 border-${social.color}-500/20 hover:bg-${social.color}-500/20`
+                                            }`}
                                     >
                                         <div className="group-hover:scale-110 transition-transform text-slate-600 dark:text-white">
                                             {social.icon}
@@ -290,7 +289,7 @@ const Contact = () => {
                             </div>
                         </div>
 
-                        <p className="text-blue-500 font-bold tracking-widest text-xs sm:text-sm mt-6 uppercase text-center flex-shrink-0">
+                        <p className="text-blue-500 font-bold tracking-widest text-xs sm:text-sm mt-6 text-center flex-shrink-0">
                             eduphysics-app.web.app
                         </p>
                     </div>
@@ -329,11 +328,10 @@ const Contact = () => {
                             href="https://maps.app.goo.gl/MDaTG75z79bbot5L7"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`mt-5 flex items-center justify-center gap-2 w-full py-3 sm:py-3.5 px-4 rounded-xl font-semibold transition-colors flex-shrink-0 ${
-                                isLight
-                                    ? 'bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700'
-                                    : 'bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white'
-                            }`}
+                            className={`mt-5 flex items-center justify-center gap-2 w-full py-3 sm:py-3.5 px-4 rounded-xl font-semibold transition-colors flex-shrink-0 ${isLight
+                                ? 'bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700'
+                                : 'bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white'
+                                }`}
                         >
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M15 3h6v6" /><path d="M10 14L21 3" /><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
@@ -352,11 +350,10 @@ const Contact = () => {
                     className="mt-20 max-w-5xl mx-auto"
                 >
                     <div className="text-center mb-8">
-                        <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-4 ${
-                            isLight
-                                ? 'bg-indigo-100 border border-indigo-200 text-indigo-600'
-                                : 'bg-indigo-500/10 border border-indigo-500/20 text-indigo-300'
-                        }`}>
+                        <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-4 ${isLight
+                            ? 'bg-indigo-100 border border-indigo-200 text-indigo-600'
+                            : 'bg-indigo-500/10 border border-indigo-500/20 text-indigo-300'
+                            }`}>
                             ⚛️ {t('solar_badge')}
                         </div>
                         <h3 className={`text-3xl md:text-4xl font-bold mb-3 ${isLight ? 'text-slate-800' : 'text-white'}`}>
@@ -367,16 +364,15 @@ const Contact = () => {
                         </p>
                     </div>
 
-                    <div className={`relative rounded-3xl overflow-hidden border shadow-2xl ${
-                        isLight ? 'border-indigo-200 shadow-indigo-100' : 'border-indigo-500/20 shadow-indigo-900/40'
-                    }`}>
+                    <div className={`relative rounded-3xl overflow-hidden border shadow-2xl ${isLight ? 'border-indigo-200 shadow-indigo-100' : 'border-indigo-500/20 shadow-indigo-900/40'
+                        }`}>
                         <div className="absolute -inset-[1px] bg-gradient-to-r from-blue-600/30 via-purple-600/30 to-indigo-600/30 rounded-3xl blur-sm pointer-events-none" />
                         <div className="relative">
                             <SolarSystemAnimation />
                         </div>
                     </div>
 
-                    <p className={`text-center text-xs mt-4 tracking-widest uppercase ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>
+                    <p className={`text-center text-xs mt-4 tracking-widest ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>
                         {t('solar_footer')}
                     </p>
                 </motion.div>
@@ -403,17 +399,15 @@ const Contact = () => {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                                className={`border rounded-2xl overflow-hidden ${
-                                    isLight
-                                        ? 'bg-white border-slate-200 shadow-sm'
-                                        : 'bg-slate-800/50 backdrop-blur-sm border-slate-700'
-                                }`}
+                                className={`border rounded-2xl overflow-hidden ${isLight
+                                    ? 'bg-white border-slate-200 shadow-sm'
+                                    : 'bg-slate-800/50 backdrop-blur-sm border-slate-700'
+                                    }`}
                             >
                                 <button
                                     onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                                    className={`w-full px-6 py-4 flex items-center justify-between text-left transition-colors ${
-                                        isLight ? 'hover:bg-slate-50' : 'hover:bg-slate-700/30'
-                                    }`}
+                                    className={`w-full px-6 py-4 flex items-center justify-between text-left transition-colors ${isLight ? 'hover:bg-slate-50' : 'hover:bg-slate-700/30'
+                                        }`}
                                 >
                                     <span className={`text-lg font-semibold pr-4 ${isLight ? 'text-slate-800' : 'text-white'}`}>
                                         {faq.question}

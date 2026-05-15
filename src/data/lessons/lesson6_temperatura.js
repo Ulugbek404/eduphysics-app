@@ -3,14 +3,14 @@ export const lesson6 = {
     id: '9-l-25', chapter_id: '9-ch-02',
     title: 'Temperatura',
     description: "Temperatura tushunchasi, Kelvin va Selsiy shkalasi, absolyut nol, molekulalarning kinetik energiyasi.",
-    order_number: 6, duration_minutes: 45, video_url: 'https://www.youtube.com/embed/UekvCbX8N0s', has_lab: false, test_count: 8, difficulty: 'medium',
+    order_number: 6, duration_minutes: 45, video_url: '', has_lab: false, test_count: 8, difficulty: 'medium',
     content: {
         key_concepts: ['Temperaturaning fizik ma\'nosi', 'Kelvin va Selsiy shkalasi', 'Absolyut nol', 'Boltsman doimiysi', 'Molekulalarning kinetik energiyasi'],
         theory: `Har kuni biz "issiq", "sovuq", "iliq" so'zlarini ishlatamiz. Lekin fizikada temperatura nima? U faqat "issiqlik darajasi" emas — u molekulalar harakatining o'lchovidir!
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-TEMPERATURA NIMA?
+Temperatura nima?
 
 Fizik ma'noda temperatura — bu moddaning molekulalarining O'RTACHA KINETIK ENERGIYASINING o'lchovi.
 
@@ -24,17 +24,17 @@ Muhim: Temperatura ALOHIDA molekulaning emas, barcha molekulalarning O'RTACHA ki
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-TEMPERATURA SHKALASI
+Temperatura shkalasi
 
 Temperaturani o'lchash uchun turli shkalalar ishlatiladi:
 
-SELSIY SHKALASI (°C)
+Selsiy shkalasi (°C)
 • Taklif qilgan: Anders Selsiy (1742)
 • 0°C — suvning muzlash temperaturasi
 • 100°C — suvning qaynash temperaturasi
 • Kundalik hayotda ishlatiladi
 
-KELVIN SHKALASI (K)
+Kelvin shkalasi (K)
 • Taklif qilgan: Lord Kelvin (Uilyam Tomson)
 • SI tizimida asosiy temperatura birligi
 • 0 K — absolyut nol (eng past mumkin bo'lgan temperatura)
@@ -52,7 +52,7 @@ Misollar:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-ABSOLYUT NOL
+Absolyut nol
 
 Absolyut nol — bu mumkin bo'lgan eng past temperatura.
 
@@ -70,7 +70,7 @@ Olimlar absolyut nolga juda yaqin temperaturalarga erishgan:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-MOLEKULALARNING O'RTACHA KINETIK ENERGIYASI
+Molekulalarning o'rtacha kinetik energiyasi
 
 Ideal gaz molekulasining o'rtacha kinetik energiyasi temperaturaga to'g'ridan-to'g'ri proporsional:
 
@@ -90,7 +90,7 @@ Muhim: Bu formulada molekulaning massasi yo'q! Demak, bir xil temperaturadagi ba
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-TERMOMETRLAR
+Termometrlar
 
 Temperaturani o'lchash asboblari — termometrlar. Turli xillari bor:
 
@@ -101,7 +101,7 @@ Temperaturani o'lchash asboblari — termometrlar. Turli xillari bor:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-TEMPERATURANING AMALIY AHAMIYATI
+Temperaturaning amaliy ahamiyati
 
 • Tibbiyot: Tana harorati — kasallik belgisi (36.6°C — normal)
 • Ob-havo: Havo temperaturasi — kundalik prognoz
@@ -110,7 +110,7 @@ TEMPERATURANING AMALIY AHAMIYATI
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-XULOSA
+Xulosa
 
 1. Temperatura — molekulalarning o'rtacha kinetik energiyasining o'lchovi
 2. T(K) = t(°C) + 273 — Kelvin va Selsiy orasidagi bog'lanish

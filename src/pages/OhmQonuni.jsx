@@ -3,120 +3,64 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, BookOpen, FlaskConical, HelpCircle,
-    Zap, CheckCircle, XCircle, RotateCcw, Trophy, Plus, Trash2
+    Zap, CheckCircle, XCircle, RotateCcw, Trophy, Plus, 
+    Trash2, Info, TrendingUp, ChevronRight, Gauge, Activity
 } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 // ══════════════════════════════════════════════════════════
-//  TAB 1 — NAZARIYA
+//  COMPONENTS & UTILS
 // ══════════════════════════════════════════════════════════
-function NazariyaTab() {
+
+function SectionTitle({ title, icon: Icon }) {
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
-        >
-            {/* Formula card */}
-            <div className="rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-950/60 to-slate-900/80 p-6 text-center">
-                <p className="text-slate-400 text-sm mb-3">Om Qonuni formulasi</p>
-                <div className="inline-flex items-center gap-4 bg-slate-900/80 border border-slate-700 rounded-2xl px-8 py-4">
-                    <span className="text-4xl font-bold font-mono text-blue-400">I</span>
-                    <span className="text-3xl font-bold text-slate-500">=</span>
-                    <div className="flex flex-col items-center">
-                        <span className="text-4xl font-bold font-mono text-yellow-400 border-b-2 border-yellow-400 px-2">U</span>
-                        <span className="text-4xl font-bold font-mono text-red-400 px-2">R</span>
-                    </div>
-                </div>
-                <div className="flex justify-center gap-8 mt-4 text-sm">
-                    <span><span className="text-blue-400 font-bold">I</span> — Tok kuchi (Amper, A)</span>
-                    <span><span className="text-yellow-400 font-bold">U</span> — Kuchlanish (Volt, V)</span>
-                    <span><span className="text-red-400 font-bold">R</span> — Qarshilik (Om, Ω)</span>
-                </div>
-            </div>
-
-            {/* Explanation */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 space-y-3 text-slate-300 text-sm leading-relaxed">
-                <h3 className="text-white font-bold text-lg">📖 Om Qonuni haqida</h3>
-                <p>Georg Simon Ohm (1789–1854) tomonidan kashf etilgan bu qonun elektr zanjirining asosini tashkil etadi.</p>
-                <p>Om Qonuniga ko'ra, <span className="text-yellow-300 font-semibold">o'tkazgichdagi tok kuchi</span> uning uchlaridagi <span className="text-blue-300 font-semibold">kuchlanishga to'g'ri proporsional</span>, <span className="text-red-300 font-semibold">qarshilikka teskari proporsional</span> bo'ladi.</p>
-                <p className="text-slate-400">Misol: Agar kuchlanish <strong className="text-white">12 V</strong> va qarshilik <strong className="text-white">4 Ω</strong> bo'lsa, tok kuchi: <strong className="text-blue-400">I = 12 / 4 = 3 A</strong></p>
-            </div>
-
-            {/* SVG Circuit */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-                <h3 className="text-white font-bold text-base mb-4">⚡ Elektr zanjiri sxemasi</h3>
-                <div className="flex items-center justify-center">
-                    <svg width="380" height="180" viewBox="0 0 380 180">
-                        {/* Wires */}
-                        <path d="M 60 90 L 60 30 L 320 30 L 320 90" stroke="#475569" strokeWidth="2.5" fill="none" />
-                        <path d="M 60 90 L 60 150 L 320 150 L 320 90" stroke="#475569" strokeWidth="2.5" fill="none" />
-
-                        {/* Battery (left side) */}
-                        <rect x="42" y="68" width="36" height="44" rx="4" fill="#1e293b" stroke="#facc15" strokeWidth="1.5" />
-                        <line x1="55" y1="80" x2="65" y2="80" stroke="#facc15" strokeWidth="3" />
-                        <line x1="53" y1="86" x2="67" y2="86" stroke="#facc15" strokeWidth="1.5" />
-                        <line x1="55" y1="92" x2="65" y2="92" stroke="#facc15" strokeWidth="3" />
-                        <line x1="53" y1="98" x2="67" y2="98" stroke="#facc15" strokeWidth="1.5" />
-                        <text x="60" y="126" textAnchor="middle" fill="#facc15" fontSize="10" fontFamily="monospace">BAT</text>
-
-                        {/* Resistor (bottom) */}
-                        <rect x="150" y="136" width="80" height="28" rx="4" fill="#1e293b" stroke="#ef4444" strokeWidth="1.5" />
-                        {[0, 1, 2, 3, 4].map(i => (
-                            <rect key={i} x={158 + i * 14} y={142} width="8" height="16" rx="1" fill="#ef4444" opacity="0.4" />
-                        ))}
-                        <text x="190" y="178" textAnchor="middle" fill="#ef4444" fontSize="10" fontFamily="monospace">R (Ω)</text>
-
-                        {/* Ammeter (right side) */}
-                        <circle cx="320" cy="90" r="22" fill="#1e293b" stroke="#60a5fa" strokeWidth="1.5" />
-                        <text x="320" y="87" textAnchor="middle" fill="#60a5fa" fontSize="14" fontWeight="bold">A</text>
-                        <text x="320" y="100" textAnchor="middle" fill="#94a3b8" fontSize="8">Amper</text>
-
-                        {/* Current arrows */}
-                        {[0, 1, 2].map(i => (
-                            <polygon key={i} points="-5,0 5,0 0,8"
-                                fill="#6366f1" opacity="0.7"
-                                transform={`translate(${100 + i * 60}, 30) rotate(90)`}
-                            />
-                        ))}
-                        <text x="190" y="22" textAnchor="middle" fill="#6366f1" fontSize="10">tok yo'nalishi →</text>
-                    </svg>
-                </div>
-            </div>
-        </motion.div>
+        <h3 className="flex items-center gap-2 text-lg font-bold theme-text mb-4">
+            <Icon size={20} className="text-indigo-500" />
+            {title}
+        </h3>
     );
 }
 
 // ══════════════════════════════════════════════════════════
-//  Ammeter Gauge SVG
+//  Ammeter Gauge Component
 // ══════════════════════════════════════════════════════════
 function AmmeterGauge({ current, maxI = 24 }) {
-    const pct = Math.min(current / maxI, 1);
-    const angle = -130 + pct * 260; // -130° to +130°
-    const rad = (angle * Math.PI) / 180;
-    const cx = 70, cy = 70, r = 52;
-    const nx = cx + r * Math.sin(rad);
-    const ny = cy - r * Math.cos(rad);
-
+    const angle = (current / maxI) * 180 - 180; // -180 to 0 range
     return (
-        <svg width="140" height="110" viewBox="0 0 140 110">
-            {/* Track arc */}
-            <path d={describeArc(70, 70, 52, -130, 130)} stroke="#1e293b" strokeWidth="8" fill="none" strokeLinecap="round" />
-            {/* Colored arc */}
-            <path d={describeArc(70, 70, 52, -130, -130 + pct * 260)} stroke="#6366f1" strokeWidth="8" fill="none" strokeLinecap="round"
-                style={{ transition: 'all 0.3s ease' }} />
-            {/* Needle */}
-            <line x1={cx} y1={cy} x2={nx} y2={ny}
-                stroke="#f1f5f9" strokeWidth="2.5" strokeLinecap="round"
-                style={{ transition: 'all 0.3s ease' }}
-            />
-            <circle cx={cx} cy={cy} r="5" fill="#6366f1" />
-            {/* Value */}
-            <text x="70" y="100" textAnchor="middle" fill="#94a3b8" fontSize="9">Ampermetr</text>
-            <text x="70" y="65" textAnchor="middle" fill="white" fontSize="13" fontWeight="bold" fontFamily="monospace">
-                {current.toFixed(2)}A
-            </text>
-        </svg>
+        <div className="relative w-48 h-28 overflow-hidden flex items-end justify-center">
+            <svg viewBox="0 0 100 60" className="w-full h-full overflow-visible">
+                {/* Background arc */}
+                <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="currentColor" className="theme-text opacity-5" strokeWidth="8" strokeLinecap="round" />
+                {/* Active arc */}
+                <path d={describeArc(50, 50, 40, -90, (current / maxI) * 180 - 90)} fill="none" stroke="#6366f1" strokeWidth="8" strokeLinecap="round" />
+                
+                {/* Scale ticks */}
+                {[0, 6, 12, 18, 24].map(v => {
+                    const tickAngle = (v / maxI) * 180 - 180;
+                    const r1 = 35, r2 = 42;
+                    const x1 = 50 + r1 * Math.cos(tickAngle * Math.PI / 180);
+                    const y1 = 50 + r1 * Math.sin(tickAngle * Math.PI / 180);
+                    const x2 = 50 + r2 * Math.cos(tickAngle * Math.PI / 180);
+                    const y2 = 50 + r2 * Math.sin(tickAngle * Math.PI / 180);
+                    return <line key={v} x1={x1} y1={y1} x2={x2} y2={y2} stroke="currentColor" className="theme-text opacity-20" strokeWidth="1" />;
+                })}
+
+                {/* Needle */}
+                <motion.line
+                    x1="50" y1="50" x2={50 + 38 * Math.cos(angle * Math.PI / 180)} y2={50 + 38 * Math.sin(angle * Math.PI / 180)}
+                    stroke="#4f46e5" strokeWidth="3" strokeLinecap="round"
+                    animate={{ x2: 50 + 38 * Math.cos(angle * Math.PI / 180), y2: 50 + 38 * Math.sin(angle * Math.PI / 180) }}
+                />
+                <circle cx="50" cy="50" r="4" fill="#4f46e5" />
+                <text x="50" y="58" textAnchor="middle" className="theme-text font-black" fontSize="10">AMPERMETR</text>
+            </svg>
+            <div className="absolute bottom-0 left-0 right-0 flex justify-between px-2 text-[8px] font-black theme-muted opacity-50">
+                <span>0A</span><span>24A</span>
+            </div>
+        </div>
     );
 }
+
 function describeArc(x, y, r, startAngle, endAngle) {
     const s = polarToCart(x, y, r, startAngle);
     const e = polarToCart(x, y, r, endAngle);
@@ -133,7 +77,8 @@ function polarToCart(cx, cy, r, angleDeg) {
 // ══════════════════════════════════════════════════════════
 function MiniLineChart({ data }) {
     if (data.length < 2) return (
-        <div className="h-24 flex items-center justify-center text-slate-600 text-xs">
+        <div className="h-32 flex flex-col items-center justify-center theme-muted text-xs gap-3">
+            <Activity size={32} className="opacity-10" />
             Kamida 2 ta o'lchov kerak
         </div>
     );
@@ -145,14 +90,95 @@ function MiniLineChart({ data }) {
         return `${x},${y}`;
     });
     return (
-        <svg width={W} height={H + 10} className="w-full">
-            <polyline points={pts.join(' ')} fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-            {data.map((v, i) => {
-                const x = pad + (i / (data.length - 1)) * (W - pad * 2);
-                const y = H - pad - (v / maxV) * (H - pad * 2);
-                return <circle key={i} cx={x} cy={y} r="4" fill="#818cf8" />;
-            })}
-        </svg>
+        <div className="p-4 rounded-2xl bg-white/5 dark:bg-black/20 border theme-border">
+            <svg width={W} height={H + 10} className="w-full overflow-visible">
+                <defs>
+                    <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#6366f1" stopOpacity="0.3" />
+                        <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
+                    </linearGradient>
+                </defs>
+                <path d={`M ${pts[0]} ${pts.map(p => `L ${p}`).slice(1).join(' ')} L ${pts[pts.length-1].split(',')[0]},${H} L ${pts[0].split(',')[0]},${H} Z`} fill="url(#chartGrad)" />
+                <polyline points={pts.join(' ')} fill="none" stroke="#6366f1" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                {data.map((v, i) => {
+                    const x = pad + (i / (data.length - 1)) * (W - pad * 2);
+                    const y = H - pad - (v / maxV) * (H - pad * 2);
+                    return (
+                        <circle key={i} cx={x} cy={y} r="5" fill="#6366f1" stroke="currentColor" className="theme-text" strokeWidth="2" />
+                    );
+                })}
+            </svg>
+        </div>
+    );
+}
+
+// ══════════════════════════════════════════════════════════
+//  TAB 1 — NAZARIYA
+// ══════════════════════════════════════════════════════════
+function NazariyaTab() {
+    return (
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            
+            {/* Main Formula Card */}
+            <div className="theme-card-premium p-8 text-center relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full -mr-16 -mt-16 blur-2xl transition-all group-hover:bg-indigo-500/20" />
+                <p className="theme-text-secondary text-xs font-bold uppercase tracking-widest mb-4 opacity-70">Om qonuni formulasi</p>
+                <div className="inline-flex items-center gap-4 bg-white/5 dark:bg-black/20 border theme-border rounded-3xl px-12 py-8 shadow-inner backdrop-blur-md">
+                    <span className="text-6xl font-black font-mono text-indigo-500 drop-shadow-sm tracking-tighter">I</span>
+                    <span className="text-4xl font-bold theme-text opacity-40">=</span>
+                    <div className="flex flex-col items-center">
+                        <span className="text-5xl font-black font-mono text-amber-500 border-b-4 border-amber-500/30 px-4 pb-2 mb-2">U</span>
+                        <span className="text-5xl font-black font-mono text-rose-500 px-4 pt-1">R</span>
+                    </div>
+                </div>
+                <div className="flex flex-wrap justify-center gap-4 mt-8">
+                    {[
+                        { l: 'I', c: 'indigo', n: 'Tok kuchi (A)' },
+                        { l: 'U', c: 'amber', n: 'Kuchlanish (V)' },
+                        { l: 'R', c: 'rose', n: 'Qarshilik (Ω)' }
+                    ].map((item, i) => (
+                        <div key={i} className={`flex items-center gap-2 px-3 py-1.5 rounded-xl bg-${item.c}-500/5 border border-${item.c}-500/10`}>
+                            <span className={`text-${item.c}-500 font-black font-mono text-lg`}>{item.l}</span>
+                            <span className="theme-text-secondary text-[11px] font-medium">— {item.n}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Explanation Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="theme-card-premium p-6 space-y-4">
+                    <SectionTitle title="Ta'rif" icon={BookOpen} />
+                    <div className="space-y-4 theme-text-secondary text-sm leading-relaxed">
+                        <p>Georg Simon Ohm (1789–1854) tomonidan kashf etilgan bu qonun elektr zanjirining asosini tashkil etadi.</p>
+                        <div className="p-4 rounded-2xl bg-indigo-500/5 border-l-4 border-indigo-500 italic">
+                            <p className="mb-0 italic font-medium">
+                                Om qonuniga ko'ra, <span className="text-amber-500 font-bold">o'tkazgichdagi tok kuchi</span> uning uchlaridagi <span className="text-indigo-500 font-bold">kuchlanishga to'g'ri proporsional</span>, <span className="text-rose-500 font-bold">qarshilikka teskari proporsional</span> bo'ladi.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="theme-card-premium p-6">
+                    <SectionTitle title="Elektr zanjiri" icon={Zap} />
+                    <div className="flex items-center justify-center p-4 rounded-3xl bg-white/5 dark:bg-black/20 border theme-border min-h-[160px]">
+                        <svg width="240" height="120" viewBox="0 0 240 120">
+                            {/* Wires */}
+                            <rect x="20" y="20" width="200" height="80" rx="12" fill="none" stroke="currentColor" className="theme-text opacity-10" strokeWidth="4" />
+                            {/* Battery */}
+                            <rect x="8" y="40" width="24" height="40" rx="6" fill="currentColor" className="theme-surface" stroke="#facc15" strokeWidth="2" />
+                            <text x="20" y="95" textAnchor="middle" fill="#facc15" fontSize="8" fontWeight="bold">BAT</text>
+                            {/* Resistor */}
+                            <rect x="95" y="90" width="50" height="20" rx="4" fill="currentColor" className="theme-surface" stroke="#ef4444" strokeWidth="2" />
+                            <text x="120" y="118" textAnchor="middle" fill="#ef4444" fontSize="8" fontWeight="bold">R (Ω)</text>
+                            {/* Ammeter */}
+                            <circle cx="220" cy="60" r="15" fill="currentColor" className="theme-surface" stroke="#60a5fa" strokeWidth="2" />
+                            <text x="220" y="65" textAnchor="middle" fill="#60a5fa" fontSize="12" fontWeight="900">A</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </motion.div>
     );
 }
 
@@ -175,147 +201,147 @@ function TajribaTab() {
     };
 
     const clearMeasurements = () => setMeasurements([]);
-
     const chartData = measurements.map(m => m.i);
 
     return (
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                {/* Left side: Visualization */}
+                <div className="theme-card-premium p-8 flex flex-col items-center justify-center gap-8 min-h-[420px]">
+                    <SectionTitle title="Zanjir vizualizatsiyasi" icon={FlaskConical} />
+                    
+                    <div className="relative p-8 rounded-3xl bg-white/5 dark:bg-black/30 border-4 theme-border overflow-hidden shadow-2xl transition-all duration-500 w-full max-w-[300px]">
+                        <svg width="100%" height="100%" viewBox="0 0 200 160" className="w-full">
+                            {/* Rectangle frame wires */}
+                            <rect x="20" y="20" width="160" height="120" rx="12" fill="none" stroke="currentColor" className="theme-text opacity-10" strokeWidth="6" />
 
-            {/* Top row: Sliders + Ammeter */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            {/* Animated current dots */}
+                            <path id="circuitPath" d="M 20 20 L 180 20 L 180 140 L 20 140 Z" fill="none" />
+                            {[0, 0.25, 0.5, 0.75].map((offset, i) => (
+                                <circle key={i} r="6" fill="#6366f1" className="drop-shadow-[0_0_8px_rgba(99,102,241,0.8)]">
+                                    <animateMotion
+                                        dur={`${animDuration}s`}
+                                        repeatCount="indefinite"
+                                        begin={`${offset * animDuration}s`}
+                                    >
+                                        <mpath href="#circuitPath" />
+                                    </animateMotion>
+                                </circle>
+                            ))}
 
-                {/* Sliders */}
-                <div className="space-y-4">
-                    {/* Voltage slider */}
-                    <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
-                        <div className="flex justify-between items-center mb-2">
-                            <span className="text-yellow-400 font-bold text-sm">⚡ Kuchlanish (U)</span>
-                            <span className="text-white font-mono bg-slate-800 px-3 py-1 rounded-lg text-sm font-bold">{voltage} V</span>
-                        </div>
-                        <input type="range" min={1} max={24} step={1} value={voltage}
-                            onChange={e => setVoltage(Number(e.target.value))}
-                            className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-yellow-500 bg-slate-700"
-                        />
-                        <div className="flex justify-between text-slate-600 text-[10px] mt-1"><span>1V</span><span>24V</span></div>
+                            {/* Battery symbol */}
+                            <rect x="8" y="60" width="24" height="40" rx="6" fill="currentColor" className="theme-surface" stroke="#facc15" strokeWidth="2" />
+                            <line x1="14" y1="72" x2="26" y2="72" stroke="#facc15" strokeWidth="4" strokeLinecap="round" />
+                            <line x1="12" y1="80" x2="28" y2="80" stroke="#facc15" strokeWidth="2" strokeLinecap="round" />
+                            
+                            {/* Resistor */}
+                            <rect x="75" y="130" width="50" height="20" rx="4" fill="currentColor" className="theme-surface" stroke="#ef4444" strokeWidth="2" />
+                            {[0, 1, 2].map(i => <rect key={i} x={82 + i * 14} y={134} width="8" height="12" rx="2" fill="#ef4444" opacity="0.4" />)}
+
+                            {/* Ammeter circle on circuit */}
+                            <circle cx="180" cy="80" r="18" fill="currentColor" className="theme-surface" stroke="#60a5fa" strokeWidth="2" />
+                            <text x="180" y="78" textAnchor="middle" fill="#60a5fa" fontSize="12" fontWeight="900">A</text>
+                            <text x="180" y="91" textAnchor="middle" className="theme-text" fontSize="8" fontWeight="bold">{current.toFixed(1)}A</text>
+                        </svg>
                     </div>
 
-                    {/* Resistance slider */}
-                    <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
-                        <div className="flex justify-between items-center mb-2">
-                            <span className="text-red-400 font-bold text-sm">🔴 Qarshilik (R)</span>
-                            <span className="text-white font-mono bg-slate-800 px-3 py-1 rounded-lg text-sm font-bold">{resistance} Ω</span>
-                        </div>
-                        <input type="range" min={1} max={100} step={1} value={resistance}
-                            onChange={e => setResistance(Number(e.target.value))}
-                            className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-red-500 bg-slate-700"
-                        />
-                        <div className="flex justify-between text-slate-600 text-[10px] mt-1"><span>1Ω</span><span>100Ω</span></div>
-                    </div>
-
-                    {/* Result */}
-                    <div className="rounded-2xl border border-indigo-500/40 bg-indigo-950/30 p-4 text-center">
-                        <p className="text-slate-400 text-xs mb-1">Hisoblangan tok kuchi (I = U/R)</p>
-                        <p className="text-4xl font-bold font-mono text-indigo-400">{current.toFixed(2)} <span className="text-2xl text-slate-400">A</span></p>
-                        <p className="text-slate-600 text-xs mt-1">{voltage}V ÷ {resistance}Ω = {current.toFixed(2)}A</p>
-                    </div>
-                </div>
-
-                {/* SVG Circuit + Ammeter */}
-                <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 flex flex-col items-center gap-4">
-                    <h4 className="text-white font-semibold text-sm self-start">Zanjir vizualizatsiyasi</h4>
-
-                    {/* Animated circuit */}
-                    <svg width="200" height="160" viewBox="0 0 200 160">
-                        {/* Rectangle frame wires */}
-                        <rect x="20" y="20" width="160" height="120" rx="4" fill="none" stroke="#334155" strokeWidth="3" />
-
-                        {/* Animated current dots */}
-                        <path id="circuitPath" d="M 20 20 L 180 20 L 180 140 L 20 140 Z" fill="none" />
-                        {[0, 0.25, 0.5, 0.75].map((offset, i) => (
-                            <circle key={i} r="4" fill="#6366f1" opacity="0.8">
-                                <animateMotion
-                                    dur={`${animDuration}s`}
-                                    repeatCount="indefinite"
-                                    begin={`${offset * animDuration}s`}
-                                >
-                                    <mpath href="#circuitPath" />
-                                </animateMotion>
-                            </circle>
-                        ))}
-
-                        {/* Battery symbol */}
-                        <rect x="10" y="60" width="20" height="40" rx="3" fill="#0f172a" stroke="#facc15" strokeWidth="1.5" />
-                        <line x1="14" y1="70" x2="22" y2="70" stroke="#facc15" strokeWidth="2.5" />
-                        <line x1="13" y1="76" x2="23" y2="76" strokeWidth="1.5" stroke="#facc15" />
-                        <line x1="14" y1="82" x2="22" y2="82" stroke="#facc15" strokeWidth="2.5" />
-                        <line x1="13" y1="88" x2="23" y2="88" strokeWidth="1.5" stroke="#facc15" />
-                        <text x="20" y="113" textAnchor="middle" fill="#facc15" fontSize="9">{voltage}V</text>
-
-                        {/* Resistor */}
-                        <rect x="75" y="130" width="50" height="20" rx="3" fill="#0f172a" stroke="#ef4444" strokeWidth="1.5" />
-                        {[0, 1, 2].map(i => <rect key={i} x={81 + i * 14} y={133} width="10" height="14" rx="1" fill="#ef4444" opacity="0.5" />)}
-                        <text x="100" y="160" textAnchor="middle" fill="#ef4444" fontSize="9">{resistance}Ω</text>
-
-                        {/* Ammeter */}
-                        <circle cx="180" cy="80" r="16" fill="#0f172a" stroke="#60a5fa" strokeWidth="1.5" />
-                        <text x="180" y="78" textAnchor="middle" fill="#60a5fa" fontSize="11" fontWeight="bold">A</text>
-                        <text x="180" y="90" textAnchor="middle" fill="#94a3b8" fontSize="7">{current.toFixed(1)}A</text>
-                    </svg>
-
-                    {/* Ammeter gauge */}
                     <AmmeterGauge current={current} maxI={24} />
                 </div>
-            </div>
 
-            {/* Record button */}
-            <div className="flex gap-3">
-                <button
-                    onClick={addMeasurement}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-500/20"
-                >
-                    <Plus size={18} /> O'lchashni Qayd Et
-                </button>
-                <button
-                    onClick={clearMeasurements}
-                    className="px-4 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-400 hover:text-white rounded-xl transition-all"
-                >
-                    <Trash2 size={16} />
-                </button>
-            </div>
+                {/* Right side: Controls & Results */}
+                <div className="space-y-6">
+                    <div className="space-y-4">
+                        <div className="theme-card-premium p-6 shadow-inner">
+                            <div className="flex justify-between items-center mb-4">
+                                <span className="text-amber-500 font-black text-sm uppercase tracking-wider flex items-center gap-2">
+                                    <Zap size={18} /> Kuchlanish (U)
+                                </span>
+                                <span className="theme-text font-black font-mono bg-amber-500/10 border border-amber-500/20 px-4 py-1.5 rounded-xl text-base">
+                                    {voltage} V
+                                </span>
+                            </div>
+                            <input type="range" min={1} max={24} step={1} value={voltage}
+                                onChange={e => setVoltage(Number(e.target.value))}
+                                className="w-full h-3 rounded-2xl appearance-none cursor-pointer accent-amber-500 bg-black/10 dark:bg-white/10 theme-border border"
+                            />
+                        </div>
 
-            {/* Table + Chart */}
-            {measurements.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    {/* Data table */}
-                    <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
-                        <h4 className="text-white font-semibold text-sm mb-3">📋 So'nggi o'lchashlar</h4>
-                        <table className="w-full text-sm">
-                            <thead>
-                                <tr className="border-b border-slate-800">
-                                    <th className="text-left text-slate-500 pb-2 font-medium">#</th>
-                                    <th className="text-right text-yellow-400 pb-2 font-medium">U (V)</th>
-                                    <th className="text-right text-red-400 pb-2 font-medium">R (Ω)</th>
-                                    <th className="text-right text-indigo-400 pb-2 font-medium">I (A)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {measurements.map((m, i) => (
-                                    <tr key={i} className="border-b border-slate-800/50 hover:bg-slate-800/30">
-                                        <td className="py-1.5 text-slate-600">{i + 1}</td>
-                                        <td className="text-right text-slate-300 font-mono">{m.u}</td>
-                                        <td className="text-right text-slate-300 font-mono">{m.r}</td>
-                                        <td className="text-right text-indigo-400 font-mono font-bold">{m.i}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        <div className="theme-card-premium p-6 shadow-inner">
+                            <div className="flex justify-between items-center mb-4">
+                                <span className="text-rose-500 font-black text-sm uppercase tracking-wider flex items-center gap-2">
+                                    <RotateCcw size={18} /> Qarshilik (R)
+                                </span>
+                                <span className="theme-text font-black font-mono bg-rose-500/10 border border-rose-500/20 px-4 py-1.5 rounded-xl text-base">
+                                    {resistance} Ω
+                                </span>
+                            </div>
+                            <input type="range" min={1} max={100} step={1} value={resistance}
+                                onChange={e => setResistance(Number(e.target.value))}
+                                className="w-full h-3 rounded-2xl appearance-none cursor-pointer accent-rose-500 bg-black/10 dark:bg-white/10 theme-border border"
+                            />
+                        </div>
                     </div>
 
-                    {/* Chart */}
-                    <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
-                        <h4 className="text-white font-semibold text-sm mb-3">📈 Tok kuchi grafigi (A)</h4>
+                    <div className="theme-card-premium p-8 text-center border-indigo-500/40 bg-gradient-to-br from-indigo-500/10 to-transparent relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-indigo-500" />
+                        <p className="theme-text-secondary text-xs font-bold uppercase tracking-widest mb-3 opacity-70">O'lchangan Tok Kuchi (I)</p>
+                        <div className="flex items-center justify-center gap-4 mb-3">
+                            <Activity size={48} className="text-indigo-500" />
+                            <p className="text-6xl font-black font-mono text-indigo-500 drop-shadow-sm">
+                                {current.toFixed(2)}
+                            </p>
+                            <span className="text-2xl font-black theme-text opacity-30 mt-4">A</span>
+                        </div>
+                        <div className="inline-flex items-center gap-2 bg-black/5 dark:bg-white/5 px-4 py-2 rounded-2xl border theme-border">
+                            <span className="theme-text font-mono font-bold text-xs">I = {voltage}V / {resistance}Ω</span>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-4">
+                        <button onClick={addMeasurement}
+                            className="flex-1 flex items-center justify-center gap-3 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black transition-all shadow-xl shadow-indigo-600/30 active:scale-[0.99]"
+                        >
+                            <Plus size={22} /> QAYD ETISH
+                        </button>
+                        <button onClick={clearMeasurements}
+                            className="px-5 py-4 theme-surface border theme-border theme-muted hover:theme-text hover:border-rose-500/50 rounded-2xl transition-all"
+                        >
+                            <Trash2 size={22} />
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {measurements.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                    <div className="theme-card-premium p-6">
+                        <SectionTitle title="O'lchashlar jadvali" icon={Plus} />
+                        <div className="overflow-hidden rounded-2xl border theme-border">
+                            <table className="w-full text-sm">
+                                <thead className="bg-black/5 dark:bg-white/5">
+                                    <tr>
+                                        <th className="text-left theme-muted p-3 font-black text-[10px] uppercase">#</th>
+                                        <th className="text-right text-amber-500 p-3 font-black text-[10px] uppercase">U (V)</th>
+                                        <th className="text-right text-indigo-500 p-3 font-black text-[10px] uppercase">I (A)</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y theme-divide">
+                                    {measurements.map((m, i) => (
+                                        <tr key={i} className="hover:bg-indigo-500/5 transition-colors">
+                                            <td className="p-3 theme-muted font-bold">{i + 1}</td>
+                                            <td className="p-3 text-right theme-text font-mono font-bold">{m.u}</td>
+                                            <td className="p-3 text-right text-indigo-500 font-mono font-black">{m.i}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div className="theme-card-premium p-6">
+                        <SectionTitle title="Tok kuchi grafigi" icon={TrendingUp} />
                         <MiniLineChart data={chartData} />
-                        <p className="text-slate-600 text-xs mt-2 text-center">Har bir nuqta — bir o'lchash</p>
                     </div>
                 </div>
             )}
@@ -324,22 +350,22 @@ function TajribaTab() {
 }
 
 // ══════════════════════════════════════════════════════════
-//  TAB 3 — SAVOL-JAVOB (Quiz)
+//  TAB 3 — SAVOL-JAVOB
 // ══════════════════════════════════════════════════════════
 const quizQuestions = [
     {
-        q: "Om Qonuniga ko'ra, kuchlanish 2 baravar oshsa, tok kuchi qanday o'zgaradi?",
-        options: ["2 baravar kamayadi", "O'zgarmaydi", "2 baravar oshadi", "4 baravar oshadi"],
+        q: "Kuchlanish o'zgarmas bo'lganda, qarshilik 2 baravar oshirilsa, tok kuchi qanday o'zgaradi?",
+        options: ["2 baravar oshadi", "2 baravar kamayadi", "O'zgarmaydi", "4 baravar kamayadi"],
+        correct: 1,
+    },
+    {
+        q: "Elektr qarshilik qanday birlikda o'lchanadi?",
+        options: ["Amper", "Volt", "Om", "Vatt"],
         correct: 2,
     },
     {
-        q: "Qarshilik 12 Ω, kuchlanish 24 V bo'lsa, tok kuchi necha Amper?",
-        options: ["0.5 A", "1 A", "2 A", "4 A"],
-        correct: 2,
-    },
-    {
-        q: "Om Qonunini kashf etgan olim kim?",
-        options: ["Albert Eynshteyn", "Nikola Tesla", "Georg Simon Ohm", "Michael Faraday"],
+        q: "O'tkazgichdagi tok kuchi 5 A va qarshilik 10 Ω bo'lsa, kuchlanish necha volt?",
+        options: ["2 V", "0.5 V", "50 V", "15 V"],
         correct: 2,
     },
 ];
@@ -366,107 +392,91 @@ function SavolJavobTab({ onXPEarned }) {
         }
     };
 
-    const handleRetry = () => {
-        setAnswers({});
-        setSubmitted(false);
-        setScore(0);
-        setShowConfetti(false);
-    };
-
-    const allAnswered = Object.keys(answers).length === quizQuestions.length;
-
     return (
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
-
-            {/* Confetti particles */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            
             {showConfetti && (
                 <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
-                    {Array.from({ length: 20 }).map((_, i) => (
+                    {Array.from({ length: 40 }).map((_, i) => (
                         <motion.div key={i}
                             initial={{ x: `${Math.random() * 100}vw`, y: -20, rotate: 0, opacity: 1 }}
                             animate={{ y: '110vh', rotate: 720, opacity: 0 }}
-                            transition={{ duration: 2 + Math.random() * 2, delay: Math.random() * 0.5 }}
-                            className="absolute w-3 h-3 rounded-sm"
+                            transition={{ duration: 2.5 + Math.random() * 2, delay: Math.random() * 0.5 }}
+                            className="absolute w-3 h-3 rounded-full"
                             style={{ background: ['#6366f1', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6'][i % 5] }}
                         />
                     ))}
                 </div>
             )}
 
-            {/* Result banner */}
             {submitted && (
-                <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                    className={`rounded-2xl border p-6 text-center ${score >= 2
-                            ? 'border-emerald-500/40 bg-emerald-950/30'
-                            : 'border-red-500/40 bg-red-950/30'
-                        }`}
-                >
+                <div className={`theme-card-premium p-8 text-center border-2 ${score >= 2 ? 'border-emerald-500/40 bg-emerald-500/5' : 'border-rose-500/40 bg-rose-500/5'}`}>
                     {score >= 2 ? (
                         <>
-                            <Trophy size={48} className="text-yellow-400 mx-auto mb-3" />
-                            <h3 className="text-2xl font-bold text-white mb-1">Ajoyib! 🎉</h3>
-                            <p className="text-slate-300 mb-3">{score}/3 to'g'ri javob</p>
-                            <div className="inline-flex items-center gap-2 bg-indigo-600/30 border border-indigo-500/40 rounded-full px-5 py-2.5">
-                                <Zap size={18} className="text-indigo-400" />
-                                <span className="text-indigo-300 font-bold text-lg">+50 XP Qo'shildi!</span>
+                            <Trophy size={64} className="text-amber-500 mx-auto mb-4" />
+                            <h3 className="text-3xl font-black theme-text mb-2 tracking-tight">Ajoyib! ⚡</h3>
+                            <p className="theme-text-secondary font-medium mb-6">Siz Om qonunini to'liq tushundingiz!</p>
+                            <div className="inline-flex items-center gap-3 bg-indigo-600 text-white rounded-2xl px-8 py-3.5 shadow-xl shadow-indigo-600/30">
+                                <Zap size={20} fill="white" /> <span className="font-black text-xl">+50 XP QO'SHILDI!</span>
                             </div>
                         </>
                     ) : (
                         <>
-                            <XCircle size={48} className="text-red-400 mx-auto mb-3" />
-                            <h3 className="text-xl font-bold text-white mb-1">Qayta urinib ko'ring</h3>
-                            <p className="text-slate-400 mb-4">{score}/3 to'g'ri — kamida 2 ta kerak</p>
-                            <button onClick={handleRetry}
-                                className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold transition-all mx-auto"
+                            <XCircle size={64} className="text-rose-500 mx-auto mb-4" />
+                            <h3 className="text-2xl font-black theme-text mb-2">Qayta o'qib ko'ring</h3>
+                            <p className="theme-text-secondary mb-6">{score}/{quizQuestions.length} to'g'ri — kamida 2 ta kerak</p>
+                            <button onClick={() => { setAnswers({}); setSubmitted(false); setShowConfetti(false); }}
+                                className="px-8 py-3.5 bg-indigo-600 text-white rounded-2xl font-black"
                             >
-                                <RotateCcw size={16} /> Qayta boshlash
+                                QAYTA BOSHLASH
                             </button>
                         </>
                     )}
-                </motion.div>
+                </div>
             )}
 
-            {/* Questions */}
-            {quizQuestions.map((q, qi) => (
-                <div key={qi} className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
-                    <p className="text-white font-semibold mb-4 leading-snug">
-                        <span className="text-indigo-400 font-bold mr-2">{qi + 1}.</span>{q.q}
-                    </p>
-                    <div className="space-y-2">
-                        {q.options.map((opt, oi) => {
-                            const selected = answers[qi] === oi;
-                            const isCorrect = oi === q.correct;
-                            let style = 'border-slate-700 bg-slate-800/50 text-slate-300 hover:border-slate-600';
-                            if (submitted) {
-                                if (isCorrect) style = 'border-emerald-500/60 bg-emerald-950/40 text-emerald-300';
-                                else if (selected && !isCorrect) style = 'border-red-500/60 bg-red-950/40 text-red-300';
-                                else style = 'border-slate-800 bg-slate-900/30 text-slate-600';
-                            } else if (selected) {
-                                style = 'border-indigo-500/60 bg-indigo-950/40 text-indigo-300';
-                            }
-                            return (
-                                <button key={oi} onClick={() => handleAnswer(qi, oi)}
-                                    className={`w-full text-left px-4 py-2.5 rounded-xl border text-sm font-medium transition-all duration-150 flex items-center gap-3 ${style}`}
-                                >
-                                    <span className="w-5 h-5 rounded-full border border-current flex-shrink-0 flex items-center justify-center text-xs">
-                                        {submitted && isCorrect ? '✓' : submitted && selected ? '✗' : opt.charAt(0)}
-                                    </span>
-                                    {opt}
-                                </button>
-                            );
-                        })}
+            <div className="space-y-4">
+                {quizQuestions.map((q, qi) => (
+                    <div key={qi} className="theme-card-premium p-6">
+                        <div className="flex gap-4 mb-6">
+                            <span className="flex-shrink-0 w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center font-black text-indigo-500">
+                                {qi + 1}
+                            </span>
+                            <p className="theme-text font-bold text-[17px] leading-snug pt-1">{q.q}</p>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {q.options.map((opt, oi) => {
+                                const selected = answers[qi] === oi;
+                                const isCorrect = oi === q.correct;
+                                let style = 'theme-surface border-theme-border theme-text hover:border-indigo-500/50 hover:bg-indigo-500/5';
+                                if (submitted) {
+                                    if (isCorrect) style = 'border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400';
+                                    else if (selected && !isCorrect) style = 'border-rose-500 bg-rose-500/10 text-rose-600 dark:text-rose-400 opacity-80';
+                                    else style = 'theme-surface theme-border opacity-40';
+                                } else if (selected) {
+                                    style = 'border-indigo-500 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shadow-md';
+                                }
+                                return (
+                                    <button key={oi} onClick={() => handleAnswer(qi, oi)}
+                                        className={`w-full text-left px-5 py-4 rounded-2xl border-2 text-sm font-bold transition-all flex items-center gap-3 ${style}`}
+                                    >
+                                        <span className={`w-6 h-6 rounded-lg border-2 flex-shrink-0 flex items-center justify-center text-[11px] font-black ${selected ? 'border-current bg-current text-white' : 'border-current opacity-30'}`}>
+                                            {String.fromCharCode(65 + oi)}
+                                        </span>
+                                        {opt}
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
-                </div>
-            ))}
+                ))}
+            </div>
 
             {!submitted && (
-                <button
-                    onClick={handleSubmit}
-                    disabled={!allAnswered}
-                    className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-500/20"
+                <button onClick={handleSubmit} disabled={Object.keys(answers).length < quizQuestions.length}
+                    className="w-full py-5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white rounded-2xl font-black text-lg transition-all shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-3 active:scale-[0.99]"
                 >
-                    {allAnswered ? "Javoblarni Tekshirish →" : `${quizQuestions.length - Object.keys(answers).length} ta savol qoldi`}
+                    JAVOBLARNI TEKSHIRISH <ChevronRight size={20} />
                 </button>
             )}
         </motion.div>
@@ -477,21 +487,24 @@ function SavolJavobTab({ onXPEarned }) {
 //  MAIN PAGE
 // ══════════════════════════════════════════════════════════
 const TABS = [
-    { id: 'nazariya', label: 'Nazariya', icon: <BookOpen size={16} /> },
-    { id: 'tajriba', label: 'Tajriba', icon: <FlaskConical size={16} /> },
-    { id: 'quiz', label: 'Savol-Javob', icon: <HelpCircle size={16} /> },
+    { id: 'nazariya', label: 'Nazariya', icon: <BookOpen size={18} /> },
+    { id: 'tajriba', label: 'Tajriba', icon: <FlaskConical size={18} /> },
+    { id: 'quiz', label: 'Savol-Javob', icon: <HelpCircle size={18} /> },
 ];
 
 export default function OhmQonuni() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('nazariya');
     const [xpEarned, setXpEarned] = useState(false);
-    const [completedTabs, setCompletedTabs] = useState(new Set());
+
+    useEffect(() => {
+        const completed = JSON.parse(localStorage.getItem('completedLabs') || '[]');
+        if (completed.includes('ohm')) setXpEarned(true);
+    }, []);
 
     const handleXPEarned = (amount) => {
         if (xpEarned) return;
         setXpEarned(true);
-        // Save to localStorage
         const completed = JSON.parse(localStorage.getItem('completedLabs') || '[]');
         if (!completed.includes('ohm')) {
             localStorage.setItem('completedLabs', JSON.stringify([...completed, 'ohm']));
@@ -499,63 +512,57 @@ export default function OhmQonuni() {
     };
 
     return (
-        <div className="h-screen overflow-y-auto custom-scrollbar font-sans text-slate-100">
-            <div className="max-w-4xl mx-auto px-6 pb-24 pt-6">
+        <div className="h-screen overflow-y-auto custom-scrollbar theme-bg theme-text font-sans scroll-smooth">
+            <div className="max-w-5xl mx-auto px-6 pb-24 pt-8">
 
-                {/* Header */}
-                <div className="flex items-center gap-4 mb-6">
-                    <button
-                        onClick={() => navigate('/laboratoriya')}
-                        className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group"
+                <div className="flex flex-col md:flex-row md:items-center gap-6 mb-8">
+                    <button onClick={() => navigate('/laboratoriya')}
+                        className="w-12 h-12 rounded-2xl theme-surface border theme-border flex items-center justify-center theme-text-secondary hover:theme-text hover:border-indigo-500 transition-all shadow-sm"
                     >
-                        <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+                        <ArrowLeft size={22} />
                     </button>
-                    <div>
-                        <div className="flex items-center gap-2 text-slate-500 text-xs mb-0.5">
+                    
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2 theme-muted text-[11px] font-black uppercase tracking-widest mb-1.5 opacity-60">
                             <span>Laboratoriya</span>
-                            <span>/</span>
-                            <span className="text-indigo-400">Om Qonuni</span>
+                            <span className="opacity-40">/</span>
+                            <span className="text-blue-500">Elektr</span>
                         </div>
-                        <h1 className="text-xl font-bold text-white flex items-center gap-2">
-                            ⚡ Om Qonuni Laboratoriyasi
+                        <h1 className="text-3xl font-black theme-text tracking-tight flex items-center gap-3">
+                            <span className="w-10 h-10 rounded-2xl bg-blue-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">⚡</span>
+                            Om qonuni laboratoriyasi
                         </h1>
                     </div>
-                    <div className="ml-auto flex items-center gap-2">
-                        <span className="text-xs bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1 rounded-full">Oson</span>
-                        <span className="text-xs bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 px-3 py-1 rounded-full flex items-center gap-1">
-                            <Zap size={11} /> +50 XP
-                        </span>
-                        {xpEarned && (
-                            <span className="text-xs bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-3 py-1 rounded-full flex items-center gap-1">
-                                <CheckCircle size={11} /> Tugallandi
-                            </span>
-                        )}
+
+                    <div className="flex items-center gap-3 self-end md:self-center">
+                        <span className="px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-wider">Oson</span>
+                        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-indigo-600/20">
+                            <Zap size={14} fill="white" /> +50 XP
+                        </div>
+                        {xpEarned && <CheckCircle size={24} className="text-amber-500" />}
                     </div>
                 </div>
 
-                {/* Tab bar */}
-                <div className="flex gap-1 bg-slate-900/80 border border-slate-800 rounded-2xl p-1 mb-6">
-                    {TABS.map(tab => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${activeTab === tab.id
-                                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
-                                    : 'text-slate-400 hover:text-slate-200'
-                                }`}
-                        >
-                            {tab.icon} {tab.label}
-                        </button>
-                    ))}
+                <div className="flex gap-2 theme-surface border theme-border rounded-2xl p-1.5 mb-8 shadow-sm backdrop-blur-md sticky top-0 z-30">
+                    {TABS.map(tab => {
+                        const isActive = activeTab === tab.id;
+                        return (
+                            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                                className={`flex-1 flex items-center justify-center gap-2.5 py-3.5 rounded-xl text-[13px] font-black uppercase tracking-widest transition-all ${isActive ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20' : 'theme-text-secondary hover:theme-text hover:bg-black/5 dark:hover:bg-white/5'}`}
+                            >
+                                <span className={isActive ? 'text-white' : 'text-indigo-500'}>{tab.icon}</span>
+                                {tab.label}
+                            </button>
+                        );
+                    })}
                 </div>
 
-                {/* Tab content */}
                 <AnimatePresence mode="wait">
-                    <div key={activeTab}>
+                    <motion.div key={activeTab} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.3 }}>
                         {activeTab === 'nazariya' && <NazariyaTab />}
                         {activeTab === 'tajriba' && <TajribaTab />}
                         {activeTab === 'quiz' && <SavolJavobTab onXPEarned={handleXPEarned} />}
-                    </div>
+                    </motion.div>
                 </AnimatePresence>
             </div>
         </div>

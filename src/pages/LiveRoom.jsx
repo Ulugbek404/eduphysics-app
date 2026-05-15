@@ -325,13 +325,13 @@ export default function LiveRoom() {
     // ═══════════════════════════════════════════════════════════════════════════
 
     if (phase === 'error') return (
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+        <div className="min-h-screen theme-bg flex items-center justify-center p-4">
             <div className="text-center max-w-sm">
                 <div className="text-6xl mb-4">😵</div>
                 <p className="text-red-400 text-lg font-semibold mb-2">{error}</p>
-                <p className="text-slate-500 text-sm mb-6">Xona kodi noto'g'ri yoki xona o'chirilgan bo'lishi mumkin</p>
+                <p className="theme-muted text-sm mb-6">Xona kodi noto'g'ri yoki xona o'chirilgan bo'lishi mumkin</p>
                 <button onClick={() => navigate('/testlar')}
-                    className="px-6 py-2.5 bg-slate-800 text-white rounded-xl hover:bg-slate-700 transition-all flex items-center gap-2 mx-auto">
+                    className="px-6 py-2.5 theme-card theme-text rounded-xl hover:opacity-80 transition-all flex items-center gap-2 mx-auto border theme-border">
                     <ArrowLeft size={16} /> Testlarga qaytish
                 </button>
             </div>
@@ -339,41 +339,45 @@ export default function LiveRoom() {
     );
 
     if (phase === 'loading') return (
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="min-h-screen theme-bg flex items-center justify-center">
             <div className="text-center space-y-3">
-                <div className="w-16 h-16 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center mx-auto">
-                    <Loader size={28} className="text-indigo-400 animate-spin" />
+                <div className="w-16 h-16 rounded-2xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center mx-auto">
+                    <Loader size={28} className="text-teal-500 animate-spin" />
                 </div>
-                <p className="text-white font-semibold">{t('common').loading || 'Xona yuklanmoqda...'}</p>
-                <p className="text-slate-500 text-sm font-mono">{roomCode}</p>
+                <p className="theme-text font-semibold">{t('common').loading || 'Xona yuklanmoqda...'}</p>
+                <p className="theme-muted text-sm font-mono opacity-60">{roomCode}</p>
             </div>
         </div>
     );
 
     // ═══════ PHASE: JOIN ═══════
     if (phase === 'join' && !joinedRef.current) return (
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
+        <div className="min-h-screen theme-bg flex items-center justify-center p-6">
             <div className="w-full max-w-sm">
                 <div className="text-center mb-8">
                     <div className="text-6xl mb-3">🎮</div>
-                    <h1 className="text-white text-2xl font-bold">{t('live_title') || 'NurFizika Live'}</h1>
-                    <p className="text-indigo-400 font-mono text-xl mt-1 tracking-widest">{roomCode}</p>
-                    {room?.topic && <p className="text-slate-500 text-sm mt-1">{room.topic}</p>}
+                    <h1 className="theme-text text-2xl font-bold">{t('live_title') || 'NurFizika Live'}</h1>
+                    <p className="text-teal-600 dark:text-teal-400 font-mono text-xl mt-1 tracking-widest">{roomCode}</p>
+                    {room?.topic && <p className="theme-muted text-sm mt-1">{room.topic}</p>}
                 </div>
 
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
+                <div className="theme-card border theme-border rounded-2xl p-6 space-y-5 shadow-xl">
                     <div>
-                        <p className="text-slate-400 text-xs mb-2 uppercase tracking-wider">Sizning rangingiz</p>
-                        <div className="flex gap-2 flex-wrap">
+                        <p className="theme-muted text-xs mb-2 uppercase tracking-wider">Sizning rangingiz</p>
+                        <div className="flex gap-2.5 flex-wrap">
                             {AVATAR_COLORS.map(color => (
-                                <div key={color} className="w-8 h-8 rounded-full flex-shrink-0"
-                                    style={{ background: color, border: color === avatarColor ? '2px solid white' : '2px solid transparent' }} />
+                                <button
+                                    key={color}
+                                    onClick={() => {/* if we want to allow selection */}}
+                                    className={`w-8 h-8 rounded-full flex-shrink-0 transition-all duration-200 ${color === avatarColor ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-slate-900 ring-teal-500 scale-110 shadow-lg' : 'opacity-60 hover:opacity-100'}`}
+                                    style={{ background: color }}
+                                />
                             ))}
                         </div>
-                        <p className="text-slate-600 text-xs mt-1.5">Rang avtomatik belgilangan</p>
+                        <p className="theme-muted opacity-60 text-[10px] mt-2 italic">Rang avtomatik belgilangan</p>
                     </div>
 
-                    <div className="flex items-center gap-3 bg-slate-800/80 rounded-xl p-3">
+                    <div className="flex items-center gap-3 theme-surface rounded-xl p-3 border theme-border">
                         <div className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
                             style={{ background: avatarColor }}>
                             {playerName?.[0]?.toUpperCase() || '?'}
@@ -384,13 +388,13 @@ export default function LiveRoom() {
                             placeholder="Ismingizni kiriting"
                             maxLength={20}
                             onKeyDown={e => e.key === 'Enter' && joinRoom(playerName)}
-                            className="bg-transparent text-white flex-1 focus:outline-none placeholder-slate-600 text-sm"
+                            className="bg-transparent theme-text flex-1 focus:outline-none placeholder:theme-muted text-sm"
                         />
                     </div>
 
                     <button onClick={() => joinRoom(playerName)}
                         disabled={!playerName.trim() || joining}
-                        className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-lg rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95">
+                        className="w-full py-4 bg-teal-600 hover:bg-teal-500 text-white font-bold text-lg rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 shadow-lg shadow-teal-500/20">
                         {joining ? `⏳ ${t('live_connecting')}` : `🎮 ${t('live_join_btn')}`}
                     </button>
                 </div>
@@ -400,11 +404,11 @@ export default function LiveRoom() {
 
     // ═══════ PHASE: LOBBY ═══════
     if (phase === 'lobby') return (
-        <div className="min-h-screen bg-slate-950 flex flex-col">
-            <div className="bg-gradient-to-r from-indigo-600 to-violet-600 p-6 text-center">
-                <p className="text-indigo-200 text-xs uppercase tracking-[0.2em] mb-1">{t('live_room_code')}</p>
+        <div className="min-h-screen theme-bg flex flex-col">
+            <div className="bg-gradient-to-r from-teal-600 to-emerald-600 p-6 text-center shadow-lg">
+                <p className="text-teal-100/80 text-xs uppercase tracking-[0.2em] mb-1">{t('live_room_code')}</p>
                 <p className="text-white text-5xl font-bold font-mono tracking-widest">{roomCode}</p>
-                <p className="text-indigo-200 mt-2">
+                <p className="text-teal-50/90 mt-2 text-sm sm:text-base">
                     {room?.topic} • {room?.questionCount || 10} ta {t('tests_questions')}
                     {' • '}{room?.difficulty === 'easy' ? `🟢 ${t('tests_easy')}` : room?.difficulty === 'hard' ? `🔴 ${t('tests_hard')}` : `🟡 ${t('tests_medium')}`}
                 </p>
@@ -413,28 +417,28 @@ export default function LiveRoom() {
             <div className="flex flex-col items-center justify-center py-4 gap-3">
                 {/* Host badge */}
                 {isHost && (
-                    <div className="inline-flex items-center gap-2 bg-indigo-500/20 border border-indigo-500/30 rounded-full px-5 py-2">
-                        <span className="text-indigo-400 font-medium text-sm">👑 Siz — Xona Admini</span>
+                    <div className="inline-flex items-center gap-2 bg-teal-500/10 border border-teal-500/20 rounded-full px-5 py-2">
+                        <span className="text-teal-600 dark:text-teal-400 font-medium text-sm">👑 Siz — Xona Admini</span>
                     </div>
                 )}
                 {/* Player count */}
-                <div className="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-500/30 rounded-full px-5 py-2">
-                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-ping" />
-                    <span className="text-emerald-400 font-medium text-sm">{players.length} {t('live_players').toLowerCase()}</span>
+                <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-5 py-2">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping" />
+                    <span className="text-emerald-600 dark:text-emerald-400 font-medium text-sm">{players.length} {t('live_players').toLowerCase()}</span>
                 </div>
             </div>
 
             <div className="flex-1 p-5 overflow-y-auto">
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 max-w-2xl mx-auto">
                     {players.map(p => (
-                        <div key={p.id} className="bg-slate-900 border border-slate-700/50 rounded-2xl p-4 flex flex-col items-center gap-2">
+                        <div key={p.id} className="theme-card border theme-border rounded-2xl p-4 flex flex-col items-center gap-2 shadow-sm">
                             <div className="w-14 h-14 rounded-full flex items-center justify-center text-white text-2xl font-bold"
-                                style={{ background: p.avatarColor || '#6366f1' }}>
+                                style={{ background: p.avatarColor || '#0d9488' }}>
                                 {p?.name?.[0]?.toUpperCase() || '?'}
                             </div>
-                            <p className="text-white text-xs font-medium text-center truncate w-full">
+                            <p className="theme-text text-xs font-medium text-center truncate w-full">
                                 {p?.name || "O'quvchi"}
-                                {p.uid === user?.uid && <span className="text-indigo-400 text-[10px] block">(Siz)</span>}
+                                {p.uid === user?.uid && <span className="text-teal-500 text-[10px] block">(Siz)</span>}
                             </p>
                         </div>
                     ))}
@@ -442,17 +446,17 @@ export default function LiveRoom() {
             </div>
 
             {isHost ? (
-                <div className="p-5 border-t border-slate-800">
+                <div className="p-5 border-t theme-border theme-card">
                     <button onClick={startGame}
                         disabled={players.length < 1 || generatingQ}
-                        className="w-full py-5 bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-xl rounded-2xl shadow-lg shadow-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-3">
+                        className="w-full py-5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xl rounded-2xl shadow-lg shadow-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-3">
                         {generatingQ
-                            ? <><Loader size={22} className="animate-spin" /> 🤖 AI...</>
+                            ? <><Loader size={22} className="animate-spin" /> 🤖 NurFizika AI...</>
                             : <>▶ {t('live_start')} ({players.length})</>}
                     </button>
                 </div>
             ) : (
-                <div className="p-5 text-center text-slate-400 text-sm border-t border-slate-800">
+                <div className="p-5 text-center theme-muted text-sm border-t theme-border theme-card">
                     ⏳ {t('live_waiting_desc')}
                 </div>
             )}
@@ -461,24 +465,24 @@ export default function LiveRoom() {
 
     // ═══════ PHASE: PLAYING ═══════
     if (phase === 'playing' && currentQuestion) return (
-        <div className="min-h-screen bg-slate-950 flex flex-col">
-            <div className="bg-slate-900 border-b border-slate-800 p-4">
+        <div className="min-h-screen theme-bg flex flex-col">
+            <div className="theme-card border-b theme-border p-4 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
-                    <span className="text-slate-400 text-sm font-medium">{currentQ + 1} / {questions.length}</span>
-                    <div className={`text-5xl font-black font-mono transition-colors ${timeLeft <= 5 ? 'text-red-400 animate-pulse' : 'text-white'}`}>
+                    <span className="theme-muted text-sm font-medium">{currentQ + 1} / {questions.length}</span>
+                    <div className={`text-5xl font-black font-mono transition-colors ${timeLeft <= 5 ? 'text-red-500 animate-pulse' : 'theme-text'}`}>
                         {timeLeft}
                     </div>
-                    <span className="text-slate-400 text-xs">{myScore.toLocaleString()} {t('live_score').toLowerCase()}</span>
+                    <span className="theme-muted text-xs">{myScore.toLocaleString()} {t('live_score').toLowerCase()}</span>
                 </div>
-                <div className="h-2.5 bg-slate-800 rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full transition-all duration-1000 ease-linear ${timeLeft <= 5 ? 'bg-red-500' : 'bg-indigo-500'}`}
+                <div className="h-2.5 theme-surface rounded-full overflow-hidden border theme-border">
+                    <div className={`h-full rounded-full transition-all duration-1000 ease-linear ${timeLeft <= 5 ? 'bg-red-500' : 'bg-teal-500'}`}
                         style={{ width: `${(timeLeft / timeLimit) * 100}%` }} />
                 </div>
             </div>
 
             <div className="flex-1 p-4 sm:p-5 overflow-y-auto">
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-5 text-center">
-                    <p className="text-white text-lg sm:text-xl font-semibold leading-relaxed">{currentQuestion.question}</p>
+                <div className="theme-card border theme-border rounded-2xl p-6 mb-5 text-center shadow-lg">
+                    <p className="theme-text text-lg sm:text-xl font-semibold leading-relaxed">{currentQuestion.question}</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -529,9 +533,9 @@ export default function LiveRoom() {
 
                     {answered && !showCorrect && (
                         <div className="text-center">
-                            <div className="inline-flex items-center gap-2 bg-slate-900 border border-slate-700 rounded-full px-5 py-2.5">
-                                <div className="w-2 h-2 bg-indigo-400 rounded-full animate-ping" />
-                                <span className="text-slate-300 text-sm">
+                            <div className="inline-flex items-center gap-2 theme-card border theme-border rounded-full px-5 py-2.5 shadow-sm">
+                                <div className="w-2 h-2 bg-teal-500 rounded-full animate-ping" />
+                                <span className="theme-muted text-sm">
                                     {room?.answeredCount || 0}/{players.length} javob berdi...
                                 </span>
                             </div>
@@ -539,9 +543,9 @@ export default function LiveRoom() {
                     )}
 
                     {showCorrect && currentQuestion.explanation && (
-                        <div className="bg-slate-900 border border-indigo-500/30 rounded-xl p-4">
-                            <p className="text-indigo-400 font-medium text-sm mb-1">💡 Tushuntirish</p>
-                            <p className="text-slate-300 text-sm">{currentQuestion.explanation}</p>
+                        <div className="theme-card border border-teal-500/30 rounded-xl p-4 shadow-inner">
+                            <p className="text-teal-600 dark:text-teal-400 font-medium text-sm mb-1">💡 Tushuntirish</p>
+                            <p className="theme-text-secondary text-sm">{currentQuestion.explanation}</p>
                         </div>
                     )}
 
@@ -549,13 +553,13 @@ export default function LiveRoom() {
                         <div className="flex gap-3 justify-center pt-1">
                             {!showCorrect && answered && (
                                 <button onClick={showAnswer}
-                                    className="px-6 py-2.5 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold rounded-xl transition-all text-sm">
+                                    className="px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-xl transition-all text-sm shadow-md">
                                     👀 Javobni Ko'rsat
                                 </button>
                             )}
                             {(showCorrect || answered) && (
                                 <button onClick={nextQuestion}
-                                    className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-all flex items-center gap-2 text-sm">
+                                    className="px-6 py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-xl transition-all flex items-center gap-2 text-sm shadow-md">
                                     {currentQ + 1 >= questions.length ? `🏆 ${t('btn_finish')}` : <>{t('btn_next')} <ChevronRight size={16} /></>}
                                 </button>
                             )}
@@ -573,12 +577,12 @@ export default function LiveRoom() {
         const myXP = myRank === 1 ? 150 : myRank === 2 ? 100 : myRank === 3 ? 75 : 50;
 
         return (
-            <div className="min-h-screen bg-slate-950 p-4 sm:p-6 overflow-y-auto">
+            <div className="min-h-screen theme-bg p-4 sm:p-6 overflow-y-auto">
                 <div className="text-center mb-6">
                     <div className="text-6xl mb-2">{MEDALS[myRank - 1] || '🎮'}</div>
-                    <h1 className="text-white text-3xl font-bold">{myRank === 1 ? "G'olib!" : `${myRank}-o'rin`}</h1>
-                    <p className="text-emerald-400 font-bold text-xl mt-1">+{myXP} XP</p>
-                    <p className="text-slate-400 text-sm mt-1">{room?.topic} • {players.length} ta ishtirokchi</p>
+                    <h1 className="theme-text text-3xl font-bold">{myRank === 1 ? "G'olib!" : `${myRank}-o'rin`}</h1>
+                    <p className="text-emerald-500 font-bold text-xl mt-1">+{myXP} XP</p>
+                    <p className="theme-muted text-sm mt-1">{room?.topic} • {players.length} ta ishtirokchi</p>
                 </div>
 
                 {sorted.length >= 2 && (
@@ -586,14 +590,14 @@ export default function LiveRoom() {
                         {[1, 0, 2].map(idx => sorted[idx] && (
                             <div key={idx} className={`text-center ${idx === 0 ? 'flex-[1.3]' : 'flex-1'}`}>
                                 <div className={`rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold shadow-lg ${idx === 0 ? 'w-16 h-16 text-2xl' : 'w-12 h-12 text-xl'}`}
-                                    style={{ background: sorted[idx].avatarColor || '#6366f1' }}>
+                                    style={{ background: sorted[idx].avatarColor || '#0d9488' }}>
                                     {sorted[idx]?.name?.[0]?.toUpperCase() || '?'}
                                 </div>
-                                <p className={`font-medium text-sm truncate ${sorted[idx]?.uid === user?.uid ? 'text-indigo-400' : 'text-white'}`}>
+                                <p className={`font-medium text-sm truncate ${sorted[idx]?.uid === user?.uid ? 'text-teal-600 dark:text-teal-400' : 'theme-text'}`}>
                                     {sorted[idx]?.name || "O'quvchi"}
                                 </p>
-                                <p className="text-slate-400 text-xs">{(sorted[idx].score || 0).toLocaleString()}</p>
-                                <div className={`rounded-t-xl mt-2 flex items-center justify-center text-2xl ${idx === 0 ? 'h-20 bg-yellow-500/20 border border-yellow-500/30' : idx === 1 ? 'h-14 bg-slate-500/20 border border-slate-500/30' : 'h-10 bg-amber-700/20 border border-amber-700/30'}`}>
+                                <p className="theme-muted text-xs">{(sorted[idx].score || 0).toLocaleString()}</p>
+                                <div className={`rounded-t-xl mt-2 flex items-center justify-center text-2xl ${idx === 0 ? 'h-20 bg-amber-500/10 border border-amber-500/30' : idx === 1 ? 'h-14 theme-surface border theme-border' : 'h-10 bg-amber-800/10 border border-amber-800/30'}`}>
                                     {MEDALS[idx === 0 ? 0 : idx === 1 ? 1 : 2]}
                                 </div>
                             </div>
@@ -601,33 +605,33 @@ export default function LiveRoom() {
                     </div>
                 )}
 
-                <div className="bg-indigo-500/10 border-2 border-indigo-500/30 rounded-2xl p-4 mb-4 max-w-md mx-auto flex items-center gap-4">
+                <div className="bg-teal-500/10 border-2 border-teal-500/30 rounded-2xl p-4 mb-4 max-w-md mx-auto flex items-center gap-4">
                     <div className="text-center">
-                        <p className="text-slate-400 text-xs">O'rningiz</p>
-                        <p className="text-indigo-400 text-2xl font-black">#{myRank}</p>
+                        <p className="theme-muted text-xs">O'rningiz</p>
+                        <p className="text-teal-600 dark:text-teal-400 text-2xl font-black">#{myRank}</p>
                     </div>
                     <div className="flex-1">
-                        <p className="text-white font-semibold">{myScore.toLocaleString()} ball</p>
-                        <p className="text-emerald-400 text-sm font-semibold">+{myXP} XP olindi! 🎉</p>
+                        <p className="theme-text font-semibold">{myScore.toLocaleString()} ball</p>
+                        <p className="text-emerald-500 text-sm font-semibold">+{myXP} XP olindi! 🎉</p>
                     </div>
-                    <Zap size={28} className="text-yellow-400" />
+                    <Zap size={28} className="text-amber-500" />
                 </div>
 
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden max-w-md mx-auto mb-6">
+                <div className="theme-card border theme-border rounded-2xl overflow-hidden max-w-md mx-auto mb-6 shadow-sm">
                     {sorted.map((p, i) => (
                         <div key={p.id}
-                            className={`flex items-center gap-3 p-4 border-b border-slate-800/50 last:border-0 ${p.uid === user?.uid ? 'bg-indigo-500/10' : ''}`}>
-                            <span className="text-slate-400 w-6 text-center font-bold text-sm">{MEDALS[i] || i + 1}</span>
+                            className={`flex items-center gap-3 p-4 border-b theme-border last:border-0 ${p.uid === user?.uid ? 'bg-teal-500/10' : ''}`}>
+                            <span className="theme-muted w-6 text-center font-bold text-sm">{MEDALS[i] || i + 1}</span>
                             <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-                                style={{ background: p.avatarColor || '#6366f1' }}>
+                                style={{ background: p.avatarColor || '#0d9488' }}>
                                 {p?.name?.[0]?.toUpperCase() || '?'}
                             </div>
-                            <p className={`flex-1 font-medium text-sm truncate ${p.uid === user?.uid ? 'text-indigo-400' : 'text-white'}`}>
+                            <p className={`flex-1 font-medium text-sm truncate ${p.uid === user?.uid ? 'text-teal-600 dark:text-teal-400' : 'theme-text'}`}>
                                 {p?.name || "O'quvchi"} {p.uid === user?.uid && '(Siz)'}
                             </p>
                             <div className="text-right">
-                                <p className="text-white font-bold text-sm">{(p.score || 0).toLocaleString()}</p>
-                                <p className="text-emerald-400 text-[10px] font-semibold">+{i === 0 ? 150 : i === 1 ? 100 : i === 2 ? 75 : 50} XP</p>
+                                <p className="theme-text font-bold text-sm">{(p.score || 0).toLocaleString()}</p>
+                                <p className="text-emerald-500 text-[10px] font-semibold">+{i === 0 ? 150 : i === 1 ? 100 : i === 2 ? 75 : 50} XP</p>
                             </div>
                         </div>
                     ))}
@@ -635,7 +639,7 @@ export default function LiveRoom() {
 
                 <div className="text-center">
                     <button onClick={() => navigate('/testlar')}
-                        className="px-8 py-3 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl transition-all">
+                        className="px-8 py-3 theme-card theme-text hover:opacity-80 font-semibold rounded-xl transition-all border theme-border">
                         🏠 {t('btn_back')}
                     </button>
                 </div>
@@ -644,8 +648,8 @@ export default function LiveRoom() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-            <Loader size={32} className="text-indigo-400 animate-spin" />
+        <div className="min-h-screen theme-bg flex items-center justify-center">
+            <Loader size={32} className="text-teal-500 animate-spin" />
         </div>
     );
 }

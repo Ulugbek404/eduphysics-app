@@ -52,6 +52,10 @@ export default function LoginPage() {
             setMessage('Email va parolni kiriting');
             return;
         }
+        if (!email.includes('@')) {
+            setMessage('❌ Email @ belgisini o\'z ichiga olishi kerak');
+            return;
+        }
         setIsLoading(true);
         setMessage('');
         try {
@@ -59,19 +63,12 @@ export default function LoginPage() {
             const role = result?.role || 'student';
             navigate(role === 'admin' ? '/admin' : '/dashboard', { replace: true });
         } catch (err) {
-            if (err.message === 'EMAIL_NOT_VERIFIED') {
-                // Verify sahifaga yo'naltirish — u yerda qayta yuborish ham bor
-                navigate('/verify-email', { state: { email } });
-            } else if (err.message?.includes('bloklangan')) {
+            if (err.message?.includes('bloklangan')) {
                 setMessage('🚫 Akkauntingiz bloklangan. Admin bilan bog\'laning.');
-            } else if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-                setMessage('❌ Email yoki parol noto\'g\'ri');
-            } else if (err.code === 'auth/user-not-found') {
-                setMessage('❌ Bu email ro\'yxatdan o\'tmagan!');
             } else if (err.code === 'auth/too-many-requests') {
                 setMessage('⏳ Ko\'p urinish! 5 daqiqadan keyin qayta urining.');
             } else {
-                setMessage('❌ Email yoki parol noto\'g\'ri');
+                setMessage(err.message || '❌ Email yoki parol noto\'g\'ri');
             }
         } finally {
             setIsLoading(false);
@@ -118,20 +115,13 @@ export default function LoginPage() {
         const role = isAdmin ? 'admin' : 'student';
         try {
             const result = await signUpWithEmailAndRole(email, password, displayName, role);
-
-            // Email tasdiqlash kerak (oddiy user)
-            if (result?.needsVerification) {
-                navigate('/verify-email', { state: { email: result.email } });
-                return;
-            }
-
-            // Admin — darhol kirish
+            // Darhol kirish — email tasdiqlash talab etilmaydi
             const finalRole = result?.role || role;
             navigate(finalRole === 'admin' ? '/admin' : '/dashboard', { replace: true });
         } catch (err) {
             setMessage(err.message?.includes('email-already-in-use')
                 ? 'Bu email allaqachon ro\'yxatdan o\'tgan'
-                : 'Xatolik yuz berdi');
+                : err.message || 'Xatolik yuz berdi');
         } finally {
             setIsLoading(false);
         }
@@ -198,15 +188,11 @@ export default function LoginPage() {
                         </div>
                     </div>
                     <div>
-                        <h1 className={`text-4xl font-extrabold tracking-tight mb-3 ${isLight ? 'text-slate-800' : 'bg-gradient-to-r from-blue-400 via-purple-400 to-white bg-clip-text text-transparent'}`}>
+                        <h1 className={`text-4xl font-extrabold tracking-tight mb-2 ${isLight ? 'text-slate-800' : 'bg-gradient-to-r from-blue-400 via-purple-400 to-white bg-clip-text text-transparent'}`}>
                             {t('app_name')}
                         </h1>
                         <p className="text-sm text-yellow-500 italic font-medium mb-2">
                             {t('hero_slogan')}
-                        </p>
-                        <p className={`flex items-center justify-center gap-2 font-medium ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>
-                            {t('hero_badge')}
-                            <Sparkles size={16} className="text-yellow-500" />
                         </p>
                     </div>
                 </div>
@@ -264,8 +250,8 @@ export default function LoginPage() {
                             <form onSubmit={handleEmailSignIn} className="space-y-4">
                                 <Input
                                     label="Email"
-                                    type="email"
-                                    placeholder="emailingiz@example.com"
+                                    type="text"
+                                    placeholder="test@demo yoki emailingiz@gmail.com"
                                     icon={<Mail size={18} />}
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
@@ -320,8 +306,8 @@ export default function LoginPage() {
                                 />
                                 <Input
                                     label="Email"
-                                    type="email"
-                                    placeholder="emailingiz@example.com"
+                                    type="text"
+                                    placeholder="test@demo yoki emailingiz@gmail.com"
                                     icon={<Mail size={18} />}
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}

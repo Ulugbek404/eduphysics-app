@@ -53,11 +53,15 @@ const SplashScreen = ({ onFinish }) => {
                 {/* Tashqi ping halqasi */}
                 <div className="absolute -inset-4 rounded-full border-2 border-indigo-500/20 animate-ping" />
                 {/* O'rta halqa */}
-                <div className="absolute -inset-2 rounded-3xl border border-indigo-500/30 animate-pulse" />
+                <div className="absolute -inset-2 rounded-[2rem] border border-indigo-500/30 animate-pulse" />
 
-                {/* Asosiy ikonka */}
-                <div className="w-28 h-28 rounded-3xl bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center shadow-2xl shadow-indigo-500/50 relative z-10">
-                    <span className="text-6xl">⚡</span>
+                {/* Asosiy ikonka — o'zimizning logo */}
+                <div className="w-28 h-28 rounded-[2rem] overflow-hidden shadow-2xl shadow-indigo-500/50 relative z-10">
+                    <img
+                        src="/icons/icon-512x512.png"
+                        alt="NurFizika"
+                        className="w-full h-full object-cover"
+                    />
                 </div>
             </div>
 
@@ -72,7 +76,7 @@ const SplashScreen = ({ onFinish }) => {
                     Nur<span className="text-indigo-400">Fizika</span>
                 </h1>
                 <p className="text-indigo-400/70 text-sm mt-2 tracking-widest uppercase font-medium">
-                    Kuch — bilimda!
+                    Fizika — yangicha nigohda
                 </p>
             </div>
 

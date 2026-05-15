@@ -92,7 +92,7 @@ export const lessonsData = {
             lessons: [
                 {
                     id: 'elec-1',
-                    title: 'Elektr Zaryadi. Kulon Qonuni',
+                    title: 'Elektr Zaryadi. Kulon qonuni',
                     description: 'Musbat va manfiy zaryadlar, Kulon qonuni',
                     duration: '20 min',
                     xp: 50,

@@ -38,7 +38,7 @@ export default function ChaptersPage() {
     ];
 
     return (
-        <div className="h-screen overflow-y-auto custom-scrollbar font-sans text-slate-100">
+        <div className="h-screen overflow-y-auto custom-scrollbar font-sans theme-bg theme-text">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -50,9 +50,9 @@ export default function ChaptersPage() {
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => navigate('/darsliklar')}
-                            className="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 transition-all border border-slate-700/50 hover:border-slate-600 active:scale-95"
+                            className="p-2.5 rounded-xl theme-card hover:bg-blue-50 transition-all border theme-border active:scale-95"
                         >
-                            <ArrowLeft size={20} className="text-slate-300" />
+                            <ArrowLeft size={20} className="theme-muted" />
                         </button>
                         <BreadcrumbNav items={[{ label: grade.name }]} />
                     </div>
@@ -75,9 +75,8 @@ export default function ChaptersPage() {
                                 <span className="text-5xl">{grade.icon}</span>
                             </div>
                             <div>
-                                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{grade.name}</h1>
-                                <p className="text-white/70 text-lg">{grade.description}</p>
-                                <p className="text-white/50 text-sm mt-2">{t('chapters_uz_standard') || "O'zbekiston Davlat Ta'lim Standarti asosida"}</p>
+                                <h1 className="text-3xl md:text-4xl font-bold text-white-fixed mb-2">{grade.name}</h1>
+                                <p className="text-white-fixed text-base md:text-lg font-bold tracking-wide leading-relaxed max-w-3xl">{grade.description}</p>
                             </div>
                         </div>
 
@@ -97,10 +96,10 @@ export default function ChaptersPage() {
                                     />
                                 </svg>
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <span className="text-2xl font-bold text-white">{overallProgress}%</span>
+                                    <span className="text-2xl font-bold text-white-fixed">{overallProgress}%</span>
                                 </div>
                             </div>
-                            <span className="text-white/60 text-sm font-medium">{t('chapters_overall_progress') || 'Umumiy progress'}</span>
+                            <span className="text-white-fixed text-sm font-bold">{t('chapters_overall_progress') || 'Umumiy progress'}</span>
                         </div>
                     </div>
 
@@ -108,11 +107,11 @@ export default function ChaptersPage() {
                     <div className="relative z-10 px-8 pb-6">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             {stats.map((stat, i) => (
-                                <div key={i} className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/10">
+                                <div key={i} className="flex items-center gap-3 bg-white-fixed/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white-fixed/10">
                                     <div className={`${stat.iconColor}`}>{stat.icon}</div>
                                     <div>
-                                        <div className="text-lg font-bold text-white">{stat.value}</div>
-                                        <div className="text-xs text-white/50">{stat.label}</div>
+                                        <div className="text-xl font-extrabold text-white-fixed">{stat.value}</div>
+                                        <div className="text-xs font-bold text-white-fixed uppercase tracking-wider">{stat.label}</div>
                                     </div>
                                 </div>
                             ))}
@@ -122,8 +121,8 @@ export default function ChaptersPage() {
 
                 {/* Section Title */}
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-white">{t('chapters_sections') || "Bo'limlar"}</h2>
-                    <span className="text-sm text-slate-500">{chapters.length} {t('chapters_count') || 'ta bob'}</span>
+                    <h2 className="text-xl font-bold theme-text">{t('chapters_sections') || "Bo'limlar"}</h2>
+                    <span className="text-sm theme-muted">{chapters.length} {t('chapters_count') || 'ta bob'}</span>
                 </div>
 
                 {/* Chapters Grid */}

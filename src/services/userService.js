@@ -11,7 +11,7 @@ import {
 import { db } from '../firebase';
 import { cachedFetch, clearCache, clearUserCache, setCache, TTL } from '../utils/cache';
 
-// ─── User Ma'lumotlari ────────────────────────────────────────────────────────
+// ─── User ma'lumotlari ────────────────────────────────────────────────────────
 
 /**
  * User progress olish yoki yaratish — CACHE BILAN
@@ -148,7 +148,7 @@ export async function updateStreak(userId) {
     }
 }
 
-// ─── User Ma'lumotlarini Yangilash ───────────────────────────────────────────
+// ─── User ma'lumotlarini Yangilash ───────────────────────────────────────────
 
 export async function updateUserData(userId, updates) {
     try {

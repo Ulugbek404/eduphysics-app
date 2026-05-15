@@ -16,7 +16,7 @@ export const lessonsData = {
             lessons: [
                 {
                     id: 'mech-1',
-                    title: 'Mexanik Harakat. Moddiy Nuqta. Sanoq Sistemasi',
+                    title: 'Mexanik harakat. Moddiy nuqta. Sanoq sistemasi',
                     description: 'Mexanik harakat tushunchasi, moddiy nuqta, sanoq sistemasi',
                     duration: '20 min',
                     xp: 50,
@@ -26,7 +26,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'mech-2',
-                    title: 'Nyuton II - Qonuni',
+                    title: 'Nyuton II - qonuni',
                     description: 'Nyutonning ikkinchi qonuni, F=ma',
                     duration: '25 min',
                     xp: 50,
@@ -36,7 +36,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'mech-3',
-                    title: 'Tabiatdagi Kuchlar. Mexanik Ish va Energiya',
+                    title: 'Tabiatdagi kuchlar. Mexanik ish va energiya',
                     description: 'Gravitatsiya, ishqalanish, mexanik ish, energiya',
                     duration: '30 min',
                     xp: 50,
@@ -46,7 +46,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'mech-4',
-                    title: 'Qattiq Jismlarning Aylanma Harakati Dinamikasi',
+                    title: 'Qattiq jismlarning aylanma harakati dinamikasi',
                     description: 'Aylanma harakat, moment, inersiya momenti',
                     duration: '25 min',
                     xp: 50,
@@ -56,7 +56,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'mech-5',
-                    title: 'Suyuqlik va Gazlar Mexanikasi',
+                    title: 'Suyuqlik va gazlar mexanikasi',
                     description: 'Suyuqliklar va gazlar harakati, bosim',
                     duration: '25 min',
                     xp: 50,
@@ -66,7 +66,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'mech-6',
-                    title: 'Bernulli Tenglamasi',
+                    title: 'Bernulli tenglamasi',
                     description: 'Bernulli tenglamasi va qo\'llanilishi',
                     duration: '20 min',
                     xp: 50,
@@ -91,7 +91,7 @@ export const lessonsData = {
             lessons: [
                 {
                     id: 'osc-1',
-                    title: 'Mexanik Tebranishlar va To\'lqinlar',
+                    title: 'Mexanik tebranishlar va to\'lqinlar',
                     description: 'Tebranish turlari, amplituda, davr, chastota, to\'lqinlar',
                     duration: '25 min',
                     xp: 50,
@@ -101,7 +101,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'osc-2',
-                    title: 'Matematik Mayatnik',
+                    title: 'Matematik mayatnik',
                     description: 'Matematik mayatnik, davr formulasi',
                     duration: '20 min',
                     xp: 50,
@@ -121,7 +121,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'osc-4',
-                    title: 'Rezonans Hodisasi',
+                    title: 'Rezonans hodisasi',
                     description: 'Rezonans, tabiiy chastota',
                     duration: '20 min',
                     xp: 50,
@@ -137,7 +137,7 @@ export const lessonsData = {
         // ========================================
         {
             id: 'molecular',
-            title: 'Molekulyar Fizika',
+            title: 'Molekulyar fizika',
             description: 'Moddaning tuzilishi va issiqlik hodisalari',
             icon: '🔬',
             color: 'green',
@@ -146,7 +146,7 @@ export const lessonsData = {
             lessons: [
                 {
                     id: 'mol-1',
-                    title: 'Ideal Gazni Harakterlovchi Kattaliklar. Gazlarning Molekulyar-Kinetik Nazariyasi',
+                    title: 'Ideal gazni harakterlovchi kattaliklar. Gazlarning molekulyar-kinetik nazariyasi',
                     description: 'Ideal gaz, bosim, hajm, temperatura, molekulyar-kinetik nazariya',
                     duration: '30 min',
                     xp: 50,
@@ -156,7 +156,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'mol-2',
-                    title: 'Mendeleyev-Klapeyron Tenglamasi',
+                    title: 'Mendeleyev-Klapeyron tenglamasi',
                     description: 'Ideal gaz holat tenglamasi',
                     duration: '20 min',
                     xp: 50,
@@ -166,7 +166,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'mol-3',
-                    title: 'Adiabatik Protsess',
+                    title: 'Adiabatik protsess',
                     description: 'Adiabatik jarayon, issiqlik almashinuvisiz',
                     duration: '20 min',
                     xp: 50,
@@ -176,7 +176,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'mol-4',
-                    title: 'Termodinamika Asoslari',
+                    title: 'Termodinamika asoslari',
                     description: 'Termodinamika asosiy tushunchalari',
                     duration: '20 min',
                     xp: 50,
@@ -186,7 +186,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'mol-5',
-                    title: 'Ish va Issiqlik Miqdori. Issiqlik Almashinuvi',
+                    title: 'Ish va issiqlik miqdori. Issiqlik almashinuvi',
                     description: 'Mexanik ish, issiqlik miqdori, issiqlik o\'tkazuvchanlik',
                     duration: '25 min',
                     xp: 50,
@@ -196,7 +196,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'mol-6',
-                    title: 'Termodinamikaning I-Qonuni',
+                    title: 'Termodinamikaning I-qonuni',
                     description: 'Energiyaning saqlanish qonuni',
                     duration: '25 min',
                     xp: 50,
@@ -206,7 +206,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'mol-7',
-                    title: 'Termodinamikaning II-Qonuni',
+                    title: 'Termodinamikaning II-qonuni',
                     description: 'Entropiya, issiqlik dvigatellari FIK',
                     duration: '25 min',
                     xp: 50,
@@ -241,7 +241,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'elec-2',
-                    title: 'Zaryadning Saqlanish Qonuni',
+                    title: 'Zaryadning Saqlanish qonuni',
                     description: 'Elektr zaryadining saqlanish qonuni',
                     duration: '20 min',
                     xp: 50,
@@ -251,7 +251,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'elec-3',
-                    title: 'Kulon Qonuni',
+                    title: 'Kulon qonuni',
                     description: 'Zaryadlar orasidagi o\'zaro ta\'sir kuchi',
                     duration: '25 min',
                     xp: 50,
@@ -261,7 +261,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'elec-4',
-                    title: 'Maydon Potensiali',
+                    title: 'Maydon potensiali',
                     description: 'Elektr maydon potensiali, potensiallar farqi',
                     duration: '25 min',
                     xp: 50,
@@ -271,7 +271,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'elec-5',
-                    title: 'Elektr Maydonda O\'tkazgichlar',
+                    title: 'Elektr maydonda o\'tkazgichlar',
                     description: 'O\'tkazgichlar, elektrostatik induksiya',
                     duration: '25 min',
                     xp: 50,
@@ -307,7 +307,7 @@ export const lessonsData = {
         // ========================================
         {
             id: 'electric-current',
-            title: 'Elektr Toki',
+            title: 'Elektr toki',
             description: 'Elektr toki, zanjir, Om qonuni',
             icon: '🔌',
             color: 'orange',
@@ -316,7 +316,7 @@ export const lessonsData = {
             lessons: [
                 {
                     id: 'curr-1',
-                    title: 'O\'zgarmas Tok',
+                    title: 'O\'zgarmas tok',
                     description: 'O\'zgarmas tok tushunchasi',
                     duration: '15 min',
                     xp: 50,
@@ -326,7 +326,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'curr-2',
-                    title: 'Tok Kuchi',
+                    title: 'Tok kuchi',
                     description: 'Tok kuchi, o\'lchov birligi',
                     duration: '20 min',
                     xp: 50,
@@ -336,7 +336,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'curr-3',
-                    title: 'Tashqi Kuchlar. Elektr Yurituvchi Kuch va Kuchlanish',
+                    title: 'Tashqi kuchlar. Elektr yurituvchi kuch va kuchlanish',
                     description: 'EYK, kuchlanish, potensiallar farqi',
                     duration: '25 min',
                     xp: 50,
@@ -346,7 +346,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'curr-4',
-                    title: 'Om Qonuni va Uning Integral hamda Differentsial Ko\'rinishlari',
+                    title: 'Om qonuni va uning integral hamda differentsial ko\'rinishlari',
                     description: 'Om qonuni, integral va differentsial shakllar',
                     duration: '25 min',
                     xp: 50,
@@ -366,7 +366,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'curr-6',
-                    title: 'Kirxgof Qoidalari. Joul-Lens Qonuni',
+                    title: 'Kirxgof qoidalari. Joul-Lens qonuni',
                     description: 'Kirxgof qoidalari, issiqlik ajralishi',
                     duration: '25 min',
                     xp: 50,
@@ -376,7 +376,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'curr-7',
-                    title: 'Elektrolitlarda Elektr Toki. Elektroliz Qonunlari',
+                    title: 'Elektrolitlarda elektr toki. Elektroliz qonunlari',
                     description: 'Elektroliz, ionlar harakati',
                     duration: '20 min',
                     xp: 50,
@@ -386,7 +386,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'curr-8',
-                    title: 'Faradeyning I va II Qonunlari',
+                    title: 'Faradeyning I va II qonunlari',
                     description: 'Elektroliz qonunlari, Faraday doimiysi',
                     duration: '20 min',
                     xp: 50,
@@ -421,7 +421,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'emag-2',
-                    title: 'Magnit Maydon. Magnit Maydonini Harakterlovchi Kattaliklar',
+                    title: 'Magnit maydon. Magnit maydonini harakterlovchi kattaliklar',
                     description: 'Magnit maydon, magnit induksiya, magnit oqimi',
                     duration: '20 min',
                     xp: 50,
@@ -441,7 +441,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'emag-4',
-                    title: 'Elektr Tokining Magnit Maydoni. Amper Qonuni va Lorens Kuchi',
+                    title: 'Elektr tokining magnit maydoni. Amper qonuni va Lorens kuchi',
                     description: 'Amper qonuni, Lorens kuchi, tok o\'tkazgichga ta\'sir',
                     duration: '30 min',
                     xp: 50,
@@ -451,7 +451,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'emag-5',
-                    title: 'Bio-Savar-Laplas Qonuni',
+                    title: 'Bio-Savar-Laplas qonuni',
                     description: 'Magnit maydon kuchlanganligini hisoblash',
                     duration: '25 min',
                     xp: 50,
@@ -461,7 +461,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'emag-6',
-                    title: 'Elektromagnit Induksiya',
+                    title: 'Elektromagnit induksiya',
                     description: 'Faradey qonuni, induksiya EYK',
                     duration: '25 min',
                     xp: 50,
@@ -481,7 +481,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'emag-8',
-                    title: 'Elektromagnit To\'lqinlar',
+                    title: 'Elektromagnit to\'lqinlar',
                     description: 'Elektromagnit to\'lqinlar, Maksvell nazariyasi',
                     duration: '25 min',
                     xp: 50,
@@ -506,7 +506,7 @@ export const lessonsData = {
             lessons: [
                 {
                     id: 'opt-1',
-                    title: 'Yorug\'likning Tabiati',
+                    title: 'Yorug\'likning tabiati',
                     description: 'Yorug\'lik to\'lqin va zarracha xossalari',
                     duration: '25 min',
                     xp: 50,
@@ -516,7 +516,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'opt-2',
-                    title: 'Yorug\'likning Sinish Qonunlari',
+                    title: 'Yorug\'likning sinish qonunlari',
                     description: 'Sinish qonuni, sindirish ko\'rsatkichi',
                     duration: '25 min',
                     xp: 50,
@@ -526,7 +526,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'opt-3',
-                    title: 'Optik Tolalar. Meditsina Qurilmalari',
+                    title: 'Optik tolalar. Meditsina qurilmalari',
                     description: 'Optik tolalar, tibbiyotda qo\'llanilishi',
                     duration: '20 min',
                     xp: 50,
@@ -546,7 +546,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'opt-5',
-                    title: 'Yorug\'lik Interferentsiyasi',
+                    title: 'Yorug\'lik interferentsiyasi',
                     description: 'Interferentsiya hodisasi, kogerent to\'lqinlar',
                     duration: '25 min',
                     xp: 50,
@@ -556,7 +556,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'opt-6',
-                    title: 'Yorug\'lik Interferentsiyasini Hosil Qilish Usullari',
+                    title: 'Yorug\'lik interferentsiyasini hosil qilish usullari',
                     description: 'Yung tajribasi, interferentsiya manzarasi',
                     duration: '25 min',
                     xp: 50,
@@ -566,7 +566,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'opt-7',
-                    title: 'Yorug\'lik Difraktsiyasi',
+                    title: 'Yorug\'lik difraktsiyasi',
                     description: 'Difraktsiya hodisasi, Frenel va Fraungofer difraktsiyasi',
                     duration: '25 min',
                     xp: 50,
@@ -576,7 +576,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'opt-8',
-                    title: 'Gyuygens Printsipi',
+                    title: 'Gyuygens printsipi',
                     description: 'Gyuygens printsipi, to\'lqin fronti',
                     duration: '20 min',
                     xp: 50,
@@ -586,7 +586,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'opt-9',
-                    title: 'Yagona Tirqish yoki Disk Orqali Difraktsiya',
+                    title: 'Yagona tirqish yoki disk orqali difraktsiya',
                     description: 'Tirqishda difraktsiya, difraktsion panjara',
                     duration: '20 min',
                     xp: 50,
@@ -602,7 +602,7 @@ export const lessonsData = {
         // ========================================
         {
             id: 'atomic',
-            title: 'Atom Fizikasi',
+            title: 'Atom fizikasi',
             description: 'Atom tuzilishi, radioaktivlik, yadro fizikasi',
             icon: '⚛️',
             color: 'cyan',
@@ -611,7 +611,7 @@ export const lessonsData = {
             lessons: [
                 {
                     id: 'atom-1',
-                    title: 'Atom Tuzilishi',
+                    title: 'Atom tuzilishi',
                     description: 'Atom modellari, elektron, proton, neytron',
                     duration: '20 min',
                     xp: 50,
@@ -621,7 +621,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'atom-2',
-                    title: 'Rezerfordning Modeli',
+                    title: 'Rezerfordning modeli',
                     description: 'Rezerford tajribasi, atom yadrosi',
                     duration: '25 min',
                     xp: 50,
@@ -631,7 +631,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'atom-3',
-                    title: 'Atomning Yadro Modeli Yaratilishi',
+                    title: 'Atomning yadro modeli yaratilishi',
                     description: 'Yadro modeli, zaryadlar taqsimoti',
                     duration: '25 min',
                     xp: 50,
@@ -641,7 +641,7 @@ export const lessonsData = {
                 },
                 {
                     id: 'atom-4',
-                    title: 'Bor Postulatlari',
+                    title: 'Bor postulatlari',
                     description: 'Bor nazariyasi, kvant shartlari, energiya sathlar',
                     duration: '30 min',
                     xp: 50,

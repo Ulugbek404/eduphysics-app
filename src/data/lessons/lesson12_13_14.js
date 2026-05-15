@@ -3,14 +3,14 @@ export const lesson12 = {
     id: '9-l-31', chapter_id: '9-ch-02',
     title: 'Izoxorik jarayon',
     description: "Sharl qonuni — o'zgarmas hajmda bosim va temperatura bog'liqligi.",
-    order_number: 12, duration_minutes: 45, video_url: 'https://www.youtube.com/embed/dN4v7ra6B-A', has_lab: false, test_count: 6, difficulty: 'medium',
+    order_number: 12, duration_minutes: 45, video_url: '', has_lab: false, test_count: 6, difficulty: 'medium',
     content: {
         key_concepts: ['Izoxorik jarayon', 'Sharl qonuni', 'P-T diagramma (izoxora)', 'Bosim va temperatura proporsional'],
         theory: `Uchinchi va oxirgi izojarayonni o'rganamiz — IZOXORIK JARAYON. Bu safar hajm o'zgarmas.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-IZOXORIK JARAYON NIMA?
+Izoxorik jarayon nima?
 
 Izoxorik jarayon — bu hajm o'zgarmas qolgan (V = const) holda bosim va temperaturaning o'zgarishi.
 
@@ -22,7 +22,7 @@ Qachon sodir bo'ladi? — Yopiq, qattiq idishda gaz qizdirilganda yoki sovutilga
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-SHARL QONUNI
+Sharl qonuni
 
 Bu qonunni fransuz fizigi Jak Sharl 1787 yilda kashf etgan.
 
@@ -41,7 +41,7 @@ DIQQAT: Temperatura KELVIN da bo'lishi SHART!
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-GRAFIK — IZOXORA
+Grafik — izoxora
 
 P-T diagrammada izoxorik jarayon TO'G'RI CHIZIQ shaklida chiziladi (0 nuqtadan boshlangan).
 
@@ -55,7 +55,7 @@ V-T diagrammada: gorizontal chiziq (V o'zgarmaydi)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-HAYOTIY MISOLLAR
+Hayotiy misollar
 
 1. Avtomobil shinasi: Uzoq yo'l yurib, shina qiziganda — bosim oshadi (V ≈ const)
 2. Yopiq idishdagi gaz balloni: Qizdirish xavfli — bosim oshadi, portlashi mumkin!
@@ -66,7 +66,7 @@ HAYOTIY MISOLLAR
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-UCHTA IZOJARAYONNI SOLISHTIRISH
+Uchta izojarayonni solishtirish
 
 | Jarayon | O'zgarmas | Qonun | Formula | Grafik (asosiy) |
 |---------|-----------|-------|---------|-----------------|
@@ -76,7 +76,7 @@ UCHTA IZOJARAYONNI SOLISHTIRISH
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-XULOSA
+Xulosa
 • Izoxorik: V = const
 • P/T = const (Sharl)
 • P va T to'g'ridan proporsional
@@ -111,20 +111,20 @@ export const lesson13 = {
     id: '9-l-32', chapter_id: '9-ch-02',
     title: "Amaliy mashg'ulot: Molekula o'lchamini baholash",
     description: "Laboratoriya ishi — oddiy tajriba orqali molekula o'lchamini taxminiy aniqlash.",
-    order_number: 13, duration_minutes: 45, video_url: 'https://www.youtube.com/embed/kZPqSFBVjrY', has_lab: true, test_count: 5, difficulty: 'medium',
+    order_number: 13, duration_minutes: 45, video_url: '', has_lab: true, test_count: 5, difficulty: 'medium',
     content: {
         key_concepts: ["Molekula o'lchamini tajribada aniqlash", "Moy tomchisi usuli", "Ilmiy metod", "Tajriba natijalarini tahlil"],
         theory: `Bu darsda amaliy tajriba o'tkazamiz — oddiy usullar bilan molekula o'lchamini baholaymiz!
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-MAQSAD
+Maqsad
 
 Moy tomchisining suvda tarqalishini kuzatib, oleyin kislotasi molekulasining taxminiy o'lchamini aniqlash.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-NAZARIY ASOS
+Nazariy asos
 
 Moy suvga tomizilganda u yupqa qatlam bo'lib tarqaladi. Agar moy bir molekula qalinligida tarqalsa, biz molekulaning o'lchamini hisoblashimiz mumkin.
 
@@ -136,7 +136,7 @@ Formulalar:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-ZARUR ASBOBLAR
+Zarur asboblar
 
 1. Keng idish (diameter 20-30 cm) — suv uchun
 2. Oleyin kislotasi yoki o'simlik moyi
@@ -148,7 +148,7 @@ ZARUR ASBOBLAR
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-TAJRIBA TARTIBI
+Tajriba tartibi
 
 1-QADAM: Eritma tayyorlash
 • Oleyin kislotani spirtda eritamiz (1:200 nisbatda)
@@ -175,7 +175,7 @@ TAJRIBA TARTIBI
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-NAMUNAVIY NATIJALAR
+Namunaviy natijalar
 
 Misol:
 • V_tomchi = 0.02 mL = 2 × 10⁻⁸ m³ (eritma 1:200, toza moy hajmi ≈ 10⁻¹⁰ m³)
@@ -187,14 +187,14 @@ Bu natija haqiqiy qiymatga yaqin (oleyin kislotasi ~2-3 nm).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-XAVFSIZLIK QOIDALARI
+Xavfsizlik qoidalari
 • Oleyin kislotani ehtiyotkorlik bilan ishlating
 • Spirt yonuvchan — olovdan uzoq!
 • Tajribadan keyin qo'llarni yuvish
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-XULOSA
+Xulosa
 
 Bu oddiy tajriba bizga:
 1. Molekulalar juda kichikligini isbotlaydi (~10⁻⁹-10⁻¹⁰ m)
@@ -226,14 +226,14 @@ export const lesson14 = {
     id: '9-l-33', chapter_id: '9-ch-02',
     title: "Yakuniy masalalar va takrorlash",
     description: "Barcha mavzulardan yakuniy masalalar yechish va bobni takrorlash.",
-    order_number: 14, duration_minutes: 50, video_url: 'https://www.youtube.com/embed/ZFrwBd41MZI', has_lab: false, test_count: 10, difficulty: 'hard',
+    order_number: 14, duration_minutes: 50, video_url: '', has_lab: false, test_count: 10, difficulty: 'hard',
     content: {
         key_concepts: ['Barcha formulalarni qo\'llash', 'Murakkab masalalar', "Bilimlarni mustahkamlash", "Imtihonga tayyorgarlik"],
         theory: `Bu yakuniy darsda I bob (Molekulyar-kinetik nazariya) bo'yicha barcha mavzularni takrorlaymiz va turli darajadagi masalalar yechamiz.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-BARCHA FORMULALAR
+Barcha formulalar
 
 1. MOLEKULA VA MOL:
    • m₀ = M/NA — bir molekula massasi
@@ -260,7 +260,7 @@ BARCHA FORMULALAR
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-DOIMIYLAR
+Doimiylar
 
 • NA = 6.02 × 10²³ mol⁻¹
 • R = 8.314 J/(mol·K)
@@ -268,7 +268,7 @@ DOIMIYLAR
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-OSON MASALALAR
+Oson masalalar
 
 1. Azot atomining massasi (M = 14 g/mol)
    m₀ = M/NA = 0.014/6.02×10²³ = 2.33×10⁻²⁶ kg
@@ -280,7 +280,7 @@ OSON MASALALAR
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-O'RTA MASALALAR
+O'rta masalalar
 
 4. 2 mol O₂ 27°C da 0.02 m³ da. Bosim?
    P = νRT/V = 2×8.314×300/0.02 = 249420 Pa ≈ 2.46 atm
@@ -293,7 +293,7 @@ O'RTA MASALALAR
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-QIYIN MASALALAR
+Qiyin masalalar
 
 7. 10 L idishda 27°C da kislorod, bosim 5 atm. Shu idishga 32 g kislorod qo'shilsa (T o'zgarmaydi), bosim qancha bo'ladi?
    n₁ = P₁V/(RT) = 5×101325×0.01/(8.314×300) = 2.03 mol
@@ -302,7 +302,7 @@ QIYIN MASALALAR
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-IMTIHONGA MASLAHATLAR
+Imtihonga maslahatlar
 
 1. Formulalarni yod oling — tushunib yod oling, mexanik emas
 2. Birliklarni doimo tekshiring (kg, m³, Pa, K)

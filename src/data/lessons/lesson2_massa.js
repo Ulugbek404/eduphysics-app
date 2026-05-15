@@ -8,7 +8,7 @@ export const lesson2 = {
     description: "Avogadro soni, molyar massa, bir molekulaning massasini hisoblash va molekulalar sonini aniqlash.",
     order_number: 2,
     duration_minutes: 50,
-    video_url: 'https://www.youtube.com/embed/YXBlRPlKOv0',
+    video_url: '',
     has_lab: false,
     test_count: 8,
     difficulty: 'medium',
@@ -28,7 +28,7 @@ Molekulalar juda kichik bo'lgani uchun ularni oddiy tarozida o'lchab bo'lmaydi. 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-AVOGADRO SONI
+Avogadro soni
 
 Italiyalik olim Amedeo Avogadro (1776-1856) moddalar bilan ishlashda muhim tushunchani kiritdi.
 
@@ -44,7 +44,7 @@ Avogadro soni tabiiy doimiylardan biri bo'lib, u barcha moddalar uchun bir xil. 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-MOL NIMA?
+Mol nima?
 
 Mol — xalqaro birliklar tizimida (SI) modda miqdorining o'lchov birligi.
 
@@ -56,7 +56,7 @@ Mol — bu o'nlab, yuzlab kabi sanash birligi, faqat juda katta miqdorlar uchun:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-MOLYAR MASSA
+Molyar massa
 
 Molyar massa (M) — 1 mol moddaning massasi.
 
@@ -76,7 +76,7 @@ Murakkab molekulalar uchun molyar massani atomlar massasini qo'shib topamiz:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-BIR MOLEKULANING MASSASI
+Bir molekulaning massasi
 
 Bir molekulaning massasini quyidagi formula bilan topamiz:
 
@@ -94,7 +94,7 @@ Ko'ryapsizmi, molekula massasi juda kichik!
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-MOLEKULALAR SONINI HISOBLASH
+Molekulalar sonini hisoblash
 
 Berilgan massadagi molekulalar sonini topish formulasi:
 
@@ -112,7 +112,7 @@ Boshqa foydali formulalar:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-MOLEKULANING O'LCHAMI
+Molekulaning o'lchami
 
 Molekulalar juda kichik, ularni oddiy ko'z bilan ko'rib bo'lmaydi.
 
@@ -133,7 +133,7 @@ Amaliy usullar bilan molekula o'lchamini aniqlash:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-ASOSIY XULOSA
+Asosiy xulosa
 
 1. Avogadro soni NA = 6.02 × 10²³ mol⁻¹ — 1 moldagi zarrachalar soni
 2. Molyar massa M — 1 mol moddaning massasi (g/mol)

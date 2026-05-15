@@ -237,7 +237,7 @@ export default function TestsModule() {
             {recentResults.length > 0 && (
                 <div>
                     <h2 className="text-white font-bold text-lg mb-3 flex items-center gap-2">
-                        📊 So'nggi Natijalar
+                        📊 So'nggi natijalar
                     </h2>
                     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                         {recentResults.map(r => (

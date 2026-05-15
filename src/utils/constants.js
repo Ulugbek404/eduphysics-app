@@ -6,7 +6,7 @@
 // App Information
 export const APP_NAME = 'NurFizika';
 export const APP_SLOGAN = 'Kuch — bilimda, bilim — bizda!';
-export const APP_DESCRIPTION = 'AI-powered Fizika Platformasi';
+export const APP_DESCRIPTION = 'AI-powered fizika platformasi';
 export const APP_VERSION = '1.0.0';
 
 // Routes

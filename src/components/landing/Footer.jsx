@@ -39,11 +39,7 @@ const Footer = () => {
     ];
 
     return (
-        <footer className={`border-t transition-colors duration-300 ${
-            isLight
-                ? 'bg-slate-100 border-slate-200'
-                : 'bg-slate-950 border-slate-800'
-        }`}>
+        <footer className="border-t transition-colors duration-300 theme-bg-secondary theme-border">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 {/* Main Footer Content */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
@@ -58,7 +54,7 @@ const Footer = () => {
                             </span>
                             <span className="text-sm text-yellow-500 italic">{t('hero_slogan')}</span>
                         </div>
-                        <p className={`mb-4 leading-relaxed ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>
+                        <p className="mb-4 leading-relaxed theme-muted">
                             {t('footer_desc')}
                         </p>
 
@@ -89,11 +85,7 @@ const Footer = () => {
                                 <li key={index}>
                                     <Link
                                         to={link.path}
-                                        className={`text-sm transition-colors ${
-                                            isLight
-                                                ? 'text-slate-600 hover:text-blue-600'
-                                                : 'text-slate-400 hover:text-blue-400'
-                                        }`}
+                                        className="text-sm transition-colors theme-muted hover:text-teal-600 dark:hover:text-teal-400"
                                     >
                                         {link.label}
                                     </Link>
@@ -104,7 +96,7 @@ const Footer = () => {
 
                     {/* Company Links */}
                     <div>
-                        <h3 className={`font-bold mb-4 ${isLight ? 'text-slate-800' : 'text-white'}`}>
+                        <h3 className="font-bold mb-4 theme-text">
                             {t('footer_support')}
                         </h3>
                         <ul className="space-y-2">
@@ -112,11 +104,7 @@ const Footer = () => {
                                 <li key={index}>
                                     <Link
                                         to={link.path}
-                                        className={`text-sm transition-colors ${
-                                            isLight
-                                                ? 'text-slate-600 hover:text-blue-600'
-                                                : 'text-slate-400 hover:text-blue-400'
-                                        }`}
+                                        className="text-sm transition-colors theme-muted hover:text-teal-600 dark:hover:text-teal-400"
                                     >
                                         {link.label}
                                     </Link>
@@ -127,7 +115,7 @@ const Footer = () => {
 
                     {/* Resources Links */}
                     <div>
-                        <h3 className={`font-bold mb-4 ${isLight ? 'text-slate-800' : 'text-white'}`}>
+                        <h3 className="font-bold mb-4 theme-text">
                             {t('footer_legal')}
                         </h3>
                         <ul className="space-y-2">
@@ -135,11 +123,7 @@ const Footer = () => {
                                 <li key={index}>
                                     <Link
                                         to={link.path}
-                                        className={`text-sm transition-colors ${
-                                            isLight
-                                                ? 'text-slate-600 hover:text-blue-600'
-                                                : 'text-slate-400 hover:text-blue-400'
-                                        }`}
+                                        className="text-sm transition-colors theme-muted hover:text-teal-600 dark:hover:text-teal-400"
                                     >
                                         {link.label}
                                     </Link>
@@ -150,10 +134,10 @@ const Footer = () => {
                 </div>
 
                 {/* Divider */}
-                <div className={`border-t pt-8 ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
+                <div className="border-t pt-8 theme-border">
                     <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                         {/* Copyright */}
-                        <div className={`text-sm ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>
+                        <div className="text-sm theme-muted">
                             © {currentYear} {t('app_name')}. {t('footer_rights')}.
                         </div>
 
@@ -164,11 +148,7 @@ const Footer = () => {
                                 href="https://eduphysics-app.web.app"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className={`flex items-center gap-3 p-2 rounded-xl border transition-colors group ${
-                                    isLight
-                                        ? 'bg-white border-slate-200 hover:border-blue-400'
-                                        : 'bg-slate-900/80 border-slate-700 hover:border-blue-500/50'
-                                }`}
+                                className="flex items-center gap-3 p-2 rounded-xl border transition-colors group theme-surface theme-border hover:border-teal-500/50"
                             >
                                 <img
                                     src="/qr-code.jpg"
@@ -176,10 +156,10 @@ const Footer = () => {
                                     className="w-10 h-10 bg-white p-1 rounded-lg group-hover:scale-105 transition-transform"
                                 />
                                 <div className="hidden sm:block text-left">
-                                    <p className={`text-xs font-medium ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
+                                    <p className="text-xs font-medium theme-text">
                                         Telefoningizda
                                     </p>
-                                    <p className={`text-[10px] ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+                                    <p className="text-[10px] theme-muted">
                                         ochish uchun skanerlang
                                     </p>
                                 </div>
@@ -195,11 +175,7 @@ const Footer = () => {
                                             href={social.url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 ${
-                                                isLight
-                                                    ? 'bg-slate-200 text-slate-600 hover:bg-blue-600 hover:text-white'
-                                                    : 'bg-slate-800 text-slate-400 hover:bg-blue-600 hover:text-white'
-                                            }`}
+                                            className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 theme-surface theme-text hover:bg-teal-600 hover:text-white"
                                             aria-label={social.label}
                                         >
                                             <Icon size={18} />

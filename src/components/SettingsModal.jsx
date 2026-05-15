@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Settings, User, Info, Moon, Sun, Monitor, Volume2, VolumeX, Palette, Atom, Camera, Sparkles, Save, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Settings, User, Info, Moon, Sun, Monitor, Volume2, VolumeX, Palette, Atom, Camera, Sparkles, Save, ChevronRight, ChevronLeft, Mail } from 'lucide-react';
 import { Button } from './ui/Button';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function SettingsModal({ show, onClose, user, theme, setTheme, soundEnabled, setSoundEnabled, updateProfile }) {
+    const { t } = useLanguage();
     const [currentView, setCurrentView] = useState('list'); // 'list', 'general', 'profile', 'about'
     const [displayName, setDisplayName] = useState(user?.displayName || '');
     const [selectedImage, setSelectedImage] = useState(null);
@@ -119,7 +121,7 @@ export default function SettingsModal({ show, onClose, user, theme, setTheme, so
                         <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
                             <Info size={22} />
                         </div>
-                        <span className="font-bold text-lg">Haqida</span>
+                        <span className="font-bold text-lg">{t('settings_about')}</span>
                     </div>
                     <ChevronRight size={20} className="text-slate-500 group-hover:translate-x-1 transition-transform" />
                 </button>
@@ -256,41 +258,165 @@ export default function SettingsModal({ show, onClose, user, theme, setTheme, so
     // ABOUT VIEW
     const renderAboutView = () => (
         <div className="animate-slideInRight">
-            <Header title="Dastur Haqida" onBack={() => setCurrentView('list')} />
+            <Header title={t('settings_about')} onBack={() => setCurrentView('list')} />
 
-            <div className="space-y-6 text-center pt-4 px-1">
-                <div className="p-8 bg-gradient-to-br from-blue-600/10 to-purple-600/10 rounded-3xl border border-blue-500/20">
-                    <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center shadow-xl mb-6 animate-pulse-slow">
-                        <Atom size={48} className="text-white animate-spin-slow" />
+            <div className="space-y-5 px-1">
+                {/* Combined App + Developer Card */}
+                <div className="bg-gradient-to-br from-blue-600/10 to-purple-600/10 border border-blue-500/20 rounded-2xl overflow-hidden">
+                    <div className="flex items-stretch">
+                        {/* Left — NurFizika */}
+                        <div className="flex-1 flex flex-col items-center justify-center p-4 border-r border-blue-500/20">
+                            <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-xl border-2 border-blue-400/30 mb-2">
+                                <img
+                                    src="/assets/nurfizika.jpg"
+                                    alt="NurFizika Logo"
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                            <h2 className="text-base font-bold mb-0.5">NurFizika</h2>
+                            <p className="text-xs text-slate-400 italic mb-1.5 text-center">{t('settings_slogan')}</p>
+                            <span className="text-xs text-blue-400 font-semibold bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-full">NurFizika 1.0</span>
+                        </div>
+
+                        {/* Right — Developer */}
+                        <div className="flex-1 flex flex-col items-center justify-center p-4">
+                            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-indigo-500/60 shadow-lg mb-2">
+                                <img
+                                    src="/assets/1776146852544.png"
+                                    alt="Ulugbek Roziboyev"
+                                    className="w-full h-full object-cover object-top"
+                                />
+                            </div>
+                            <p className="text-white font-bold text-sm mb-0.5 text-center">Ulug'bek Ro'ziboyev</p>
+                            <p className="text-indigo-400 text-xs text-center">{t('settings_dev_role')}</p>
+                            <p className="text-slate-400 text-xs text-center">{t('settings_dev_desc')}</p>
+                        </div>
                     </div>
-                    <h2 className="text-2xl font-bold mb-2">NurFizika</h2>
-                    <p className="text-sm text-slate-400 italic">Kuch — bilimda, bilim — bizda!</p>
-                    <p className="text-blue-400 font-medium mb-6">9-Sinf Fizika O'quv Platformasi</p>
-                    <p className="text-sm text-slate-400 leading-relaxed max-w-sm mx-auto">
-                        Ushbu ilova o'quvchilarga fizikani qiziqarli va interaktiv usulda o'rganishga yordam beradi.
-                        AI yordamchisi, virtual laboratoriya va testlar bilimingizni mustahkamlash uchun xizmat qiladi.
-                    </p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-slate-800 rounded-2xl border border-slate-700">
-                        <div className="text-xs text-slate-400 mb-1 uppercase tracking-wider">Versiya</div>
-                        <div className="font-bold text-lg">2.5.0</div>
-                    </div>
-                    <div className="p-4 bg-slate-800 rounded-2xl border border-slate-700">
-                        <div className="text-xs text-slate-400 mb-1 uppercase tracking-wider">Tuzuvchi</div>
-                        <div className="font-bold text-lg">Ulugbek R.</div>
+                {/* Legal Documents */}
+                <div>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider px-1 mb-3">{t('settings_legal_title')}</p>
+                    <div className="space-y-2">
+                        {[
+                            { label: t('settings_offer'), view: 'oferta', icon: '📄' },
+                            { label: t('settings_privacy'), view: 'maxfiylik', icon: '🔒' },
+                            { label: t('settings_consent'), view: 'rozilik', icon: '📋' },
+                        ].map((item) => (
+                            <button
+                                key={item.view}
+                                onClick={() => setCurrentView(item.view)}
+                                className="w-full flex items-center justify-between p-4 bg-slate-800/80 hover:bg-slate-800 rounded-2xl transition-all group border border-slate-700/50"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <span className="text-lg">{item.icon}</span>
+                                    <span className="font-medium text-sm text-left text-white">{item.label}</span>
+                                </div>
+                                <ChevronRight size={18} className="text-slate-500 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                            </button>
+                        ))}
                     </div>
                 </div>
 
-                <div className="pt-8">
-                    <p className="text-xs text-slate-600">
-                        &copy; 2026 NurFizika. Barcha huquqlar himoyalangan.
-                    </p>
+                {/* Social Media */}
+                <div>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider px-1 mb-3">{t('settings_social')}</p>
+                    <div className="grid grid-cols-4 gap-3">
+                        {[
+                            {
+                                name: 'Telegram', url: 'https://t.me/+sRohecqH4KVlYjli', color: 'from-sky-500 to-blue-600',
+                                icon: <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                            },
+                            {
+                                name: 'Instagram', url: 'https://www.instagram.com/nurfizika', color: 'from-pink-500 to-purple-600',
+                                icon: <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                            },
+                            {
+                                name: 'YouTube', url: 'https://www.youtube.com/@NurFizika', color: 'from-red-500 to-red-600',
+                                icon: <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current"><path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>
+                            },
+                            {
+                                name: 'Facebook', url: 'https://www.facebook.com/share/18bRKT6BbK/', color: 'from-blue-600 to-blue-700',
+                                icon: <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                            },
+                        ].map((social) => (
+                            <a
+                                key={social.name}
+                                href={social.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`flex flex-col items-center gap-2 p-3 rounded-2xl bg-gradient-to-br ${social.color} text-white hover:opacity-90 active:scale-95 transition-all shadow-lg`}
+                            >
+                                {social.icon}
+                                <span className="text-xs font-medium">{social.name}</span>
+                            </a>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Contact Email */}
+                <a
+                    href="mailto:nurfizikasupport@gmail.com"
+                    className="flex items-center gap-3 p-4 bg-slate-800/80 hover:bg-slate-800 rounded-2xl border border-slate-700/50 transition-all group"
+                >
+                    <div className="p-2.5 bg-blue-500/10 rounded-xl text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                        <Mail size={20} />
+                    </div>
+                    <div>
+                        <div className="text-xs text-slate-400 mb-0.5">{t('settings_contact')}</div>
+                        <div className="text-sm font-medium text-blue-400">nurfizikasupport@gmail.com</div>
+                    </div>
+                </a>
+
+                <div className="text-center text-xs text-slate-600 pb-2">
+                    {t('settings_copyright')}
                 </div>
             </div>
         </div>
     );
+
+    // LEGAL DOCUMENT VIEW (reusable)
+    const renderLegalView = (title, paragraphs) => (
+        <div className="animate-slideInRight">
+            <Header title={title} onBack={() => setCurrentView('about')} />
+            <div className="space-y-4 px-1 pb-6">
+                {paragraphs.map((p, i) => (
+                    <div key={i} className="bg-slate-800/60 rounded-2xl p-4 border border-slate-700/50">
+                        {p.heading && <h4 className="font-bold text-white mb-2 text-sm flex items-center gap-2"><span className="w-1.5 h-1.5 bg-blue-500 rounded-full inline-block"></span>{p.heading}</h4>}
+                        <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-line">{p.text}</p>
+                    </div>
+                ))}
+                <div className="text-center text-xs text-slate-600 pt-2">{t('settings_copyright')}</div>
+            </div>
+        </div>
+    );
+
+    // OMMAVIY OFERTA VIEW
+    const renderOfertaView = () => renderLegalView(t('legal_offer_title'), [
+        { heading: t('offer_item1_head'), text: t('offer_item1_text') },
+        { heading: t('offer_item2_head'), text: t('offer_item2_text') },
+        { heading: t('offer_item3_head'), text: t('offer_item3_text') },
+        { heading: t('offer_item4_head'), text: t('offer_item4_text') },
+        { heading: t('offer_item5_head'), text: t('offer_item5_text') },
+    ]);
+
+    // MAXFIYLIK SIYOSATI VIEW
+    const renderMaxfiylikView = () => renderLegalView(t('legal_privacy_title'), [
+        { heading: t('priv_item1_head'), text: t('priv_item1_text') },
+        { heading: t('priv_item2_head'), text: t('priv_item2_text') },
+        { heading: t('priv_item3_head'), text: t('priv_item3_text') },
+        { heading: t('priv_item4_head'), text: t('priv_item4_text') },
+        { heading: t('priv_item5_head'), text: t('priv_item5_text') },
+    ]);
+
+    // ROZILIK VIEW
+    const renderRozilikView = () => renderLegalView(t('legal_consent_title'), [
+        { heading: t('cons_item1_head'), text: t('cons_item1_text') },
+        { text: t('cons_item2_text') },
+        { heading: t('cons_item3_head'), text: t('cons_item3_text') },
+        { heading: t('cons_item4_head'), text: t('cons_item4_text') },
+        { heading: t('cons_item5_head'), text: t('cons_item5_text') },
+    ]);
 
     return (
         <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-md flex items-center justify-center md:p-4 animate-fadeIn">
@@ -302,6 +428,9 @@ export default function SettingsModal({ show, onClose, user, theme, setTheme, so
                     {currentView === 'general' && renderGeneralView()}
                     {currentView === 'profile' && renderProfileView()}
                     {currentView === 'about' && renderAboutView()}
+                    {currentView === 'oferta' && renderOfertaView()}
+                    {currentView === 'maxfiylik' && renderMaxfiylikView()}
+                    {currentView === 'rozilik' && renderRozilikView()}
                 </div>
             </div>
         </div>

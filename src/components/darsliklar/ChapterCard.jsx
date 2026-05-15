@@ -21,7 +21,7 @@ export default function ChapterCard({ chapter, progress = 0 }) {
 
     return (
         <Link to={`/darsliklar/${grade_id}/${id}`} className="block h-full">
-            <div className="h-full flex flex-col bg-slate-800/60 backdrop-blur-sm border border-slate-700/60 rounded-2xl overflow-hidden hover:border-slate-500/80 transition-all duration-300 hover:shadow-xl hover:shadow-black/20 group">
+            <div className="h-full flex flex-col theme-card border theme-border rounded-2xl overflow-hidden hover:border-blue-400/60 dark:hover:border-slate-500/80 transition-all duration-300 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/20 group">
 
                 {/* Color Strip Top */}
                 <div className={`h-1.5 bg-gradient-to-r ${colors.gradient}`} />
@@ -51,26 +51,26 @@ export default function ChapterCard({ chapter, progress = 0 }) {
 
                     {/* Content */}
                     <div className="flex-1 mb-5">
-                        <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">
+                        <h3 className="text-xl font-bold theme-text mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors">
                             {name}
                         </h3>
-                        <p className="text-sm text-slate-400 line-clamp-2 leading-relaxed">
+                        <p className="text-sm theme-muted line-clamp-2 leading-relaxed">
                             {description}
                         </p>
                     </div>
 
                     {/* Stats Row */}
                     <div className="grid grid-cols-3 gap-2 mb-5">
-                        <div className="flex items-center gap-1.5 text-slate-400 text-xs bg-slate-900/40 p-2.5 rounded-xl">
-                            <Book size={13} className="text-blue-400 flex-shrink-0" />
+                        <div className="flex items-center gap-1.5 theme-muted text-xs bg-gray-100 dark:bg-slate-900/40 p-2.5 rounded-xl">
+                            <Book size={13} className="text-blue-500 dark:text-blue-400 flex-shrink-0" />
                             <span>{lessonsCount} {t('lessons_count_word') || 'ta dars'}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 text-slate-400 text-xs bg-slate-900/40 p-2.5 rounded-xl">
-                            <Trophy size={13} className="text-yellow-400 flex-shrink-0" />
+                        <div className="flex items-center gap-1.5 theme-muted text-xs bg-gray-100 dark:bg-slate-900/40 p-2.5 rounded-xl">
+                            <Trophy size={13} className="text-yellow-500 dark:text-yellow-400 flex-shrink-0" />
                             <span>{total_tests || 0} {t('tests_count_word') || 'ta test'}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 text-slate-400 text-xs bg-slate-900/40 p-2.5 rounded-xl">
-                            <FlaskConical size={13} className="text-purple-400 flex-shrink-0" />
+                        <div className="flex items-center gap-1.5 theme-muted text-xs bg-gray-100 dark:bg-slate-900/40 p-2.5 rounded-xl">
+                            <FlaskConical size={13} className="text-purple-500 dark:text-purple-400 flex-shrink-0" />
                             <span>{total_labs || 0} {t('labs_count_word') || 'ta tajriba'}</span>
                         </div>
                     </div>
@@ -78,10 +78,10 @@ export default function ChapterCard({ chapter, progress = 0 }) {
                     {/* Progress Bar */}
                     <div className="mb-5">
                         <div className="flex justify-between items-center mb-2">
-                            <span className="text-xs text-slate-500">{t('common_progress') || 'Progress'}</span>
+                            <span className="text-xs theme-muted">{t('common_progress') || 'Progress'}</span>
                             <span className={`text-xs font-bold ${colors.text}`}>{progress}%</span>
                         </div>
-                        <div className="w-full bg-slate-700/40 h-2 rounded-full overflow-hidden">
+                        <div className="w-full bg-gray-200 dark:bg-slate-700/40 h-2 rounded-full overflow-hidden">
                             <div
                                 className={`h-full bg-gradient-to-r ${colors.gradient} rounded-full transition-all duration-1000`}
                                 style={{ width: `${progress}%` }}

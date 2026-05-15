@@ -22,21 +22,21 @@ export default function LessonItem({ lesson, index, isLocked, isCompleted }) {
     if (isLocked) {
         return (
             <div className="opacity-50 cursor-not-allowed">
-                <div className="flex items-center gap-4 p-4 bg-slate-800/20 border border-slate-800/50 rounded-2xl">
-                    <div className="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-slate-800/60 rounded-xl border border-slate-700/50">
-                        <Lock size={18} className="text-slate-600" />
+                <div className="flex items-center gap-4 p-4 theme-card border theme-border rounded-2xl">
+                    <div className="flex-shrink-0 w-11 h-11 flex items-center justify-center theme-card rounded-xl border theme-border">
+                        <Lock size={18} className="theme-muted" />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h4 className="text-base font-semibold text-slate-500 truncate">
+                        <h4 className="text-base font-semibold theme-muted truncate">
                             {index + 1}. {title}
                         </h4>
-                        <div className="flex items-center gap-3 mt-1 text-sm text-slate-600">
+                        <div className="flex items-center gap-3 mt-1 text-sm theme-muted">
                             <span className="flex items-center gap-1">
                                 <Clock size={12} /> {duration_minutes} daq
                             </span>
                         </div>
                     </div>
-                    <span className="text-xs font-medium text-slate-600 bg-slate-800/40 px-3 py-1.5 rounded-lg">
+                    <span className="text-xs font-medium theme-muted theme-card border theme-border px-3 py-1.5 rounded-lg">
                         🔒 {t('locked') || 'Ochilmagan'}
                     </span>
                 </div>
@@ -47,8 +47,8 @@ export default function LessonItem({ lesson, index, isLocked, isCompleted }) {
     return (
         <Link to={`/darsliklar/${gradeId}/${chapter_id}/${id}`} className="block group">
             <div className={`flex items-center gap-4 p-4 rounded-2xl border transition-all duration-200 hover:shadow-lg ${isCompleted
-                ? 'bg-green-500/5 border-green-500/20 hover:border-green-500/40 hover:shadow-green-500/5'
-                : 'bg-slate-800/50 border-slate-700/60 hover:border-blue-500/40 hover:bg-slate-800/80 hover:shadow-blue-500/5'
+                ? 'bg-emerald-50 dark:bg-green-500/5 border-emerald-300 dark:border-green-500/20 hover:border-emerald-400 dark:hover:border-green-500/40 hover:shadow-emerald-500/10'
+                : 'theme-card theme-border hover:border-blue-400/50 dark:hover:border-blue-500/40 hover:shadow-blue-500/5'
                 }`}>
 
                 {/* Status Icon */}
@@ -62,24 +62,26 @@ export default function LessonItem({ lesson, index, isLocked, isCompleted }) {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                        <span className={`text-xs font-bold px-2 py-0.5 rounded-md ${isCompleted ? 'bg-green-500/15 text-green-400' : 'bg-blue-500/10 text-blue-400'
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded-md ${isCompleted ? 'bg-emerald-100 dark:bg-green-500/15 text-emerald-700 dark:text-green-400' : 'bg-blue-100 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400'
                             }`}>
                             {t('common_lesson') || 'Dars'} {index + 1}
                         </span>
                         {isCompleted && (
-                            <span className="flex items-center gap-1 text-[10px] font-bold text-green-400 bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20">
-                                <Star size={10} /> {(t('completed_word') || 'TUGATILDI').toUpperCase()}
+                            <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-green-400 bg-emerald-100 dark:bg-green-500/10 px-2 py-0.5 rounded border border-emerald-300 dark:border-green-500/20">
+                                <Star size={10} /> {t('completed_word') || 'Tugatildi'}
                             </span>
                         )}
                     </div>
-                    <h4 className={`text-base font-semibold truncate ${isCompleted ? 'text-green-300' : 'text-white group-hover:text-blue-300'
+                    <h4 className={`text-base font-semibold truncate ${isCompleted
+                        ? 'text-emerald-700 dark:text-green-300'
+                        : 'theme-text group-hover:text-blue-600 dark:group-hover:text-blue-300'
                         } transition-colors`}>
                         {title}
                     </h4>
 
-                    <div className="flex items-center gap-3 mt-1.5 text-xs text-slate-400">
+                    <div className="flex items-center gap-3 mt-1.5 text-xs theme-muted">
                         <span className="flex items-center gap-1">
-                            <Clock size={12} className="text-slate-500" /> {duration_minutes} {t('common_minutes') || 'daqiqa'}
+                            <Clock size={12} className="opacity-60" /> {duration_minutes} {t('common_minutes') || 'daqiqa'}
                         </span>
                         {test_count > 0 && (
                             <span className="flex items-center gap-1">
@@ -96,12 +98,12 @@ export default function LessonItem({ lesson, index, isLocked, isCompleted }) {
 
                 {/* Right Side */}
                 {isCompleted ? (
-                    <div className="hidden sm:flex flex-col items-center gap-1 bg-green-500/10 px-3 py-2 rounded-xl border border-green-500/20">
-                        <span className="text-xs text-slate-500">{t('common_score') || 'Ball'}</span>
-                        <span className="text-lg font-bold text-green-400">{lesson.score || 90}%</span>
+                    <div className="hidden sm:flex flex-col items-center gap-1 bg-emerald-50 dark:bg-green-500/10 px-3 py-2 rounded-xl border border-emerald-200 dark:border-green-500/20">
+                        <span className="text-xs theme-muted">{t('common_score') || 'Ball'}</span>
+                        <span className="text-lg font-bold text-emerald-600 dark:text-green-400">{lesson.score || 90}%</span>
                     </div>
                 ) : (
-                    <div className="p-2.5 rounded-xl bg-slate-700/40 text-slate-400 group-hover:bg-blue-500 group-hover:text-white transition-all duration-200">
+                    <div className="p-2.5 rounded-xl bg-gray-100 dark:bg-slate-700/40 theme-muted group-hover:bg-blue-500 group-hover:text-white transition-all duration-200">
                         <ChevronRight size={18} />
                     </div>
                 )}

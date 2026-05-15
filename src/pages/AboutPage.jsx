@@ -126,25 +126,25 @@ const AboutPage = () => {
                             {[
                                 {
                                     icon: <Brain className="w-8 h-8" />,
-                                    title: "AI Shaxsiy Ustoz",
+                                    title: "AI shaxsiy ustoz",
                                     description: "Har bir o'quvchi uchun individual yondashuv va shaxsiy o'rganish rejasi",
                                     color: "blue"
                                 },
                                 {
                                     icon: <Zap className="w-8 h-8" />,
-                                    title: "Virtual Laboratoriya",
+                                    title: "Virtual laboratoriya",
                                     description: "Xavfsiz va interaktiv tajribalar o'tkazish imkoniyati",
                                     color: "purple"
                                 },
                                 {
                                     icon: <BookOpen className="w-8 h-8" />,
-                                    title: "50+ Interaktiv Darslar",
+                                    title: "50+ interaktiv darslar",
                                     description: "To'liq 9-sinf fizika dasturi bo'yicha batafsil darslar",
                                     color: "pink"
                                 },
                                 {
                                     icon: <Trophy className="w-8 h-8" />,
-                                    title: "100+ Test Savollari",
+                                    title: "100+ test savollari",
                                     description: "Turli darajadagi test savollari va amaliy mashqlar",
                                     color: "yellow"
                                 },
@@ -156,7 +156,7 @@ const AboutPage = () => {
                                 },
                                 {
                                     icon: <Users className="w-8 h-8" />,
-                                    title: "Butunlay Bepul",
+                                    title: "Butunlay bepul",
                                     description: "Hech qanday to'lov yoki yashirin xarajatlarsiz",
                                     color: "red"
                                 }
@@ -185,10 +185,10 @@ const AboutPage = () => {
                     <div className="container mx-auto px-4">
                         <div className="grid md:grid-cols-4 gap-8 max-w-6xl mx-auto">
                             {[
-                                { number: "1000+", label: "Faol Foydalanuvchilar" },
-                                { number: "50+", label: "Interaktiv Darslar" },
-                                { number: "100+", label: "Test Savollari" },
-                                { number: "20+", label: "Virtual Tajribalar" }
+                                { number: "1000+", label: "Faol foydalanuvchilar" },
+                                { number: "50+", label: "Interaktiv darslar" },
+                                { number: "100+", label: "Test savollari" },
+                                { number: "20+", label: "Virtual tajribalar" }
                             ].map((stat, index) => (
                                 <motion.div
                                     key={index}
@@ -227,7 +227,7 @@ const AboutPage = () => {
                                 to="/register"
                                 className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl hover:from-blue-500 hover:to-purple-500 transition-all transform hover:scale-105 shadow-lg shadow-blue-500/50"
                             >
-                                Bepul Boshlash
+                                Bepul boshlash
                                 <ArrowRight className="w-5 h-5" />
                             </Link>
                         </motion.div>

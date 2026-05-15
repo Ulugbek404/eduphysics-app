@@ -60,10 +60,10 @@ const ProgressOverview = () => {
             {/* Header with Level Badge */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-2xl font-bold text-white mb-1">
+                    <h2 className="text-2xl font-bold theme-text mb-1">
                         O'rganish Progressi
                     </h2>
-                    <p className="text-slate-400">
+                    <p className="theme-text-secondary">
                         Sizning yutuqlaringiz va statistikangiz
                     </p>
                 </div>

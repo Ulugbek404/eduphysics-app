@@ -8,7 +8,7 @@ export const lesson1 = {
     description: "Molekulyar-kinetik nazariyaning asosiy g'oyalari, Browncha harakati, diffuziya hodisasi va moddaning uch holati.",
     order_number: 1,
     duration_minutes: 45,
-    video_url: 'https://www.youtube.com/embed/-_62S8WmEzc',
+    video_url: '',
     has_lab: true,
     test_count: 5,
     difficulty: 'easy',
@@ -34,7 +34,7 @@ Bu nazariya Molekulyar-kinetik nazariya deb ataladi.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-MOLEKULYAR-KINETIK NAZARIYANING ASOSIY QOIDALARI
+Molekulyar-kinetik nazariyaning asosiy qoidalari
 
 Molekulyar-kinetik nazariya (MKN) — bu moddalarning tuzilishi va xossalarini molekulalar va atomlarning harakati orqali tushuntiradigan nazariya.
 
@@ -92,7 +92,7 @@ Bu kuchlarning nisbati moddaning holatini belgilaydi:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-BROWNCHA HARAKATI
+Browncha harakati
 
 1827-yil. Ingliz botanik Robert Brown mikroskop ostida suvdagi gulchangning zarrachalarini kuzatardi. U ajablanarli narsani ko'rdi: kichik zarrachalar tartibsiz tebranib, zigzag yo'llar bo'ylab harakatlanardi!
 
@@ -110,7 +110,7 @@ Natija: Tartibsiz, to'xtamaydigan harakat!
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-DIFFUZIYA
+Diffuziya
 
 Xonada atr purkaganingizda, bir necha soniyadan keyin butun xona hid bilan to'ladi. Bu qanday sodir bo'ladi?
 
@@ -118,7 +118,7 @@ Bu diffuziya hodisasi!
 
 Diffuziya — bir moddaning molekulalarining boshqa modda molekulalari orasiga o'z-o'zidan kirib borishi.
 
-Diffuziya Qonuniyatlari:
+Diffuziya qonuniyatlari:
 
 1. Temperatura ortsa, diffuziya tezlashadi
    • Issiq choyda shakar tezroq eriydi
@@ -139,7 +139,7 @@ Hayotiy Misollar:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-TARIXIY RIVOJLANISH
+Tarixiy rivojlanish
 
 Molekulyar-kinetik nazariyaning shakllanishi:
 
@@ -152,11 +152,11 @@ Molekulyar-kinetik nazariyaning shakllanishi:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-MODDANING UCH HOLATI
+Moddaning uch holati
 
 MKN orqali moddaning qattiq, suyuq va gaz holatlarini tushuntiramiz:
 
-🧊 QATTIQ HOLAT
+🧊 Qattiq holat
 Molekulyar rasm:
 • Molekulalar juda yaqin joylashgan
 • Tartibli tuzilish (kristall panjara)
@@ -169,7 +169,7 @@ Xossalar:
 • Siqilmaydi (deyarli)
 • Qattiq
 
-💧 SUYUQ HOLAT
+💧 Suyuq holat
 Molekulyar rasm:
 • Molekulalar yaqin lekin tartibsiz
 • Sirg'alib, aylanib yuradi
@@ -182,7 +182,7 @@ Xossalar:
 • Oz siqiladi
 • Oqadi
 
-💨 GAZ HOLATI
+💨 Gaz holati
 Molekulyar rasm:
 • Molekulalar juda uzoq
 • To'g'ri chiziq bo'ylab tez uchadi
@@ -197,7 +197,7 @@ Xossalar:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-ASOSIY XULOSA
+Asosiy xulosa
 
 Molekulyar-kinetik nazariya bizga quyidagilarni tushuntiradi:
 

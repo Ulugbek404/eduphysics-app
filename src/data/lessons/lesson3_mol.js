@@ -8,7 +8,7 @@ export const lesson3 = {
     description: "Mol — modda miqdorining o'lchov birligi. Modda miqdorini hisoblash usullari.",
     order_number: 3,
     duration_minutes: 45,
-    video_url: 'https://www.youtube.com/embed/tH9ClacGlD4',
+    video_url: '',
     has_lab: false,
     test_count: 6,
     difficulty: 'easy',
@@ -25,7 +25,7 @@ export const lesson3 = {
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-MOL NIMA?
+Mol nima?
 
 Mol — Xalqaro birliklar tizimida (SI) modda miqdorining asosiy o'lchov birligi.
 
@@ -41,7 +41,7 @@ Mol — bu "kimyoviy o'nlab" deb tushunish mumkin:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-MODDA MIQDORI FORMULASI
+Modda miqdori formulasi
 
 Modda miqdori ikki xil usulda hisoblanadi:
 
@@ -68,7 +68,7 @@ Bundan boshqa foydali formulalar chiqarish mumkin:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-MODDA MIQDORI BILAN ISHLASH QOIDALARI
+Modda miqdori bilan ishlash qoidalari
 
 1. Birliklar mos kelishi kerak:
    Agar M g/mol da bo'lsa, m ham grammda bo'lishi kerak.
@@ -82,7 +82,7 @@ MODDA MIQDORI BILAN ISHLASH QOIDALARI
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-MODDA MIQDORINING AMALIY AHAMIYATI
+Modda miqdorining amaliy ahamiyati
 
 Modda miqdori tushunchasi nafaqat fizikada, balki kimyoda, biologiyada va tibbiyotda ham qo'llaniladi:
 
@@ -93,7 +93,7 @@ Modda miqdori tushunchasi nafaqat fizikada, balki kimyoda, biologiyada va tibbiy
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-MASALA YECHISH ALGORITMI
+Masala yechish algoritmi
 
 1. Berilgan ma'lumotlarni yozing
 2. Topish kerak bo'lgan kattalikni aniqlang
@@ -104,7 +104,7 @@ MASALA YECHISH ALGORITMI
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-XULOSA
+Xulosa
 
 • Mol — zarrachalar sonini ifodalovchi qulay birlik
 • 1 mol = 6.02 × 10²³ ta zarracha

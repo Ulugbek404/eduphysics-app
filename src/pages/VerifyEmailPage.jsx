@@ -76,25 +76,24 @@ export default function VerifyEmailPage() {
     if (!email) return null;
 
     return (
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-            <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-8 max-w-md w-full text-center backdrop-blur-sm">
-
+        <div className="min-h-screen theme-bg flex items-center justify-center p-4">
+            <div className="theme-card border theme-border rounded-2xl p-8 max-w-md w-full text-center shadow-xl">
                 {/* Email icon */}
-                <div className="w-20 h-20 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
-                    <Mail size={36} className="text-indigo-400" />
+                <div className="w-20 h-20 bg-teal-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+                    <Mail size={36} className="text-teal-600 dark:text-teal-400" />
                 </div>
 
-                <h1 className="text-2xl font-bold text-white mb-2">
+                <h1 className="text-2xl font-bold theme-text mb-2">
                     {t('verify_title')}
                 </h1>
 
-                <p className="text-slate-400 mb-1 text-sm">
+                <p className="theme-muted mb-1 text-sm">
                     {t('verify_subtitle')}
                 </p>
-                <p className="text-indigo-400 font-semibold mb-6">{email}</p>
+                <p className="text-teal-600 dark:text-teal-400 font-semibold mb-6">{email}</p>
 
                 {/* Qadamlar */}
-                <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 mb-5 text-left space-y-3">
+                <div className="theme-surface border theme-border rounded-xl p-4 mb-5 text-left space-y-3">
                     {[
                         t('verify_step_1'),
                         t('verify_step_2'),
@@ -102,18 +101,18 @@ export default function VerifyEmailPage() {
                         t('verify_step_4'),
                     ].map((step, i) => (
                         <div key={i} className="flex items-center gap-3">
-                            <div className="w-6 h-6 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <div className="w-6 h-6 bg-teal-600 rounded-full flex items-center justify-center flex-shrink-0">
                                 <span className="text-white text-xs font-bold">{i + 1}</span>
                             </div>
-                            <p className="text-slate-300 text-sm">{step}</p>
+                            <p className="theme-text text-sm opacity-80">{step}</p>
                         </div>
                     ))}
                 </div>
 
                 {/* Spam eslatma */}
-                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 mb-5 flex items-center gap-2">
-                    <AlertTriangle size={16} className="text-yellow-400 flex-shrink-0" />
-                    <p className="text-yellow-400 text-xs text-left">
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 mb-5 flex items-center gap-2">
+                    <AlertTriangle size={16} className="text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                    <p className="text-amber-600 dark:text-amber-400 text-xs text-left">
                         {t('verify_spam')}
                     </p>
                 </div>
@@ -121,22 +120,22 @@ export default function VerifyEmailPage() {
                 {/* Muvaffaqiyat xabari */}
                 {resendSuccess && (
                     <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3 mb-4 flex items-center gap-2 justify-center">
-                        <CheckCircle size={16} className="text-emerald-400" />
-                        <p className="text-emerald-400 text-sm">{t('verify_resent_success')}</p>
+                        <CheckCircle size={16} className="text-emerald-500 dark:text-emerald-400" />
+                        <p className="text-emerald-500 dark:text-emerald-400 text-sm">{t('verify_resent_success')}</p>
                     </div>
                 )}
 
                 {/* Xatolik */}
                 {error && (
                     <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 mb-4">
-                        <p className="text-red-400 text-xs">{error}</p>
+                        <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>
                     </div>
                 )}
 
                 {/* Tasdiqlandi mi? tekshirish */}
                 <button
                     onClick={handleCheckVerification}
-                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all mb-3 flex items-center justify-center gap-2"
+                    className="w-full py-3 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-xl transition-all mb-3 flex items-center justify-center gap-2 shadow-lg shadow-teal-500/20"
                 >
                     <CheckCircle size={16} /> {t('verify_check_btn')}
                 </button>
@@ -147,8 +146,8 @@ export default function VerifyEmailPage() {
                     disabled={countdown > 0 || resendLoading}
                     className={`w-full py-3 rounded-xl font-medium transition-all mb-4 flex items-center justify-center gap-2
                         ${countdown > 0
-                            ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                            : 'bg-indigo-600 hover:bg-indigo-500 text-white'
+                            ? 'theme-surface theme-muted cursor-not-allowed border theme-border'
+                            : 'bg-teal-600 hover:bg-teal-500 text-white shadow-lg shadow-teal-500/20'
                         }`}
                 >
                     <RefreshCw size={15} className={resendLoading ? 'animate-spin' : ''} />
@@ -161,7 +160,7 @@ export default function VerifyEmailPage() {
 
                 <Link
                     to="/login"
-                    className="text-slate-400 hover:text-white text-sm transition-all flex items-center justify-center gap-1"
+                    className="theme-muted hover:theme-text text-sm transition-all flex items-center justify-center gap-1"
                 >
                     <ArrowLeft size={14} /> {t('verify_back')}
                 </Link>

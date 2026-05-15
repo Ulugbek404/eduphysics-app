@@ -15,11 +15,11 @@ const DAY_LABELS = ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'];
 
 // ─── XP → rang sinfi ──────────────────────────────────────────────────────────
 function getColorClass(xp) {
-    if (xp === 0) return 'bg-slate-800/60 text-slate-600 border-slate-700/40';
-    if (xp < 20) return 'bg-indigo-900/80 text-indigo-300 border-indigo-700/50';
-    if (xp < 50) return 'bg-indigo-700    text-indigo-100 border-indigo-500/60';
-    if (xp < 100) return 'bg-indigo-500    text-white      border-indigo-400/60';
-    return 'bg-purple-500    text-white      border-purple-400/60';
+    if (xp === 0) return 'bg-slate-100 dark:bg-slate-800/60 text-slate-500 dark:text-slate-500 border-slate-200 dark:border-slate-700/40';
+    if (xp < 20) return 'bg-indigo-50 dark:bg-indigo-900/80 text-indigo-600 dark:text-indigo-300 border-indigo-200 dark:border-indigo-700/50';
+    if (xp < 50) return 'bg-indigo-200 dark:bg-indigo-700 text-indigo-700 dark:text-indigo-100 border-indigo-300 dark:border-indigo-500/60';
+    if (xp < 100) return 'bg-indigo-500 text-white-fixed border-indigo-400/60 shadow-sm';
+    return 'bg-purple-600 dark:bg-purple-500 text-white-fixed border-purple-400/60 shadow-sm';
 }
 
 // ─── Streakni sanalar array dan hisoblash ─────────────────────────────────────
@@ -46,10 +46,10 @@ function Tooltip({ text, visible }) {
     if (!visible) return null;
     return (
         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 pointer-events-none">
-            <div className="bg-slate-900/95 border border-slate-600/80 rounded-xl px-3 py-2 text-xs whitespace-nowrap shadow-2xl backdrop-blur-sm">
-                <p className="text-slate-200 font-medium">{text}</p>
+            <div className="bg-slate-900/95 dark:bg-slate-800/95 border border-slate-600/80 rounded-xl px-3 py-2 text-xs whitespace-nowrap shadow-2xl backdrop-blur-sm">
+                <p className="text-white-fixed font-medium">{text}</p>
             </div>
-            <div className="w-2 h-2 bg-slate-900/95 border-r border-b border-slate-600/80 rotate-45 mx-auto -mt-1" />
+            <div className="w-2 h-2 bg-slate-900/95 dark:bg-slate-800/95 border-r border-b border-slate-600/80 rotate-45 mx-auto -mt-1" />
         </div>
     );
 }
@@ -72,7 +72,7 @@ function DayCell({ day, xp, year, month, isToday }) {
                     cursor-pointer select-none font-semibold text-sm
                     transition-shadow duration-200
                     ${getColorClass(xp)}
-                    ${isToday ? 'ring-2 ring-blue-400 ring-offset-1 ring-offset-slate-900' : ''}
+                    ${isToday ? 'ring-2 ring-blue-500 dark:ring-blue-400 ring-offset-2 theme-bg' : ''}
                     ${hovered ? 'shadow-lg shadow-indigo-500/20 z-10' : ''}
                 `}
             >
@@ -193,22 +193,22 @@ export default function ActivityHeatmap() {
             icon: <Flame size={20} />,
             label: 'Joriy seriya',
             value: `${streakDays} kun`,
-            color: 'border-orange-500/30 from-orange-600/15 to-red-600/5',
-            iconColor: 'text-orange-400',
+            color: 'border-orange-200 bg-orange-50 dark:border-orange-500/30 dark:bg-gradient-to-br dark:from-orange-600/15 dark:to-red-600/5',
+            iconColor: 'text-orange-500 dark:text-orange-400',
         },
         {
             icon: <Trophy size={20} />,
             label: 'Eng yaxshi natija',
             value: `${bestStreak} kun`,
-            color: 'border-yellow-500/30 from-yellow-600/15 to-amber-600/5',
-            iconColor: 'text-yellow-400',
+            color: 'border-yellow-200 bg-yellow-50 dark:border-yellow-500/30 dark:bg-gradient-to-br dark:from-yellow-600/15 dark:to-amber-600/5',
+            iconColor: 'text-yellow-600 dark:text-yellow-400',
         },
         {
             icon: <Activity size={20} />,
             label: 'Faol kunlar',
             value: `${totalActiveDays} kun`,
-            color: 'border-indigo-500/30 from-indigo-600/15 to-purple-600/5',
-            iconColor: 'text-indigo-400',
+            color: 'border-indigo-200 bg-indigo-50 dark:border-indigo-500/30 dark:bg-gradient-to-br dark:from-indigo-600/15 dark:to-purple-600/5',
+            iconColor: 'text-indigo-500 dark:text-indigo-400',
         },
     ];
 
@@ -227,24 +227,24 @@ export default function ActivityHeatmap() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.07 }}
-                        className={`relative rounded-2xl border bg-gradient-to-br ${c.color} p-5 overflow-hidden backdrop-blur-sm`}
+                        className={`relative rounded-2xl border ${c.color} p-5 overflow-hidden backdrop-blur-sm`}
                     >
-                        <div className="absolute -right-3 -top-3 w-16 h-16 rounded-full bg-white/5" />
+                        <div className="absolute -right-3 -top-3 w-16 h-16 rounded-full bg-white/5 dark:bg-white/5 bg-black/5" />
                         <div className={`mb-2 ${c.iconColor}`}>{c.icon}</div>
-                        <p className="text-xl font-bold text-white">{c.value}</p>
-                        <p className="text-xs text-slate-400 mt-0.5">{c.label}</p>
+                        <p className="text-xl font-bold theme-text">{c.value}</p>
+                        <p className="text-xs theme-text-secondary mt-0.5">{c.label}</p>
                     </motion.div>
                 ))}
             </div>
 
             {/* ── Calendar card ── */}
-            <div className="rounded-2xl border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-6">
+            <div className="rounded-2xl border theme-border theme-card backdrop-blur-sm p-6">
 
                 {/* Header: prev / month-year / next */}
                 <div className="flex items-center justify-between mb-6">
                     <button
                         onClick={prevMonth}
-                        className="p-2 rounded-xl bg-slate-700/50 hover:bg-slate-700 border border-slate-600/50 text-slate-400 hover:text-white transition-all"
+                        className="p-2 rounded-xl theme-surface hover:bg-slate-200 dark:hover:bg-slate-700 border theme-border theme-text transition-all"
                     >
                         <ChevronLeft size={18} />
                     </button>
@@ -256,7 +256,7 @@ export default function ActivityHeatmap() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 6 }}
                             transition={{ duration: 0.2 }}
-                            className="text-lg font-bold text-white"
+                            className="text-lg font-bold theme-text"
                         >
                             {UZ_MONTHS[viewDate.month]} {viewDate.year}
                         </motion.h3>
@@ -267,8 +267,8 @@ export default function ActivityHeatmap() {
                         disabled={isCurrentMonth}
                         className={`p-2 rounded-xl border transition-all
                             ${isCurrentMonth
-                                ? 'bg-slate-800/30 border-slate-700/30 text-slate-600 cursor-not-allowed'
-                                : 'bg-slate-700/50 hover:bg-slate-700 border-slate-600/50 text-slate-400 hover:text-white'
+                                ? 'bg-slate-100 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700/30 text-slate-400 dark:text-slate-600 cursor-not-allowed'
+                                : 'theme-surface hover:bg-slate-200 dark:hover:bg-slate-700 border-theme-border theme-text'
                             }`}
                     >
                         <ChevronRight size={18} />
@@ -311,12 +311,12 @@ export default function ActivityHeatmap() {
             </div>
 
             {/* ── Legend ── */}
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-slate-500 px-1">
-                <span className="text-slate-600">Kam</span>
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs theme-text-secondary px-1">
+                <span className="theme-text-secondary">Kam</span>
                 {[
-                    { cls: 'bg-slate-800/60', label: '0 XP' },
-                    { cls: 'bg-indigo-900/80', label: '1–20 XP' },
-                    { cls: 'bg-indigo-700', label: '20–50 XP' },
+                    { cls: 'bg-slate-100 dark:bg-slate-800/60', label: '0 XP' },
+                    { cls: 'bg-indigo-50 dark:bg-indigo-900/80', label: '1–20 XP' },
+                    { cls: 'bg-indigo-100 dark:bg-indigo-700', label: '20–50 XP' },
                     { cls: 'bg-indigo-500', label: '50–100 XP' },
                     { cls: 'bg-purple-500', label: '100+ XP' },
                 ].map(({ cls, label }) => (
@@ -325,7 +325,7 @@ export default function ActivityHeatmap() {
                         <span>{label}</span>
                     </div>
                 ))}
-                <span className="text-slate-600">Ko'p</span>
+                <span className="theme-text-secondary">Ko'p</span>
             </div>
         </motion.div>
     );

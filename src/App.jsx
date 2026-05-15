@@ -36,6 +36,7 @@ import OhmQonuni from './pages/OhmQonuni';
 import MolekulyarFizika from './pages/MolekulyarFizika';
 import LiveRoom from './pages/LiveRoom';
 import TestlarPage from './pages/TestlarPage';
+import FormulalarPage from './pages/FormulalarPage';
 
 // Route Guards
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -46,10 +47,10 @@ import { Loader } from 'lucide-react';
 // Loading Screen
 function LoadingScreen() {
     return (
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="min-h-screen theme-bg flex items-center justify-center">
             <div className="text-center space-y-4">
-                <Loader className="w-12 h-12 text-blue-500 animate-spin mx-auto" />
-                <p className="text-slate-400 text-lg">Yuklanmoqda...</p>
+                <Loader className="w-12 h-12 text-teal-500 animate-spin mx-auto" />
+                <p className="theme-text-secondary text-lg">Yuklanmoqda...</p>
             </div>
         </div>
     );
@@ -144,6 +145,7 @@ function AppRoutes() {
                 <Route path="/missiyalar" element={<ProtectedRoute><MissionsPage /></ProtectedRoute>} />
                 <Route path="/testlar" element={<ProtectedRoute><TestlarPage /></ProtectedRoute>} />
                 <Route path="/testlar/live/:roomCode" element={<ProtectedRoute><LiveRoom /></ProtectedRoute>} />
+                <Route path="/formulalar" element={<ProtectedRoute><FormulalarPage /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
                 <Route path="/dashboard/*" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
 

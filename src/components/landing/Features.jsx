@@ -70,7 +70,7 @@ const Features = () => {
                     className="text-center mb-16"
                 >
                     <h2 className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-4 ${isLight ? 'text-slate-800' : 'text-white'}`}>
-                        {t('features_title').replace('NurFizika', '')}{' '}
+                        {t('features_title')}{' '}
                         <span className="bg-gradient-to-r from-cyan-500 to-purple-500 bg-clip-text text-transparent">
                             NurFizika?
                         </span>

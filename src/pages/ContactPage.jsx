@@ -242,7 +242,7 @@ const ContactPage = () => {
                                 {/* Contact Details */}
                                 <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-3xl p-8">
                                     <h3 className="text-2xl font-bold text-white mb-6">
-                                        Aloqa Ma'lumotlari
+                                        Aloqa ma'lumotlari
                                     </h3>
 
                                     <div className="space-y-6">

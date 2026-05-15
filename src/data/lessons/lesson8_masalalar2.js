@@ -3,14 +3,14 @@ export const lesson8 = {
     id: '9-l-27', chapter_id: '9-ch-02',
     title: 'Masalalar yechish (4-7 mavzular)',
     description: "Ideal gaz, temperatura va molekula tezligi bo'yicha amaliy masalalar.",
-    order_number: 8, duration_minutes: 50, video_url: 'https://www.youtube.com/embed/OOPH2Ms5wRA', has_lab: false, test_count: 6, difficulty: 'hard',
+    order_number: 8, duration_minutes: 50, video_url: '', has_lab: false, test_count: 6, difficulty: 'hard',
     content: {
         key_concepts: ['Ideal gaz tenglamasi', 'Temperatura konvertatsiyasi', "Molekula tezligi hisoblash", "Ko'p bosqichli masalalar"],
         theory: `Bu darsda 4-7 mavzulardagi formulalarni amalda qo'llaymiz. Ideal gaz tenglamasi, temperatura va molekula tezligi bo'yicha masalalar yechamiz.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-FORMULALAR TAKRORLASH
+Formulalar takrorlash
 
 Ideal gaz tenglamasi:
 PV = νRT = (m/M)RT
@@ -29,7 +29,7 @@ NA = 6.02 × 10²³ mol⁻¹
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-IDEAL GAZ TENGLAMASI MASALALARI
+Ideal gaz tenglamasi masalalari
 
 MASALA 1 (Oson): Gazning bosimini toping
 3 mol ideal gaz 27°C da 0.1 m³ idishda. Bosim = ?
@@ -47,7 +47,7 @@ m = PVM/(RT) = 303975 × 0.01 × 0.044 / (8.314 × 400) = 133.7 / 3325.6 ≈ 0.0
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-TEMPERATURA MASALALARI
+Temperatura masalalari
 
 MASALA 4: Kinetik energiyadan temperatura
 Gaz molekulasining o'rtacha kinetik energiyasi 6.21 × 10⁻²¹ J. Temperatura?
@@ -55,7 +55,7 @@ Yechish: T = 2E/(3k) = 2 × 6.21×10⁻²¹ / (3 × 1.38×10⁻²³) = 12.42×10
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-TEZLIK MASALALARI
+Tezlik masalalari
 
 MASALA 5: Tezlikni solishtirish
 Ayni temperaturada geliy (He, M=4) va argon (Ar, M=40) tezliklari nisbati?
@@ -63,7 +63,7 @@ Yechish: v(He)/v(Ar) = √(M(Ar)/M(He)) = √(40/4) = √10 ≈ 3.16
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-MUSTAQIL MASALALAR
+Mustaqil masalalar
 1. 0.2 mol N₂ 500 K da bosimi qancha? (V = 0.005 m³)
 2. 327°C da O₂ molekulasining tezligi?
 3. Molekula tezligi 600 m/s (M = 0.028 kg/mol). T = ?

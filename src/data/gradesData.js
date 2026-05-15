@@ -9,7 +9,7 @@ export const grades = [
   {
     id: 'grade-7',
     number: 7,
-    name: '7-sinf Fizika',
+    name: '7-sinf fizika',
     description: 'Fizikaga kirish',
     total_hours: 68,
     is_active: false,
@@ -19,7 +19,7 @@ export const grades = [
   {
     id: 'grade-8',
     number: 8,
-    name: '8-sinf Fizika',
+    name: '8-sinf fizika',
     description: 'Issiqlik va elektr',
     total_hours: 68,
     is_active: false,
@@ -29,8 +29,8 @@ export const grades = [
   {
     id: 'grade-9',
     number: 9,
-    name: '9-sinf Fizika',
-    description: 'Mexanika, termodinamika, elektr',
+    name: '9-sinf fizika',
+    description: 'MODDA TUZILISHINING MOLEKULYAR-KINETIK NAZARIYASI ASOSLARI, TERMODINAMIKA ELEMENTLARI, ISSIQLIK DVIGATELLARI, SUYUQLIK VA QATTIQ JISMLARNING XOSSALARI, OPTIKA',
     total_hours: 70,
     is_active: true, // ONLY THIS ONE IS ACTIVE
     icon: '📗',
@@ -39,7 +39,7 @@ export const grades = [
   {
     id: 'grade-10',
     number: 10,
-    name: '10-sinf Fizika',
+    name: '10-sinf fizika',
     description: 'Tez kunda',
     total_hours: 102,
     is_active: false,
@@ -49,7 +49,7 @@ export const grades = [
   {
     id: 'grade-11',
     number: 11,
-    name: '11-sinf Fizika',
+    name: '11-sinf fizika',
     description: 'Tez kunda',
     total_hours: 136,
     is_active: false,
@@ -63,7 +63,7 @@ export const chapters = [
   {
     id: '9-ch-02',
     grade_id: 'grade-9',
-    name: 'MODDA TUZILISHINING MOLEKULYAR-KINETIK NAZARIYASI ASOSLARI',
+    name: 'Modda tuzilishining molekulyar-kinetik nazariyasi asoslari',
     description: 'Moddalarning molekulyar tuzilishi va issiqlik hodisalari',
     order_number: 1,
     icon: '🌡️',
@@ -77,7 +77,7 @@ export const chapters = [
   {
     id: '9-ch-01',
     grade_id: 'grade-9',
-    name: 'ICHKI ENERGIYA VA TERMODINAMIKA ELEMENTLARI',
+    name: 'Ichki energiya va termodinamika elementlari',
     description: 'Jismlarning harakati, kuchlar, impuls va energiya',
     order_number: 2,
     icon: '📖',
@@ -90,7 +90,7 @@ export const chapters = [
   {
     id: '9-ch-03',
     grade_id: 'grade-9',
-    name: 'ISSIQLIK DVIGATELLARI',
+    name: 'Issiqlik dvigatellari',
     description: 'Elektr zaryadi, elektr toki, magnit maydoni',
     order_number: 3,
     icon: '⚡',
@@ -103,7 +103,7 @@ export const chapters = [
   {
     id: '9-ch-04',
     grade_id: 'grade-9',
-    name: 'SUYUQLIK VA QATTIQ JISMLARNING XOSSALARI',
+    name: 'Suyuqlik va qattiq jismlarning xossalari',
     description: 'Mexanik tebranishlar, to\'lqinlar va tovush',
     order_number: 4,
     icon: '🌊',

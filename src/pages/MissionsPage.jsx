@@ -31,19 +31,19 @@ function XPBar({ totalXP }) {
 
     return (
         <div className="flex-1">
-            <div className="flex justify-between items-center mb-1.5">
-                <span className="text-white font-bold text-sm">{t('missions_level') || 'Daraja'} {level}</span>
-                <span className="text-slate-400 text-xs">{inLevel} / {needed} XP</span>
+            <div className="flex justify-between items-center mb-2">
+                <span className="theme-text font-bold text-[14px]">{t('missions_level') || 'Daraja'} {level}</span>
+                <span className="theme-muted text-[13px] font-medium">{inLevel} / {needed} XP</span>
             </div>
-            <div className="h-2.5 bg-slate-800 rounded-full overflow-hidden">
+            <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--border-color)' }}>
                 <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${pct}%` }}
                     transition={{ duration: 1, ease: 'easeOut' }}
-                    className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500"
+                    className="h-full rounded-full bg-[#0d9488]"
                 />
             </div>
-            <p className="text-slate-600 text-xs mt-1">{t('missions_to_next') || 'Keyingi darajaga:'} {needed - inLevel} XP</p>
+            <p className="theme-muted text-[12px] mt-2 font-medium">{t('missions_to_next') || 'Keyingi darajaga:'} {needed - inLevel} XP</p>
         </div>
     );
 }
@@ -55,49 +55,62 @@ function MissionCard({ mission, index }) {
     const pct = Math.min((current / target) * 100, 100);
 
     return (
-        <motion.div
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.06 }}
-            className={`relative rounded-2xl border p-4 transition-all duration-300 ${completed
-                ? 'border-emerald-500/50 bg-emerald-950/25 shadow-lg shadow-emerald-500/10'
-                : 'theme-border theme-surface hover:border-slate-700'
-                }`}
+        <div
+            className="relative rounded-2xl border-[0.5px] p-5 transition-all duration-300"
+            style={{
+                backgroundColor: completed ? 'var(--sidebar-item-active-bg)' : 'var(--bg-card)',
+                borderColor: completed ? 'var(--border-brand-soft)' : 'var(--border-color)',
+            }}
+            onMouseEnter={e => { if (!completed) e.currentTarget.style.borderColor = 'var(--brand-400)'; }}
+            onMouseLeave={e => { if (!completed) e.currentTarget.style.borderColor = 'var(--border-color)'; }}
         >
             <div className="flex items-start gap-4">
                 {/* Icon */}
-                <div className={`flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center border ${completed
-                    ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
-                    : 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400'
-                    }`}>
+                <div
+                    className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center border-[0.5px]"
+                    style={{
+                        backgroundColor: completed ? 'var(--bg-card)' : 'var(--bg-primary)',
+                        borderColor: completed ? 'var(--border-brand-soft)' : 'var(--border-color)',
+                        color: completed ? '#0d9488' : 'var(--text-muted)',
+                    }}
+                >
                     {ICON_MAP[icon] || <Target size={20} />}
                 </div>
 
                 <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2 mb-1">
-                        <h3 className={`font-semibold text-sm ${completed ? 'text-emerald-300' : 'text-white'}`}>
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                        <h3
+                            className="font-bold text-[15px]"
+                            style={{ color: completed ? '#0d9488' : 'var(--text-primary)' }}
+                        >
                             {title}
                         </h3>
-                        <span className={`flex-shrink-0 flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full border ${completed
-                            ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
-                            : 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400'
-                            }`}>
+                        <span
+                            className="flex-shrink-0 flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-sm border-[0.5px]"
+                            style={{
+                                backgroundColor: completed ? 'var(--bg-card)' : 'var(--bg-primary)',
+                                borderColor: completed ? 'var(--border-brand-soft)' : 'var(--border-color)',
+                                color: completed ? '#0d9488' : 'var(--text-secondary)',
+                            }}
+                        >
                             <Zap size={10} /> +{xp} XP
                         </span>
                     </div>
 
                     {/* Progress bar */}
-                    <div className="h-2 bg-slate-800 rounded-full overflow-hidden mb-1.5">
+                    <div
+                        className="h-1.5 rounded-full overflow-hidden mb-2 border-[0.5px]"
+                        style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-color)' }}
+                    >
                         <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${pct}%` }}
                             transition={{ duration: 0.6, ease: 'easeOut', delay: index * 0.06 }}
-                            className={`h-full rounded-full transition-all ${completed ? 'bg-emerald-500' : 'bg-gradient-to-r from-indigo-500 to-violet-500'
-                                }`}
+                            className={`h-full rounded-full transition-all ${completed ? 'bg-[#0d9488]' : 'bg-[#14b8a6]'}`}
                         />
                     </div>
 
-                    <p className="text-slate-500 text-xs">
+                    <p className="theme-text-secondary text-[13px] font-medium">
                         {completed
                             ? `✓ ${t('missions_completed') || 'Bajarildi!'}`
                             : `${current}/${target} ${t('missions_completed_lower') || 'bajarildi'}`}
@@ -107,11 +120,11 @@ function MissionCard({ mission, index }) {
 
             {/* Completed overlay checkmark */}
             {completed && (
-                <div className="absolute top-3 right-3">
-                    <CheckCircle size={18} className="text-emerald-400" />
+                <div className="absolute top-4 right-4">
+                    <CheckCircle size={20} className="text-[#0d9488]" />
                 </div>
             )}
-        </motion.div>
+        </div>
     );
 }
 
@@ -119,44 +132,55 @@ function MissionCard({ mission, index }) {
 function AchievementCard({ ach, index }) {
     const { t } = useLanguage();
     return (
-        <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: index * 0.07 }}
-            className={`relative rounded-2xl border p-5 text-center transition-all duration-300 ${ach.earned
-                ? 'border-yellow-500/50 bg-yellow-950/20 shadow-lg shadow-yellow-500/10'
-                : 'theme-border theme-surface'
-                }`}
+        <div
+            className="relative rounded-2xl border-[0.5px] p-6 text-center transition-all duration-300"
+            style={{
+                backgroundColor: ach.earned ? 'rgba(234,179,8,0.08)' : 'var(--bg-card)',
+                borderColor: ach.earned ? 'rgba(234,179,8,0.3)' : 'var(--border-color)',
+            }}
         >
             {/* Emoji icon */}
-            <div className={`text-4xl mb-3 transition-all ${ach.earned ? '' : 'grayscale opacity-40'}`}>
+            <div className={`text-[40px] mb-4 transition-all ${ach.earned ? '' : 'grayscale opacity-40'}`}>
                 {ach.icon}
             </div>
 
-            <h3 className={`font-bold text-sm mb-1 ${ach.earned ? 'text-yellow-300' : 'text-slate-500'}`}>
+            <h3
+                className="font-bold text-[15px] mb-2"
+                style={{ color: ach.earned ? '#b45309' : 'var(--text-muted)' }}
+            >
                 {ach.title}
             </h3>
-            <p className={`text-xs mb-3 leading-snug ${ach.earned ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p
+                className="text-[13px] mb-4 leading-relaxed"
+                style={{ color: ach.earned ? '#d97706' : 'var(--text-muted)', opacity: ach.earned ? 1 : 0.7 }}
+            >
                 {ach.desc}
             </p>
 
-            <span className={`inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full border ${ach.earned
-                ? 'bg-yellow-500/15 border-yellow-500/40 text-yellow-400'
-                : 'bg-slate-800/60 border-slate-700/40 text-slate-600'
-                }`}>
-                <Star size={10} /> +{ach.xp} XP
+            <span
+                className="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1.5 rounded-md border-[0.5px]"
+                style={{
+                    backgroundColor: ach.earned ? 'var(--bg-card)' : 'var(--bg-primary)',
+                    borderColor: ach.earned ? 'rgba(234,179,8,0.3)' : 'var(--border-color)',
+                    color: ach.earned ? '#b45309' : 'var(--text-muted)',
+                }}
+            >
+                <Star size={12} /> +{ach.xp} XP
             </span>
 
             {/* Lock overlay */}
             {!ach.earned && (
-                <div className="absolute inset-0 flex items-end justify-center pb-3 pointer-events-none">
-                    <div className="bg-slate-900/80 rounded-lg px-2 py-1 flex items-center gap-1">
-                        <Lock size={10} className="text-slate-600" />
-                        <span className="text-slate-600 text-[10px]">{t('missions_locked') || 'Qulflangan'}</span>
+                <div className="absolute inset-0 flex items-end justify-center pb-4 pointer-events-none">
+                    <div
+                        className="rounded-md px-3 py-1.5 flex items-center gap-1.5 border-[0.5px]"
+                        style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}
+                    >
+                        <Lock size={12} className="theme-muted" />
+                        <span className="theme-muted text-[11px] font-bold uppercase tracking-wider">{t('missions_locked') || 'Qulflangan'}</span>
                     </div>
                 </div>
             )}
-        </motion.div>
+        </div>
     );
 }
 
@@ -165,7 +189,7 @@ const getTabs = (t) => [
     { id: 'daily', label: t('missions_daily') || 'Kunlik', icon: <Target size={15} /> },
     { id: 'weekly', label: t('missions_weekly') || 'Haftalik', icon: <Flame size={15} /> },
     { id: 'achieve', label: t('missions_achievements') || 'Yutuqlar', icon: <Trophy size={15} /> },
-    { id: 'reyting', label: t('missions_rating') || 'Reyting', icon: <Trophy size={15} className="text-yellow-400" /> },
+    { id: 'reyting', label: t('missions_rating') || 'Reyting', icon: <Trophy size={15} className="text-yellow-500" /> },
 ];
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
@@ -181,38 +205,35 @@ export default function MissionsPage() {
     const achieveDone = achievements.filter(a => a.earned).length;
 
     return (
-        <div className="h-screen overflow-y-auto custom-scrollbar theme-bg theme-text font-sans">
-            <div className="max-w-3xl mx-auto px-6 pb-24 pt-6">
+        <div className="h-screen overflow-y-auto custom-scrollbar theme-bg font-sans">
+            <div className="max-w-3xl mx-auto px-6 pb-24 pt-8">
 
                 {/* Back */}
                 <button
                     onClick={() => navigate('/dashboard')}
-                    className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6 group"
+                    className="flex items-center gap-2 theme-muted hover:theme-text transition-colors mb-6 group"
                 >
                     <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-                    <span className="font-medium text-sm">{t('nav_back') || 'Ortga qaytish'}</span>
+                    <span className="font-semibold text-[14px]">{t('nav_back') || 'Ortga qaytish'}</span>
                 </button>
 
                 {/* ── Hero / XP Card ── */}
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="relative rounded-3xl border border-slate-800 bg-gradient-to-br from-indigo-950/50 via-slate-900/80 to-violet-950/50 backdrop-blur-sm p-6 mb-7 overflow-hidden"
+                <div
+                    className="relative rounded-2xl border-[0.5px] p-8 mb-8 overflow-hidden theme-card"
+                    style={{ borderColor: 'var(--border-color)' }}
                 >
-                    <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                        <div className="absolute -top-8 -right-8 w-40 h-40 bg-indigo-600/10 rounded-full blur-3xl" />
-                        <div className="absolute -bottom-8 -left-8 w-40 h-40 bg-violet-600/10 rounded-full blur-3xl" />
-                    </div>
-
-                    <div className="relative z-10 flex flex-col sm:flex-row sm:items-center gap-5">
+                    <div className="relative z-10 flex flex-col sm:flex-row sm:items-center gap-6">
                         {/* XP display */}
-                        <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-xl shadow-indigo-500/30 flex-shrink-0">
-                                <span className="text-2xl font-black text-white">{calcLevel(totalXP)}</span>
+                        <div className="flex items-center gap-5">
+                            <div
+                                className="w-20 h-20 rounded-2xl flex items-center justify-center flex-shrink-0 border-[0.5px]"
+                                style={{ backgroundColor: 'rgba(13,148,136,0.12)', borderColor: 'var(--border-brand-soft)' }}
+                            >
+                                <span className="text-[32px] font-black text-[#0d9488]">{calcLevel(totalXP)}</span>
                             </div>
                             <div>
-                                <p className="text-slate-400 text-xs">{t('missions_total_xp') || 'Umumiy XP'}</p>
-                                <p className="text-2xl font-black text-white">{totalXP.toLocaleString()}</p>
+                                <p className="theme-muted text-[14px] font-medium">{t('missions_total_xp') || 'Umumiy XP'}</p>
+                                <p className="text-[32px] font-black theme-text">{totalXP.toLocaleString()}</p>
                             </div>
                         </div>
 
@@ -221,32 +242,50 @@ export default function MissionsPage() {
                     </div>
 
                     {/* Mission summary chips */}
-                    <div className="relative z-10 flex gap-3 mt-5 text-xs">
-                        <div className="flex items-center gap-1.5 bg-slate-800/60 border border-slate-700/50 rounded-full px-3 py-1.5">
-                            <Target size={11} className="text-indigo-400" />
-                            <span className="text-slate-300">{dailyDone}/{dailyMissions.length} {t('missions_daily_lower') || 'kunlik'}</span>
+                    <div
+                        className="relative z-10 flex gap-3 mt-8 pt-6 border-t-[0.5px] text-[13px] font-bold flex-wrap"
+                        style={{ borderColor: 'var(--border-color)' }}
+                    >
+                        <div
+                            className="flex items-center gap-2 rounded-md px-3 py-1.5 border-[0.5px]"
+                            style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-color)' }}
+                        >
+                            <Target size={14} className="text-[#0d9488]" />
+                            <span className="theme-text">{dailyDone}/{dailyMissions.length} <span className="theme-muted font-medium">{t('missions_daily_lower') || 'kunlik'}</span></span>
                         </div>
-                        <div className="flex items-center gap-1.5 bg-slate-800/60 border border-slate-700/50 rounded-full px-3 py-1.5">
-                            <Flame size={11} className="text-orange-400" />
-                            <span className="text-slate-300">{weeklyDone}/{weeklyMissions.length} {t('missions_weekly_lower') || 'haftalik'}</span>
+                        <div
+                            className="flex items-center gap-2 rounded-md px-3 py-1.5 border-[0.5px]"
+                            style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-color)' }}
+                        >
+                            <Flame size={14} className="text-[#0d9488]" />
+                            <span className="theme-text">{weeklyDone}/{weeklyMissions.length} <span className="theme-muted font-medium">{t('missions_weekly_lower') || 'haftalik'}</span></span>
                         </div>
-                        <div className="flex items-center gap-1.5 bg-slate-800/60 border border-slate-700/50 rounded-full px-3 py-1.5">
-                            <Trophy size={11} className="text-yellow-400" />
-                            <span className="text-slate-300">{achieveDone}/{achievements.length} {t('missions_achievement_lower') || 'yutuq'}</span>
+                        <div
+                            className="flex items-center gap-2 rounded-md px-3 py-1.5 border-[0.5px]"
+                            style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-color)' }}
+                        >
+                            <Trophy size={14} className="text-yellow-500" />
+                            <span className="theme-text">{achieveDone}/{achievements.length} <span className="theme-muted font-medium">{t('missions_achievement_lower') || 'yutuq'}</span></span>
                         </div>
                     </div>
-                </motion.div>
+                </div>
 
                 {/* ── Tab bar ── */}
-                <div className="flex gap-1 theme-surface border theme-border rounded-2xl p-1 mb-6">
+                <div
+                    className="flex gap-1 rounded-xl p-1.5 mb-8 border-[0.5px]"
+                    style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}
+                >
                     {getTabs(t).map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${activeTab === tab.id
-                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
-                                : 'text-slate-400 hover:text-slate-200'
-                                }`}
+                            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-[14px] font-bold transition-all duration-200"
+                            style={activeTab === tab.id
+                                ? { backgroundColor: '#0d9488', color: '#ffffff' }
+                                : { color: 'var(--text-secondary)', backgroundColor: 'transparent' }
+                            }
+                            onMouseEnter={e => { if (activeTab !== tab.id) e.currentTarget.style.backgroundColor = 'var(--bg-primary)'; }}
+                            onMouseLeave={e => { if (activeTab !== tab.id) e.currentTarget.style.backgroundColor = 'transparent'; }}
                         >
                             {tab.icon} {tab.label}
                         </button>
@@ -257,26 +296,26 @@ export default function MissionsPage() {
                 <AnimatePresence mode="wait">
                     {activeTab === 'daily' && (
                         <motion.div key="daily" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                            className="space-y-3"
+                            className="space-y-4"
                         >
-                            <p className="text-slate-500 text-xs mb-4">{t('missions_daily_desc') || 'Har kuni yangilanadi'} · {dailyDone}/{dailyMissions.length} {t('missions_completed_lower') || 'bajarildi'}</p>
+                            <p className="theme-muted text-[14px] font-medium mb-5">{t('missions_daily_desc') || 'Har kuni yangilanadi'} · <span className="text-[#0d9488] font-bold">{dailyDone}/{dailyMissions.length}</span> {t('missions_completed_lower') || 'bajarildi'}</p>
                             {dailyMissions.map((m, i) => <MissionCard key={m.id} mission={m} index={i} />)}
                         </motion.div>
                     )}
 
                     {activeTab === 'weekly' && (
                         <motion.div key="weekly" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                            className="space-y-3"
+                            className="space-y-4"
                         >
-                            <p className="text-slate-500 text-xs mb-4">{t('missions_weekly_desc') || 'Har dushanba yangilanadi'} · {weeklyDone}/{weeklyMissions.length} {t('missions_completed_lower') || 'bajarildi'}</p>
+                            <p className="theme-muted text-[14px] font-medium mb-5">{t('missions_weekly_desc') || 'Har dushanba yangilanadi'} · <span className="text-[#0d9488] font-bold">{weeklyDone}/{weeklyMissions.length}</span> {t('missions_completed_lower') || 'bajarildi'}</p>
                             {weeklyMissions.map((m, i) => <MissionCard key={m.id} mission={m} index={i} />)}
                         </motion.div>
                     )}
 
                     {activeTab === 'achieve' && (
                         <motion.div key="achieve" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                            <p className="text-slate-500 text-xs mb-4">{t('missions_achieve_desc') || 'Bir marta beriladigan yutuqlar'} · {achieveDone}/{achievements.length} {t('missions_unlocked_lower') || 'ochilgan'}</p>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            <p className="theme-muted text-[14px] font-medium mb-5">{t('missions_achieve_desc') || 'Bir marta beriladigan yutuqlar'} · <span className="text-[#0d9488] font-bold">{achieveDone}/{achievements.length}</span> {t('missions_unlocked_lower') || 'ochilgan'}</p>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
                                 {achievements.map((a, i) => <AchievementCard key={a.id} ach={a} index={i} />)}
                             </div>
                         </motion.div>

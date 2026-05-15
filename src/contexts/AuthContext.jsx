@@ -10,12 +10,27 @@ import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     sendPasswordResetEmail,
-    sendEmailVerification,
     updateProfile
 } from 'firebase/auth';
 import {
-    doc, getDoc, setDoc, updateDoc, serverTimestamp
+    doc, getDoc, setDoc, updateDoc, serverTimestamp, arrayUnion
 } from 'firebase/firestore';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// normalizeEmail — Firebase qabul qiladigan formatga keltirish
+// 'demo@test'  →  'demo@test.com'
+// 'user@abc'   →  'user@abc.com'
+// 'x@y.com'    →  'x@y.com'  (o'zgarishsiz)
+// ─────────────────────────────────────────────────────────────────────────────
+const normalizeEmail = (email) => {
+    if (!email || !email.includes('@')) return email;
+    const [local, domain] = email.split('@');
+    // Domain da nuqta yo'q bo'lsa .com qo'shamiz
+    if (!domain.includes('.')) {
+        return `${local}@${domain}.com`;
+    }
+    return email;
+};
 
 const AuthContext = createContext();
 
@@ -23,6 +38,60 @@ const hasCachedFirebaseAuth = () => {
     try {
         return Object.keys(localStorage).some(k => k.startsWith('firebase:authUser'));
     } catch { return false; }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ensureUserInFirestore — Auth da bor lekin Firestore da yo'q bo'lsa yaratadi.
+// Mavjud bo'lsa — hech narsa qilmaydi (overwrite yo'q).
+// ─────────────────────────────────────────────────────────────────────────────
+const ensureUserInFirestore = async (user, extraData = {}) => {
+    if (!user) return;
+
+    try {
+        const userRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
+
+        // Allaqachon Firestore da bor — hech narsa qilmaymiz
+        if (userSnap.exists()) return;
+
+        // Yo'q — yangi hujjat yaratamiz
+        await setDoc(userRef, {
+            uid: user.uid,
+            email: user.email || '',
+            displayName: user.displayName || extraData.displayName || 'Foydalanuvchi',
+            photoURL: user.photoURL || '',
+            role: extraData.role || 'student',
+            emailVerified: true, // tasdiqlamasdan to'g'ridan kiritamiz
+            region: '',
+            currentLevel: 1,
+            totalXP: 0,
+            streakDays: 0,
+            activeDates: [],
+            blocked: false,
+            provider: user.providerData?.[0]?.providerId || 'unknown',
+            createdAt: serverTimestamp(),
+            lastLogin: serverTimestamp(),
+        });
+
+        console.log(`[Auth] Yangi foydalanuvchi Firestore ga qo'shildi: ${user.email}`);
+    } catch (err) {
+        console.warn('[Auth] ensureUserInFirestore xatosi:', err);
+    }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// lastLogin va activeDates ni yangilash — har kirishda
+// ─────────────────────────────────────────────────────────────────────────────
+const updateLastLogin = async (uid) => {
+    try {
+        const today = new Date().toISOString().split('T')[0]; // '2026-05-04'
+        await updateDoc(doc(db, 'users', uid), {
+            lastLogin: serverTimestamp(),
+            activeDates: arrayUnion(today),   // ✅ Admin "Bugun faol" hisoblagichi
+        });
+    } catch (err) {
+        console.warn('[Auth] lastLogin yangilash xatosi:', err);
+    }
 };
 
 export function AuthProvider({ children }) {
@@ -49,6 +118,7 @@ export function AuthProvider({ children }) {
         }
     };
 
+    // ── onAuthStateChanged — sahifa yangilanishida ham sinxronlaydi ──────────
     useEffect(() => {
         if (!auth) {
             setError("Firebase konfiguratsiyasi xatosi.");
@@ -60,38 +130,20 @@ export function AuthProvider({ children }) {
 
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             if (currentUser) {
-                // ── Email/parol foydalanuvchisi tasdiqlanganmi? ──────────────
-                const isEmailProvider = currentUser.providerData
-                    .some(p => p.providerId === 'password');
-
-                if (isEmailProvider && !currentUser.emailVerified) {
-                    // Tasdiqlanmagan — logout va bloklash
-                    await signOut(auth);
-                    setUser(null);
-                    setUserData(null);
-                    setLoading(false);
-                    return;
-                }
+                // Email verification tekshirilmaydi — barcha foydalanuvchilar kirishi mumkin
+                await ensureUserInFirestore(currentUser);
+                await updateLastLogin(currentUser.uid); // ✅ activeDates va lastLogin yangilash
 
                 setUser(currentUser);
                 const data = await fetchUserData(currentUser.uid);
 
-                // Bloklangan foydalanuvchi tekshiruvi
+                // Bloklangan foydalanuvchi tekshiruvi (bu qoladi)
                 if (data?.blocked) {
                     await signOut(auth);
                     setUser(null);
                     setUserData(null);
                     setLoading(false);
                     return;
-                }
-
-                // Email tasdiqlangan bo'lsa Firestore ga sync
-                if (currentUser.emailVerified && data && !data.emailVerified) {
-                    try {
-                        await updateDoc(doc(db, 'users', currentUser.uid), {
-                            emailVerified: true,
-                        });
-                    } catch (e) { /* ignore — doc may not exist yet */ }
                 }
             } else {
                 setUser(null);
@@ -107,83 +159,74 @@ export function AuthProvider({ children }) {
         return () => unsubscribe();
     }, []);
 
-    // Google bilan kirish
+    // ── Google bilan kirish ──────────────────────────────────────────────────
     const loginWithGoogle = async () => {
         try {
             setError(null);
             const result = await signInWithPopup(auth, googleProvider);
-            // Google bilan kiruvchi ham Firestore ga yoziladi (agar mavjud bo'lmasa)
-            const snap = await getDoc(doc(db, 'users', result.user.uid));
-            if (!snap.exists()) {
-                await setDoc(doc(db, 'users', result.user.uid), {
-                    uid: result.user.uid,
-                    email: result.user.email,
-                    displayName: result.user.displayName || '',
-                    role: 'student',
-                    region: '',
-                    currentLevel: 1,
-                    totalXP: 0,
-                    streakDays: 0,
-                    activeDates: [],
-                    createdAt: serverTimestamp(),
-                });
-            } else {
-                // Bloklangan foydalanuvchini tekshirish
-                const data = snap.data();
-                if (data?.blocked) {
-                    await signOut(auth);
-                    const err = new Error('Akkauntingiz bloklangan. Admin bilan bog\'laning.');
-                    setError(err.message);
-                    throw err;
-                }
+            const user = result.user;
+
+            await ensureUserInFirestore(user);
+
+            const snap = await getDoc(doc(db, 'users', user.uid));
+            const data = snap.data();
+            if (data?.blocked) {
+                await signOut(auth);
+                const err = new Error("Akkauntingiz bloklangan. Admin bilan bog'laning.");
+                setError(err.message);
+                throw err;
             }
-            await fetchUserData(result.user.uid);
-            return result.user;
+
+            await updateLastLogin(user.uid);
+            await fetchUserData(user.uid);
+
+            return user;
         } catch (err) {
             console.error('Login error:', err);
-            if (!err.message.includes('bloklangan')) setError(err.message);
+            if (!err.message?.includes('bloklangan')) setError(err.message);
             throw err;
         }
     };
 
-    // Email + rol bilan ro'yxatdan o'tish (ustoz yoki o'quvchi)
-    const signUpWithEmailAndRole = async (email, password, displayName, role = 'student') => {
+    // ── Email + rol bilan ro'yxatdan o'tish ─────────────────────────────────
+    // Email tasdiqlamasdan to'g'ridan-to'g'ri kirish (demo va real akkauntlar uchun)
+    const signUpWithEmailAndRole = async (rawEmail, password, displayName, role = 'student') => {
         try {
             setError(null);
+
+            // @ belgisi tekshiruvi (minimal format)
+            if (!rawEmail.includes('@')) {
+                throw new Error('Email @ belgisini o\'z ichiga olishi kerak');
+            }
+
+            // Firebase uchun normalize qilamiz (demo@test → demo@test.com)
+            const email = normalizeEmail(rawEmail);
+
             const result = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(result.user, { displayName });
 
-            // Tasdiqlash xati yuborish
-            await sendEmailVerification(result.user, {
-                url: window.location.origin + '/login',
-                handleCodeInApp: false,
-            });
-
-            // Firestore ga yoz (emailVerified: false)
+            // Firestore ga yozamiz — email tasdiqlash TALAB ETILMAYDI
             await setDoc(doc(db, 'users', result.user.uid), {
                 uid: result.user.uid,
                 email,
                 displayName,
+                photoURL: result.user.photoURL || '',
                 role,
-                emailVerified: false,
+                emailVerified: true, // tasdiqlamasdan to'g'ridan ruxsat
                 region: '',
                 currentLevel: 1,
                 totalXP: 0,
                 streakDays: 0,
                 activeDates: [],
+                blocked: false,
+                provider: 'password',
                 createdAt: serverTimestamp(),
+                lastLogin: serverTimestamp(),
             });
 
-            // Admin uchun — darhol kirishga ruxsat (email tekshirilmaydi)
-            if (role === 'admin') {
-                await fetchUserData(result.user.uid);
-                return { user: result.user, role };
-            }
-
-            // Oddiy foydalanuvchi — signOut, verify sahifaga
-            await signOut(auth);
-            setUserData(null);
-            return { user: result.user, role, needsVerification: true, email };
+            // Darhol kirish — hamma uchun (admin va student)
+            await fetchUserData(result.user.uid);
+            return { user: result.user, role };
         } catch (err) {
             console.error('Sign up error:', err);
             setError(err.message);
@@ -195,43 +238,68 @@ export function AuthProvider({ children }) {
     const signUpWithEmail = (email, password, displayName) =>
         signUpWithEmailAndRole(email, password, displayName, 'student');
 
-    // Email bilan kirish
-    const loginWithEmail = async (email, password) => {
+    // ── Email bilan kirish ───────────────────────────────────────────────────
+    const loginWithEmail = async (rawEmail, password) => {
+        setError(null);
+
+        // @ belgisi tekshiruvi (minimal)
+        if (!rawEmail.includes('@')) {
+            const err = new Error('Email @ belgisini o\'z ichiga olishi kerak');
+            setError(err.message);
+            throw err;
+        }
+
+        // Firebase uchun normalize qilamiz (demo@test → demo@test.com)
+        const email = normalizeEmail(rawEmail);
+
         try {
-            setError(null);
             const result = await signInWithEmailAndPassword(auth, email, password);
-            const data = await fetchUserData(result.user.uid);
+            const user = result.user;
+
+            await ensureUserInFirestore(user);
+
+            const data = await fetchUserData(user.uid);
 
             // Bloklangan foydalanuvchini tekshirish
             if (data?.blocked) {
                 await signOut(auth);
                 setUserData(null);
-                const err = new Error('Akkauntingiz bloklangan. Admin bilan bog\'laning.');
+                const err = new Error("Akkauntingiz bloklangan. Admin bilan bog'laning.");
                 setError(err.message);
                 throw err;
             }
 
-            // Email tasdiqlanganmi? (admin uchun tekshirilmaydi)
-            if (!result.user.emailVerified && data?.role !== 'admin') {
-                await signOut(auth);
-                setUserData(null);
-                const err = new Error('EMAIL_NOT_VERIFIED');
-                err.email = email;
-                throw err;
-            }
+            // Email verification tekshiruvi YO'Q — barcha kirishi mumkin
+            await updateLastLogin(user.uid);
 
-            // role ni qaytaramiz — LoginPage yo'nalishni aniqlash uchun
-            return { user: result.user, role: data?.role || 'student' };
+            return { user, role: data?.role || 'student' };
         } catch (err) {
-            console.error('Email login error:', err);
-            if (!err.message.includes('bloklangan') && !err.message.includes('EMAIL_NOT_VERIFIED')) {
-                setError(err.message);
+            if (err.message?.includes('bloklangan')) throw err;
+
+            // Firebase xato kodlari
+            if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+                const e = new Error('❌ Email yoki parol noto\'g\'ri');
+                setError(e.message);
+                throw e;
             }
+            if (err.code === 'auth/wrong-password') {
+                const e = new Error('❌ Parol noto\'g\'ri');
+                setError(e.message);
+                throw e;
+            }
+            if (err.code === 'auth/too-many-requests') {
+                const e = new Error('⏳ Ko\'p urinish! 5 daqiqadan keyin qayta urining.');
+                setError(e.message);
+                throw e;
+            }
+
+            console.error('Email login error:', err);
+            setError(err.message);
             throw err;
         }
     };
 
-    // Parolni tiklash
+    // ── Parolni tiklash ─────────────────────────────────────────────────────
     const resetPassword = async (email) => {
         try {
             setError(null);
@@ -243,11 +311,10 @@ export function AuthProvider({ children }) {
         }
     };
 
-    // Chiqish
+    // ── Chiqish ─────────────────────────────────────────────────────────────
     const logout = async () => {
         try {
             const uid = auth.currentUser?.uid;
-            // localStorage eski kalitlarini tozalash
             if (uid) {
                 const keysToRemove = [
                     `progress_${uid}`,
@@ -266,10 +333,9 @@ export function AuthProvider({ children }) {
         }
     };
 
-
     // Rol yordamchilari
     const isAdmin = userData?.role === 'admin';
-    const isTeacher = userData?.role === 'teacher'; // orqaga moslash uchun saqlanadi
+    const isTeacher = userData?.role === 'teacher';
     const isStudent = userData?.role === 'student' || (!userData?.role && !isAdmin);
 
     const value = {
@@ -280,6 +346,7 @@ export function AuthProvider({ children }) {
         isAdmin,
         isTeacher,
         isStudent,
+        isDemoMode: false, // eski kod bilan moslashish uchun
         loginWithGoogle,
         signUpWithEmail,
         signUpWithEmailAndRole,

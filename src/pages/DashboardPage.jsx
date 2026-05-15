@@ -7,7 +7,7 @@ import {
   Zap, Flame, Award, ArrowRight, Settings, MessageSquare,
   Info, Smartphone, Moon, Sun, Monitor, Volume2, VolumeX, Palette, Camera, Sparkles,
   Send, Loader, Bot, Key, Search, LogOut, BookOpen, Clock, TrendingUp, Activity, Library, Target,
-  Crown
+  Crown, FlaskConical
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -17,12 +17,12 @@ import { auth, db } from '../firebase';
 import { doc, collection, onSnapshot, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
 import {
   getUserProgress, addUserXP, updateUserLevel, markLessonComplete, saveQuizResult,
-  updateUserStats, saveAssessmentResult, initUserStats, trackTodayActivity
+  updateUserStats, initUserStats, trackTodayActivity
 } from '../services/userService';
 
 
 import { lessonsData, calculateChapterProgress } from '../data/lessonsData';
-import { testsData } from '../data/testsData';
+
 import AIRecommendations from '../components/AIRecommendations';
 import { askAITutor } from '../services/aiService';
 import { useGeminiAI } from '../hooks/useGeminiAI';
@@ -32,7 +32,7 @@ import PageHeader from '../components/ui/PageHeader';
 import StatsCard from '../components/dashboard/StatsCard';
 import QuickActionCard from '../components/dashboard/QuickActionCard';
 import ActivityItem from '../components/dashboard/ActivityItem';
-import AssessmentTest from '../components/AssessmentTest';
+
 import { useXP } from '../contexts/XPContext';
 // Modulli laboratoriyalar (Lazy Load)
 const OhmLawLab = lazy(() => import('../components/lab/modules/OhmLawLab'));
@@ -40,10 +40,10 @@ const NewtonsLawLab = lazy(() => import('../components/lab/modules/NewtonsLawLab
 
 // Loading component for lazy modules
 const ComponentLoader = () => (
-  <div className="flex items-center justify-center h-64 w-full bg-slate-800 rounded-2xl border border-slate-700">
+  <div className="flex items-center justify-center h-64 w-full theme-card rounded-2xl border theme-border">
     <div className="flex flex-col items-center gap-4">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-      <span className="text-slate-400 text-sm">Laboratoriya yuklanmoqda...</span>
+      <span className="theme-muted text-sm">Laboratoriya yuklanmoqda...</span>
     </div>
   </div>
 );
@@ -58,7 +58,7 @@ const PDFViewer = lazy(() => import('../components/PDFViewer'));
 function LoadingScreen() {
   const { t } = useLanguage();
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+    <div className="min-h-screen theme-bg flex items-center justify-center">
       <div className="text-center space-y-4">
         <div className="relative">
           <div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-50 animate-pulse"></div>
@@ -66,7 +66,7 @@ function LoadingScreen() {
             <Atom size={64} className="text-white animate-spin" />
           </div>
         </div>
-        <p className="text-slate-400 text-lg">{t('common_loading') || 'Yuklanmoqda...'}</p>
+        <p className="theme-muted text-lg">{t('common_loading') || 'Yuklanmoqda...'}</p>
       </div>
     </div>
   );
@@ -90,19 +90,19 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-10 text-white">
-          <div className="bg-red-900/50 p-8 rounded-2xl border border-red-500 max-w-2xl w-full">
+        <div className="min-h-screen theme-bg flex flex-col items-center justify-center p-10 theme-text">
+          <div className="theme-card p-8 rounded-2xl border border-red-500/50 max-w-2xl w-full shadow-2xl">
             <h1 className="text-3xl font-bold mb-4 flex items-center gap-3">
-              <AlertCircle size={32} className="text-red-400" />
+              <AlertCircle size={32} className="text-red-500" />
               {this.props.t ? this.props.t('error_title') : 'Xatolik yuz berdi'}
             </h1>
-            <p className="text-slate-300 mb-6">{this.props.t ? this.props.t('error_desc') : "Dasturni yuklashda muammo bo'ldi. Iltimos, quyidagi xatoni administratorga yuboring:"}</p>
-            <pre className="bg-black/50 p-4 rounded-lg overflow-auto font-mono text-sm text-red-200 border border-red-500/30">
+            <p className="theme-muted mb-6">{this.props.t ? this.props.t('error_desc') : "Dasturni yuklashda muammo bo'ldi. Iltimos, quyidagi xatoni administratorga yuboring:"}</p>
+            <pre className="theme-surface p-4 rounded-lg overflow-auto font-mono text-sm text-red-500/80 border border-red-500/20">
               {this.state.error?.toString()}
             </pre>
             <button
               onClick={() => window.location.reload()}
-              className="mt-6 px-6 py-3 bg-red-600 hover:bg-red-500 rounded-xl font-bold transition-colors w-full"
+              className="mt-6 px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold transition-all w-full shadow-lg shadow-red-500/20"
             >
               {this.props.t ? this.props.t('common_refresh') : 'Sahifani yangilash'}
             </button>
@@ -136,10 +136,7 @@ function EduPhysicsAppContent() {
   const [userLevel, setUserLevel] = useState(1);
   const [completedLessons, setCompletedLessons] = useState([]);
 
-  // --- ASSESSMENT STATE ---
-  const [showAssessment, setShowAssessment] = useState(false);
-  const [assessmentCompleted, setAssessmentCompleted] = useState(false);
-  const [assessmentResults, setAssessmentResults] = useState(null);
+
 
   // --- AI MESSAGES STATE ---
   const [aiMessages, setAiMessages] = useState([
@@ -318,16 +315,6 @@ function EduPhysicsAppContent() {
       setUserLevel(data.level || 1);
       setCompletedLessons(data.completedLessons || []);
 
-      // Assessment — Firestore dan
-      if (data.assessmentCompleted) {
-        setAssessmentCompleted(true);
-        setAssessmentResults(data.assessmentResults || null);
-        setShowAssessment(false);
-      } else {
-        // Birinchi marta kelgan foydalanuvchi
-        setShowAssessment(true);
-      }
-
       setProgressLoading(false);
     }, (err) => {
       console.warn('DashboardPage progress listener:', err?.code);
@@ -374,26 +361,7 @@ function EduPhysicsAppContent() {
     }
   };
 
-  // Handle assessment completion — Firestore ga saqlash
-  const handleAssessmentComplete = async (results) => {
-    // Firestore ga saqlash (localStorage emas!)
-    if (user?.uid) {
-      await saveAssessmentResult(user.uid, results);
-      await trackTodayActivity(user.uid);
-    }
-    setAssessmentResults(results);
-    setAssessmentCompleted(true);
-    setShowAssessment(false);
-    setActiveTab('dashboard');
-    addNotification('✅ Test muvaffaqiyatli yakunlandi!', 'success');
-  };
 
-
-  // Handle assessment skip
-  const handleAssessmentSkip = () => {
-    setShowAssessment(false);
-    addNotification('Testni keyinroq topshirishingiz mumkin', 'info');
-  };
 
   // Extended User with local avatar
   const displayUser = user ? { ...user, photoURL: userAvatar || user.photoURL } : null;
@@ -401,16 +369,9 @@ function EduPhysicsAppContent() {
   // Render content function
   const renderContent = () => {
     switch (activeTab) {
-      case 'dashboard': return <Dashboard setActiveTab={setActiveTab} setTargetChapter={setTargetChapter} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} completedLessons={completedLessons} totalLessons={lessonsData.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0)} assessmentResults={assessmentResults} showAssessment={showAssessment} onAssessmentComplete={handleAssessmentComplete} onAssessmentSkip={handleAssessmentSkip} announcements={announcements} dismissAnnouncement={dismissAnnouncement} />;
+      case 'dashboard': return <Dashboard setActiveTab={setActiveTab} setTargetChapter={setTargetChapter} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} completedLessons={completedLessons} totalLessons={lessonsData.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0)} announcements={announcements} dismissAnnouncement={dismissAnnouncement} />;
 
-      case 'assessment': return (
-        <AssessmentTest
-          onComplete={handleAssessmentComplete}
-          onSkip={handleAssessmentSkip}
-        />
-      );
-
-      case 'menu': setActiveTab('dashboard'); return <Dashboard setActiveTab={setActiveTab} setTargetChapter={setTargetChapter} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} completedLessons={completedLessons} totalLessons={lessonsData.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0)} assessmentResults={assessmentResults} showAssessment={showAssessment} onAssessmentComplete={handleAssessmentComplete} onAssessmentSkip={handleAssessmentSkip} announcements={announcements} dismissAnnouncement={dismissAnnouncement} />;
+      case 'menu': setActiveTab('dashboard'); return <Dashboard setActiveTab={setActiveTab} setTargetChapter={setTargetChapter} userXP={userXP} userLevel={userLevel} theme={theme} userStats={userStats} completedLessons={completedLessons} totalLessons={lessonsData.chapters.reduce((acc, ch) => acc + ch.lessons.length, 0)} announcements={announcements} dismissAnnouncement={dismissAnnouncement} />;
 
       case 'ai-tutor': return (
         <AITutorModule setActiveTab={setActiveTab} messages={aiMessages} setMessages={setAiMessages} />
@@ -492,28 +453,31 @@ function EduPhysicsAppContent() {
 
       {/* Yon panel (Sidebar) */}
       <aside className={`
-        fixed inset-y-0 left-0 z-40 w-64
-        theme-surface border-r theme-border
+        fixed inset-y-0 left-0 z-40 w-[220px]
+        theme-sidebar border-r-[0.5px] theme-border
         flex flex-col
-        transition-transform duration-300 shadow-2xl
+        transition-transform duration-300
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0
       `}>
         {/* Logo & Brand */}
-        <div className="p-4 lg:p-6 flex items-center justify-between border-b border-slate-700">
+        <div className="p-4 lg:p-6 flex items-center justify-between border-b-[0.5px] theme-border pb-4">
           <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2.5 rounded-xl shadow-lg shadow-blue-500/30">
-              <Atom size={24} className="text-white animate-spin-slow" />
-            </div>
+            <img 
+              src="/assets/nurfizika.jpg" 
+              alt="NurFizika Logo" 
+              className="w-8 h-8 rounded-lg object-cover"
+              style={{ filter: 'drop-shadow(0 2px 4px rgba(13, 148, 136, 0.2))' }}
+            />
             <div className="flex flex-col">
-              <span className="text-white font-bold text-lg">{t('app_name') || 'NurFizika'}</span>
-              <span className="text-xs text-yellow-300 italic">{t('app_slogan') || 'Kuch — bilimda!'}</span>
+              <span className="text-[#0d9488] font-bold text-[18px] tracking-tight">{t('app_name') || 'NurFizika'}</span>
+              <span className="text-[9px] sm:text-[10px] font-serif italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 drop-shadow-[0_1px_1px_rgba(251,191,36,0.2)] mt-0.5">{t('app_slogan') || 'Fizika — yangicha nigohda'}</span>
             </div>
           </div>
           {/* Close button - only on mobile */}
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+            className="lg:hidden p-1.5 theme-muted hover:text-teal-500 theme-card-hover rounded-lg transition-colors"
           >
             <X size={20} />
           </button>
@@ -528,6 +492,9 @@ function EduPhysicsAppContent() {
           <div onClick={() => handleNavNavigate('/kutubxona')}>
             <SidebarItem icon={<Library />} label={t('nav_library') || 'Kutubxona'} id="kutubxona" active={activeTab} set={() => { }} />
           </div>
+          <div onClick={() => handleNavNavigate('/formulalar')}>
+            <SidebarItem icon={<FlaskConical />} label={t('nav_formulas') || 'Formulalar'} id="formulalar" active={activeTab} set={() => { }} />
+          </div>
           <div onClick={() => handleNavNavigate('/missiyalar')}>
             <SidebarItem icon={<Target />} label={t('nav_missions') || 'Missiyalar'} id="missiyalar" active={activeTab} set={() => { }} />
           </div>
@@ -539,65 +506,72 @@ function EduPhysicsAppContent() {
           </div>
           <SidebarItem icon={<BookOpen />} label={t('nav_homework') || 'Uy Vazifasi'} id="homework" active={activeTab} set={handleTabChange} />
           <SidebarItem icon={<Brain />} label={t('nav_tests') || 'AI Test Sinovlari'} id="quiz" active={activeTab} set={handleTabChange} />
+          <SidebarItem icon={<MessageSquare />} label={t('dash_ai_tutor') || 'AI Fizik Ustoz'} id="ai-tutor" active={activeTab} set={handleTabChange} />
           <SidebarItem icon={<User />} label={t('nav_profile') || 'Profil'} id="profile" active={activeTab} set={handleTabChange} />
         </nav>
 
         {/* User Section */}
-        <div className="p-4 border-t border-slate-700 bg-slate-900 space-y-3">
-          <div className="flex items-center gap-3 p-3 bg-slate-800 rounded-xl border border-slate-700">
-            <div className="w-10 h-10 rounded-full border-2 border-blue-500/40 overflow-hidden bg-slate-800 flex items-center justify-center flex-shrink-0">
+        <div className="p-4 border-t-[0.5px] theme-border theme-sidebar space-y-3">
+          <motion.div 
+            whileHover={{ y: -2 }}
+            className="flex items-center gap-3 p-3 theme-card rounded-xl border-[0.5px] theme-border hover:border-teal-500/30 transition-all duration-300"
+          >
+            <div className="w-10 h-10 rounded-full border-2 border-teal-500/40 overflow-hidden theme-card flex items-center justify-center flex-shrink-0">
               {displayUser?.photoURL ? (
                 <img src={displayUser.photoURL} alt="User" className="w-full h-full object-cover" />
               ) : (
-                <span className="text-white font-bold text-sm">{displayUser?.displayName ? displayUser.displayName[0].toUpperCase() : 'U'}</span>
+                <span className="theme-text font-bold text-sm">{displayUser?.displayName ? displayUser.displayName[0].toUpperCase() : 'U'}</span>
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white font-medium text-sm truncate">
+              <p className="theme-text font-medium text-sm truncate">
                 {displayUser?.displayName || (t('dash_profile_default_user') || 'Foydalanuvchi')}
               </p>
-              <p className="text-slate-400 text-xs truncate">
+              <p className="theme-muted text-xs truncate">
                 {displayUser?.email || 'email@example.com'}
               </p>
             </div>
-          </div>
+          </motion.div>
           <div className="space-y-2">
             {userData?.role === 'admin' && (
-              <button
+              <motion.button
+                whileHover={{ x: 4 }}
                 onClick={() => { navigate('/admin'); setSidebarOpen(false); }}
-                className="w-full flex items-center gap-3 px-4 py-2.5 bg-violet-500/10 hover:bg-violet-500/20 rounded-lg transition-all duration-200 text-violet-400 hover:text-violet-300 group border border-violet-500/20"
+                className="w-full flex items-center gap-3 px-4 py-2.5 bg-violet-500/10 hover:bg-violet-500/20 rounded-lg transition-all duration-300 text-violet-400 hover:text-violet-300 group border border-violet-500/20"
               >
-                <Crown size={18} className="flex-shrink-0" />
+                <Crown size={18} className="flex-shrink-0 group-hover:rotate-12 transition-transform duration-300" />
                 <span className="text-sm font-medium flex-1 text-left">{t('nav_admin') || 'Admin Panel'}</span>
-                <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all duration-200" />
-              </button>
+                <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
+              </motion.button>
             )}
-            <button
+            <motion.button
+              whileHover={{ x: 4 }}
               onClick={() => { navigate('/settings'); setSidebarOpen(false); }}
-              className="w-full flex items-center gap-3 px-4 py-2.5 bg-slate-800 hover:bg-slate-800 rounded-lg transition-all duration-200 text-slate-300 hover:text-white group border border-slate-700"
+              className="w-full flex items-center gap-3 px-4 py-2.5 theme-card rounded-lg transition-all duration-300 theme-text-secondary group border-[0.5px] theme-border hover:border-teal-500/30 hover:theme-text"
             >
-              <Settings size={18} className="flex-shrink-0 self-center group-hover:rotate-90 transition-transform duration-300" />
+              <Settings size={18} className="flex-shrink-0 self-center group-hover:rotate-90 transition-transform duration-500" />
               <span className="text-sm font-medium self-center leading-none">{t('nav_settings') || 'Sozlamalar'}</span>
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileHover={{ x: 4 }}
               onClick={logout}
-              className="w-full flex items-center gap-3 px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-all duration-200 text-red-400 hover:text-red-300 group border border-red-500/20"
+              className="w-full flex items-center gap-3 px-4 py-2.5 bg-red-500/5 hover:bg-red-500/10 rounded-lg transition-all duration-300 text-red-400/80 hover:text-red-400 group border border-red-500/10 hover:border-red-500/30"
             >
-              <LogOut size={18} className="flex-shrink-0 self-center" />
+              <LogOut size={18} className="flex-shrink-0 self-center group-hover:-translate-x-1 transition-transform duration-300" />
               <span className="text-sm font-medium self-center leading-none">{t('nav_logout') || 'Chiqish'}</span>
-            </button>
+            </motion.button>
           </div>
         </div>
       </aside>
 
       {/* Asosiy oyna */}
-      <main className="flex-1 overflow-y-auto theme-bg relative scroll-smooth transition-all duration-300 lg:ml-64">
+      <main className="flex-1 overflow-y-auto theme-bg relative scroll-smooth transition-all duration-300 lg:ml-[220px]">
 
         {/* Mobile Top Bar */}
-        <div className="lg:hidden sticky top-0 z-20 flex items-center justify-between px-4 py-3 bg-slate-900 backdrop-blur-lg border-b border-slate-700 shadow-lg">
+        <div className="lg:hidden sticky top-0 z-20 flex items-center justify-between px-4 py-3 theme-topbar border-b-[0.5px] theme-border">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 text-white hover:bg-slate-800 rounded-lg transition-colors"
+            className="p-2 theme-text theme-card-hover rounded-lg transition-colors"
           >
             <Menu size={22} />
           </button>
@@ -608,13 +582,13 @@ function EduPhysicsAppContent() {
               className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-cover"
               style={{ filter: 'drop-shadow(0 2px 5px rgba(255, 215, 0, 0.3))' }}
             />
-            <span className="text-white font-bold text-base">NurFizika</span>
+            <span className="theme-text font-medium text-base">NurFizika</span>
           </div>
-          <div className="w-10 h-10 rounded-full border-2 border-blue-500/40 overflow-hidden bg-slate-800 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full border-2 border-teal-500/40 overflow-hidden theme-card flex items-center justify-center">
             {displayUser?.photoURL ? (
               <img src={displayUser.photoURL} alt="User" className="w-full h-full object-cover" />
             ) : (
-              <span className="text-white font-bold text-sm">{displayUser?.displayName ? displayUser.displayName[0].toUpperCase() : 'U'}</span>
+              <span className="theme-text font-bold text-sm">{displayUser?.displayName ? displayUser.displayName[0].toUpperCase() : 'U'}</span>
             )}
           </div>
         </div>
@@ -643,11 +617,11 @@ function EduPhysicsAppContent() {
       </main>
 
       {/* Mobile Bottom Navigation Bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-slate-900 backdrop-blur-lg border-t border-slate-700 safe-area-bottom">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-30 theme-bottom-nav border-t theme-border safe-area-bottom">
         <div className="flex items-center justify-around px-2 py-2">
           <button
             onClick={() => handleTabChange('dashboard')}
-            className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 ${activeTab === 'dashboard' ? 'text-blue-400' : 'text-slate-400 hover:text-slate-300'
+            className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 ${activeTab === 'dashboard' ? 'text-teal-600 dark:text-teal-400' : 'theme-muted'
               }`}
           >
             <BarChart2 size={20} />
@@ -655,14 +629,14 @@ function EduPhysicsAppContent() {
           </button>
           <button
             onClick={() => handleNavNavigate('/darsliklar')}
-            className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 text-slate-400 hover:text-slate-300"
+            className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 theme-muted"
           >
             <BookOpen size={20} />
             <span className="text-[10px] font-medium">{t('nav_lessons') || 'Darslar'}</span>
           </button>
           <button
             onClick={() => handleTabChange('quiz')}
-            className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 ${activeTab === 'quiz' ? 'text-blue-400' : 'text-slate-400 hover:text-slate-300'
+            className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 ${activeTab === 'quiz' ? 'text-teal-600 dark:text-teal-400' : 'theme-muted'
               }`}
           >
             <Brain size={20} />
@@ -670,7 +644,7 @@ function EduPhysicsAppContent() {
           </button>
           <button
             onClick={() => handleTabChange('ai-tutor')}
-            className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 ${activeTab === 'ai-tutor' ? 'text-purple-400' : 'text-slate-400 hover:text-slate-300'
+            className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 ${activeTab === 'ai-tutor' ? 'text-teal-600 dark:text-teal-400' : 'theme-muted'
               }`}
           >
             <Zap size={20} />
@@ -678,7 +652,7 @@ function EduPhysicsAppContent() {
           </button>
           <button
             onClick={() => handleTabChange('profile')}
-            className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 ${activeTab === 'profile' ? 'text-blue-400' : 'text-slate-400 hover:text-slate-300'
+            className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 ${activeTab === 'profile' ? 'text-blue-500' : 'theme-muted'
               }`}
           >
             <User size={20} />
@@ -693,10 +667,10 @@ function EduPhysicsAppContent() {
 
 // --- ANNOUNCEMENT BANNERS ---
 const ANN_STYLES = {
-  info: { bg: 'bg-blue-500/10', border: 'border-blue-500/30', icon: 'ℹ️', text: 'text-blue-300' },
-  success: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', icon: '✅', text: 'text-emerald-300' },
-  warning: { bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', icon: '⚠️', text: 'text-yellow-300' },
-  error: { bg: 'bg-red-500/10', border: 'border-red-500/30', icon: '🔴', text: 'text-red-300' },
+  info: { bg: 'bg-blue-600 dark:bg-blue-500/10', border: 'border-blue-700 dark:border-blue-500/30', icon: 'ℹ️', text: 'text-white-fixed dark:text-blue-300', body: 'text-white-fixed/80 dark:theme-muted', close: 'text-white-fixed/60 dark:theme-muted' },
+  success: { bg: 'bg-emerald-600 dark:bg-emerald-500/10', border: 'border-emerald-700 dark:border-emerald-500/30', icon: '✅', text: 'text-white-fixed dark:text-emerald-300', body: 'text-white-fixed/80 dark:theme-muted', close: 'text-white-fixed/60 dark:theme-muted' },
+  warning: { bg: 'bg-amber-500 dark:bg-yellow-500/10', border: 'border-amber-600 dark:border-yellow-500/30', icon: '⚠️', text: 'text-white-fixed dark:text-yellow-300', body: 'text-white-fixed/90 dark:theme-muted', close: 'text-white-fixed/70 dark:theme-muted' },
+  error: { bg: 'bg-red-600 dark:bg-red-500/10', border: 'border-red-700 dark:border-red-500/30', icon: '🔴', text: 'text-white-fixed dark:text-red-300', body: 'text-white-fixed/80 dark:theme-muted', close: 'text-white-fixed/60 dark:theme-muted' },
 };
 function AnnouncementBanners({ announcements = [], onDismiss }) {
   const navigate = useNavigate();
@@ -718,11 +692,11 @@ function AnnouncementBanners({ announcements = [], onDismiss }) {
               <span className="text-lg flex-shrink-0 mt-0.5">{s.icon}</span>
               <div>
                 <p className={`font-semibold text-sm ${s.text}`}>{ann.title}</p>
-                {ann.body && <p className="text-slate-400 text-xs mt-0.5 leading-relaxed">{ann.body}</p>}
+                {ann.body && <p className={`${s.body} text-xs mt-0.5 leading-relaxed`}>{ann.body}</p>}
               </div>
             </div>
             <button onClick={() => onDismiss(ann.id)}
-              className="text-slate-600 hover:text-slate-300 transition-colors flex-shrink-0 mt-0.5 text-lg leading-none">
+              className={`${s.close} hover:text-white-fixed dark:hover:theme-text transition-colors flex-shrink-0 mt-0.5 text-lg leading-none`}>
               ✕
             </button>
           </div>
@@ -738,14 +712,19 @@ function AIAssistant({ apiKey, setShowSettings, isOpen: externalIsOpen, setIsOpe
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
   const setIsOpen = externalSetIsOpen || setInternalIsOpen;
   const [messages, setMessages] = useState([
-    { role: 'ai', text: "Salom! Men AI Fizik Ustozman. Menga dars bo'yicha har qanday savol berishingiz mumkin. ⚛️" }
+    { role: 'ai', text: "Salom! Men NurFizika AI ustoziman. Menga dars bo'yicha har qanday savol berishingiz mumkin. ⚛️" }
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    if (isOpen) messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (isOpen) {
+        const timer = setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+        return () => clearTimeout(timer);
+    }
   }, [messages, isOpen]);
 
   const handleSend = async () => {
@@ -775,34 +754,34 @@ function AIAssistant({ apiKey, setShowSettings, isOpen: externalIsOpen, setIsOpe
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
       {/* Chat Window */}
       {isOpen && (
-        <div className="mb-4 w-80 md:w-96 bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 overflow-hidden flex flex-col h-[500px] animate-scaleIn origin-bottom-right pointer-events-auto">
+        <div className="mb-4 w-[350px] md:w-[450px] theme-card rounded-2xl shadow-2xl border-2 border-teal-500/20 overflow-hidden flex flex-col h-[600px] animate-scaleIn origin-bottom-right pointer-events-auto">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 flex items-center justify-between">
+          <div className="bg-gradient-to-r from-teal-600 to-emerald-600 p-4 flex items-center justify-between shadow-lg">
             <div className="flex items-center space-x-2">
               <Bot className="text-white" size={20} />
-              <h3 className="font-bold text-white">{t("dash_ai_tutor") || "AI Fizik Ustoz"}</h3>
+              <h3 className="font-bold text-white">{t("dash_ai_tutor") || "NurFizika AI"}</h3>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-white/80 hover:text-white"><X size={18} /></button>
+            <button onClick={() => setIsOpen(false)} className="text-white/80 hover:text-white transition-colors"><X size={20} /></button>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-900 scrollbar-thin scrollbar-thumb-slate-700">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 theme-bg custom-scrollbar">
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} `}>
-                <div className={`max - w - [85 %] p - 3 rounded - 2xl text - sm leading - relaxed ${msg.role === 'user'
-                  ? 'bg-blue-600 text-white rounded-br-none shadow-lg'
-                  : 'bg-slate-800 text-slate-200 rounded-bl-none shadow-md'
-                  } `}>
+                <div className={`max-w-[85%] p-3.5 rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
+                  ? 'bg-teal-600 text-white rounded-br-none shadow-lg shadow-teal-500/20'
+                  : 'theme-surface theme-text rounded-bl-none shadow-md border theme-border'
+                  }`}>
                   {msg.text}
                 </div>
               </div>
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-slate-800 p-3 rounded-2xl rounded-bl-none flex space-x-1 items-center">
-                  <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-100"></div>
-                  <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-200"></div>
+                <div className="theme-surface border theme-border p-3.5 rounded-2xl rounded-bl-none flex space-x-1.5 items-center shadow-sm">
+                  <div className="w-2 h-2 bg-teal-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-2 h-2 bg-teal-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-2 h-2 bg-teal-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                 </div>
               </div>
             )}
@@ -810,21 +789,21 @@ function AIAssistant({ apiKey, setShowSettings, isOpen: externalIsOpen, setIsOpe
           </div>
 
           {/* Input */}
-          <div className="p-3 bg-slate-800 border-t border-slate-700 flex space-x-2">
+          <div className="p-4 theme-card border-t-2 theme-border flex space-x-3 shadow-[0_-4px_15px_rgba(0,0,0,0.05)]">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-              placeholder={t("dash_ai_placeholder") || "Savol bering..."}
-              className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+              placeholder="Savol bering..."
+              className="flex-1 theme-input border-2 border-teal-500/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all placeholder:theme-muted theme-text"
             />
             <button
               onClick={handleSend}
               disabled={isLoading || !input.trim()}
-              className="p-2 bg-blue-600 rounded-xl hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-white"
+              className="p-3 bg-teal-600 rounded-xl hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-white shadow-lg shadow-teal-500/20 active:scale-95"
             >
-              <Send size={18} />
+              <Send size={20} />
             </button>
           </div>
         </div>
@@ -833,12 +812,12 @@ function AIAssistant({ apiKey, setShowSettings, isOpen: externalIsOpen, setIsOpe
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="pointer-events-auto group relative flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-600/40 hover:scale-110 transition-transform duration-200 active:scale-95"
+        className="pointer-events-auto group relative flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-tr from-teal-600 to-emerald-600 text-white shadow-xl shadow-teal-500/40 hover:scale-110 transition-all duration-300 active:scale-95 border-2 border-white/20"
       >
-        {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
+        {isOpen ? <X size={28} /> : <MessageSquare size={28} />}
 
         {!isOpen && (
-          <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-slate-700 animate-pulse"></span>
+          <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 theme-card animate-pulse shadow-md"></span>
         )}
       </button>
     </div>
@@ -856,7 +835,7 @@ function VirtualLab({ addNotification, setShowSettings, updateStats }) {
     return (
       <div className="space-y-6 animate-fadeIn pb-12">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold flex items-center gap-2 text-white">
+          <h2 className="text-2xl font-bold flex items-center gap-2 theme-text">
             <Zap className="text-yellow-400" />
             {t("dash_lab_title") || "Virtual Laboratoriya"}
           </h2>
@@ -868,20 +847,20 @@ function VirtualLab({ addNotification, setShowSettings, updateStats }) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setActiveModule('ohm')}
-            className="bg-slate-800 rounded-2xl p-6 border border-slate-700 cursor-pointer hover:border-blue-500 transition-colors group relative overflow-hidden"
+            className="theme-card rounded-2xl p-6 border theme-border cursor-pointer hover:border-teal-500 transition-colors group relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
               <Zap size={100} />
             </div>
             <div className="relative z-10">
-              <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-4 text-blue-400">
+              <div className="w-12 h-12 bg-teal-500/20 rounded-xl flex items-center justify-center mb-4 text-teal-500 dark:text-teal-400">
                 <Zap size={24} />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">{t("dash_lab_ohm_title") || "Elektr Toki (Om Qonuni)"}</h3>
-              <p className="text-slate-400 text-sm mb-4">
+              <h3 className="text-xl font-bold theme-text mb-2">{t("dash_lab_ohm_title") || "Elektr toki (Om qonuni)"}</h3>
+              <p className="theme-muted text-sm mb-4">
                 Tok kuchi, kuchlanish va qarshilik orasidagi bog'liqlikni o'rganing.
               </p>
-              <div className="flex items-center gap-2 text-blue-400 font-medium text-sm">
+              <div className="flex items-center gap-2 text-teal-600 dark:text-teal-400 font-medium text-sm">
                 Tajribani boshlash <ArrowRight size={16} />
               </div>
             </div>
@@ -892,7 +871,7 @@ function VirtualLab({ addNotification, setShowSettings, updateStats }) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setActiveModule('newton')}
-            className="bg-slate-800 rounded-2xl p-6 border border-slate-700 cursor-pointer hover:border-green-500 transition-colors group relative overflow-hidden"
+            className="theme-card rounded-2xl p-6 border theme-border cursor-pointer hover:border-green-500 transition-colors group relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
               <Activity size={100} />
@@ -901,8 +880,8 @@ function VirtualLab({ addNotification, setShowSettings, updateStats }) {
               <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-4 text-green-400">
                 <Activity size={24} />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">{t('dash_lab_newton_title') || "Mexanika (Nyuton Qonuni)"}</h3>
-              <p className="text-slate-400 text-sm mb-4">
+              <h3 className="text-xl font-bold theme-text mb-2">{t('dash_lab_newton_title') || "Mexanika (Nyuton qonuni)"}</h3>
+              <p className="theme-muted text-sm mb-4">
                 Kuch, massa va tezlanish. Harakat qonunlarini interaktiv o'rganing.
               </p>
               <div className="flex items-center gap-2 text-green-400 font-medium text-sm">
@@ -912,12 +891,12 @@ function VirtualLab({ addNotification, setShowSettings, updateStats }) {
           </motion.div>
 
           {/* Module 3: Coming Soon - Optics */}
-          <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 opacity-60">
+          <div className="theme-card rounded-2xl p-6 border theme-border opacity-60">
             <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mb-4 text-purple-400">
               <Sparkles size={24} />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">{t('dash_lab_optics_title') || "Optika"}</h3>
-            <p className="text-slate-400 text-sm mb-4">
+            <h3 className="text-xl font-bold theme-text mb-2">{t('dash_lab_optics_title') || "Optika"}</h3>
+            <p className="theme-muted text-sm mb-4">
               Yorug'lik, linzalar va ko'zgular. Tez kunda...
             </p>
           </div>
@@ -930,7 +909,7 @@ function VirtualLab({ addNotification, setShowSettings, updateStats }) {
     <div className="space-y-4">
       <button
         onClick={() => setActiveModule('home')}
-        className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-2"
+        className="flex items-center gap-2 theme-muted hover:theme-text transition-colors mb-2"
       >
         <ArrowRight className="rotate-180" size={20} />
         {t("dash_lab_all") || "Barcha tajribalar"}
@@ -959,15 +938,25 @@ function VideoContent({ url }) {
   const { t } = useLanguage();
   if (!url) {
     return (
-      <div className="w-full aspect-video bg-slate-800 rounded-xl flex items-center justify-center border border-slate-700 animate-fadeIn">
-        <div className="text-center p-6">
-          <div className="bg-slate-800 p-4 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-            <Video size={32} className="text-slate-400" />
-          </div>
-          <h3 className="text-white font-bold mb-2">{t("dash_video_loading") || "Video dars tez orada yuklanadi"}</h3>
-          <p className="text-slate-400 text-sm max-w-xs mx-auto">
-            Ushbu mavzu bo'yicha maxsus video dars tayyorlanmoqda. Tez orada bu yerda tomosha qilishingiz mumkin bo'ladi.
-          </p>
+      <div className="w-full aspect-video bg-slate-800 rounded-xl flex items-center justify-center border border-slate-700 overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-orange-500/5" />
+        <div className="text-center p-6 relative z-10 flex flex-col items-center">
+            <div className="animate-bounce" style={{ animationDuration: '3s' }}>
+                <div className="bg-gradient-to-br from-red-500/20 to-orange-500/20 p-5 rounded-full mb-4 relative shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+                    <div className="absolute inset-0 rounded-full animate-ping bg-red-500/20 opacity-75" style={{ animationDuration: '2s' }} />
+                    <Video size={36} className="text-red-500 relative z-10" />
+                </div>
+            </div>
+            <h3 className="text-2xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-400 flex items-center gap-2">
+                {t("dash_video_loading") || "Tez kunda!"}
+                <span className="flex h-3 w-3 relative">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
+                </span>
+            </h3>
+            <p className="text-slate-400 text-sm max-w-xs mx-auto">
+                {t("lesson_video_desc_soon") || "Ushbu mavzu uchun maxsus video dars tayyorlanmoqda. Tez orada tomosha qilishingiz mumkin bo'ladi."}
+            </p>
         </div>
       </div>
     );
@@ -1070,27 +1059,27 @@ function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }
     return (
       <div className="max-w-2xl mx-auto mt-10 space-y-8 animate-fadeIn">
         <div className="text-center space-y-4">
-          <div className="w-20 h-20 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-2xl mx-auto flex items-center justify-center shadow-xl">
+          <div className="w-20 h-20 bg-gradient-to-tr from-teal-600 to-emerald-600 rounded-2xl mx-auto flex items-center justify-center shadow-xl">
             <Brain size={40} className="text-white" />
           </div>
-          <h2 className="text-3xl font-bold text-white">{t("dash_quiz_ai_builder") || "AI Test Tuzuvchi"}</h2>
-          <p className="text-slate-400">{t('dash_quiz_ai_desc') || "Sun'iy intellekt yordamida o'zingiz istagan mavzuda bilimingizni sinang."}</p>
+          <h2 className="text-3xl font-bold theme-text">{t("dash_quiz_ai_builder") || "AI Test Tuzuvchi"}</h2>
+          <p className="theme-muted">{t('dash_quiz_ai_desc') || "Sun'iy intellekt yordamida o'zingiz istagan mavzuda bilimingizni sinang."}</p>
         </div>
 
-        <div className="bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl relative overflow-hidden">
+        <div className="theme-card p-8 rounded-3xl border theme-border shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
             <Sparkles size={120} />
           </div>
 
-          <label className="block text-sm font-medium text-slate-300 mb-3 ml-1">{t("dash_quiz_input_label") || "Mavzuni kiriting (yoki tanlang)"}</label>
+          <label className="block text-sm font-medium theme-muted mb-3 ml-1">{t("dash_quiz_input_label") || "Mavzuni kiriting (yoki tanlang)"}</label>
           <div className="relative mb-6">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
             <input
               type="text"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
-              placeholder={t("dash_quiz_input_placeholder") || "Masalan: Optika, Atom fizikasi, Magnit..."}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+              placeholder={t("dash_quiz_input_placeholder") || "Masalan: optika, atom fizikasi, magnit..."}
+              className="w-full theme-input border theme-border rounded-xl py-4 pl-12 pr-4 theme-text placeholder:text-slate-400 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
             />
           </div>
 
@@ -1106,7 +1095,7 @@ function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }
               <button
                 key={tag.id}
                 onClick={() => setTopic(tag.id)}
-                className="px-3 py-1 bg-slate-800 hover:bg-slate-600 rounded-lg text-sm text-slate-300 transition-colors"
+                className="px-3 py-1 theme-card border theme-border hover:border-teal-500 rounded-lg text-sm theme-muted transition-colors"
               >
                 {tag.label}
               </button>
@@ -1126,7 +1115,7 @@ function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }
             ) : (
               <>
                 <Sparkles />
-                {t('dash_quiz_start_btn') || "Testni Boshlash"}
+                {t('dash_quiz_start_btn') || "Testni boshlash"}
               </>
             )}
           </button>
@@ -1146,23 +1135,23 @@ function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }
         </div>
 
         <div>
-          <h2 className="text-4xl font-bold text-white mb-2">{t("dash_quiz_result_label") || "Natija:"} {percentage}%</h2>
-          <p className="text-slate-400">{t("dash_quiz_result_desc")?.replace("{total}", questions.length).replace("{score}", score) || `Siz ${questions.length} ta savoldan ${score} tasiga to'g'ri javob berdingiz.`}</p>
+          <h2 className="text-4xl font-bold theme-text mb-2">{t("dash_quiz_result_label") || "Natija:"} {percentage}%</h2>
+          <p className="theme-muted">{t("dash_quiz_result_desc")?.replace("{total}", questions.length).replace("{score}", score) || `Siz ${questions.length} ta savoldan ${score} tasiga to'g'ri javob berdingiz.`}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
-          <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
-            <div className="text-green-400 font-bold text-xl">+{score * 50}</div>
-            <div className="text-xs text-slate-400 uppercase">{t("dash_quiz_xp_points") || "XP Points"}</div>
+          <div className="theme-card p-4 rounded-xl border theme-border">
+            <div className="text-green-500 font-bold text-xl">+{score * 50}</div>
+            <div className="text-xs theme-muted">{t("dash_quiz_xp_points") || "XP ballar"}</div>
           </div>
-          <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
-            <div className="text-blue-400 font-bold text-xl">{score}</div>
-            <div className="text-xs text-slate-400 uppercase">{t('dash_quiz_correct_ans') || "To'g'ri Javob"}</div>
+          <div className="theme-card p-4 rounded-xl border theme-border">
+            <div className="text-blue-500 font-bold text-xl">{score}</div>
+            <div className="text-xs theme-muted">{t('dash_quiz_correct_ans') || "To'g'ri javob"}</div>
           </div>
         </div>
 
-        <button onClick={resetQuiz} className="flex items-center space-x-2 px-8 py-3 bg-blue-600 hover:bg-blue-50 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-600/30 hover:-translate-y-1">
-          <RotateCcw size={18} /> <span>{t("dash_quiz_retry") || "Boshqa Test Yechish"}</span>
+        <button onClick={resetQuiz} className="flex items-center space-x-2 px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-600/30 hover:-translate-y-1">
+          <RotateCcw size={18} /> <span>{t("dash_quiz_retry") || "Boshqa test yechish"}</span>
         </button>
       </div>
     );
@@ -1173,32 +1162,32 @@ function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }
     <div className="max-w-3xl mx-auto mt-6 animate-fadeIn">
       <div className="mb-8">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-slate-400 font-medium">{t("dash_quiz_topic") || "Mavzu: "}<span className="text-white">{topic || t("dash_quiz_general") || "Umumiy Fizika"}</span></span>
-          <span className="font-mono font-bold text-blue-400">{currentQ + 1}/{questions.length}</span>
+          <span className="text-sm theme-muted font-medium">{t("dash_quiz_topic") || "Mavzu: "}<span className="theme-text">{topic || t("dash_quiz_general") || "Umumiy fizika"}</span></span>
+          <span className="font-mono font-bold text-blue-500">{currentQ + 1}/{questions.length}</span>
         </div>
-        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+        <div className="w-full bg-gray-200 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
           <div className="bg-blue-500 h-full transition-all duration-500" style={{ width: `${((currentQ) / questions.length) * 100}%` }}></div>
         </div>
       </div>
 
-      <div className="bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl relative overflow-hidden">
+      <div className="theme-card p-8 rounded-3xl border theme-border shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 right-0 p-6 opacity-10">
-          <Brain size={100} className="text-white" />
+          <Brain size={100} className="theme-text" />
         </div>
 
-        <h3 className="text-2xl text-white mb-8 font-medium relative z-10 leading-relaxed">{questions[currentQ].q}</h3>
+        <h3 className="text-2xl theme-text mb-8 font-medium relative z-10 leading-relaxed">{questions[currentQ].q}</h3>
 
         <div className="space-y-3 relative z-10">
           {questions[currentQ].options.map((opt, idx) => {
             const isSelected = selectedOption === idx;
             const isCorrect = idx === questions[currentQ].ans;
-            let btnClass = "bg-slate-800 hover:bg-slate-600 text-slate-200";
+            let btnClass = "theme-surface hover:theme-bg theme-text border theme-border";
             if (selectedOption !== null) {
               if (isSelected && isCorrect) btnClass = "bg-green-600 text-white border-green-400 ring-2 ring-green-500/50";
               else if (isSelected && !isCorrect) btnClass = "bg-red-600 text-white border-red-400";
-              else btnClass = "bg-slate-800 opacity-50 cursor-not-allowed";
+              else btnClass = "theme-surface opacity-50 cursor-not-allowed border theme-border theme-text";
             } else {
-              btnClass = "bg-slate-800 hover:bg-blue-600 hover:text-white hover:shadow-lg hover:-translate-y-0.5";
+              btnClass = "theme-surface hover:bg-blue-600 hover:text-white border theme-border theme-text hover:shadow-lg hover:-translate-y-0.5";
             }
 
             return (
@@ -1246,7 +1235,7 @@ function UserProfile({ user, userXP, userLevel, userStats = { timeSpent: 0, test
   // Unlock achievements based on stats
   const achievements = [
     { id: 'first_step', title: "Birinchi Qadam", icon: <Zap />, unlocked: true },
-    { id: 'om_law', title: "Om Qonuni", icon: <Atom />, unlocked: labCount >= 1 },
+    { id: 'om_law', title: "Om qonuni", icon: <Atom />, unlocked: labCount >= 1 },
     { id: 'quiz_master', title: "Test Ustasi", icon: <Brain />, unlocked: (userStats?.testsSolved || 0) >= 5 },
     { id: 'week_streak', title: "7 Kunlik", icon: <Flame />, unlocked: false },
   ];
@@ -1272,7 +1261,7 @@ function UserProfile({ user, userXP, userLevel, userStats = { timeSpent: 0, test
           <div className="text-center md:text-left">
             <h2 className="text-4xl font-bold text-white mb-2">{user?.displayName || "Foydalanuvchi"}</h2>
             <p className="text-blue-100 mb-4 flex items-center justify-center md:justify-start gap-2">
-              <Award size={18} /> 9-sinf O'quvchisi | Bo'lajak Muhandis
+              <Award size={18} /> 9-sinf o'quvchisi | bo'lajak muhandis
             </p>
             <div className="flex flex-wrap justify-center md:justify-start gap-3">
               <Badge label={`Level ${userLevel}`} color="bg-white/20 text-white" />
@@ -1285,51 +1274,51 @@ function UserProfile({ user, userXP, userLevel, userStats = { timeSpent: 0, test
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors">
+        <div className="theme-card p-6 rounded-2xl border theme-border hover:border-blue-500/50 transition-colors">
           <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-blue-500/10 rounded-xl text-blue-400"><Trophy size={24} /></div>
-            <span className="text-xs font-bold text-slate-400 bg-slate-900 px-2 py-1 rounded-lg">LEVEL {userLevel}</span>
+            <div className="p-3 bg-blue-500/10 rounded-xl text-blue-500 dark:text-blue-400"><Trophy size={24} /></div>
+            <span className="text-xs font-bold theme-muted bg-gray-200 dark:bg-slate-900 px-2 py-1 rounded-lg">LEVEL {userLevel}</span>
           </div>
-          <div className="text-3xl font-bold text-white mb-1">{userXP}</div>
-          <div className="text-sm text-slate-400">{t("dash_profile_tot_xp") || "Umumiy XP ballar"}</div>
+          <div className="text-3xl font-bold theme-text mb-1">{userXP}</div>
+          <div className="text-sm theme-muted">{t("dash_profile_tot_xp") || "Umumiy XP ballar"}</div>
         </div>
-        <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-green-500/50 transition-colors">
+        <div className="theme-card p-6 rounded-2xl border theme-border hover:border-green-500/50 transition-colors">
           <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-green-500/10 rounded-xl text-green-400"><Book size={24} /></div>
-            <span className="text-xs font-bold text-slate-400 bg-slate-900 px-2 py-1 rounded-lg">6 BOB</span>
+            <div className="p-3 bg-green-500/10 rounded-xl text-green-500 dark:text-green-400"><Book size={24} /></div>
+            <span className="text-xs font-bold theme-muted bg-gray-200 dark:bg-slate-900 px-2 py-1 rounded-lg">6 BOB</span>
           </div>
-          <div className="text-3xl font-bold text-white mb-1">{progressPercent}%</div>
-          <div className="text-sm text-slate-400">{t("dash_profile_progress") || "Kurs progressi"}</div>
+          <div className="text-3xl font-bold theme-text mb-1">{progressPercent}%</div>
+          <div className="text-sm theme-muted">{t("dash_profile_progress") || "Kurs progressi"}</div>
         </div>
-        <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-purple-500/50 transition-colors">
+        <div className="theme-card p-6 rounded-2xl border theme-border hover:border-purple-500/50 transition-colors">
           <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-purple-500/10 rounded-xl text-purple-400"><Zap size={24} /></div>
-            <span className="text-xs font-bold text-slate-400 bg-slate-900 px-2 py-1 rounded-lg">LAB</span>
+            <div className="p-3 bg-purple-500/10 rounded-xl text-purple-500 dark:text-purple-400"><Zap size={24} /></div>
+            <span className="text-xs font-bold theme-muted bg-gray-200 dark:bg-slate-900 px-2 py-1 rounded-lg">LAB</span>
           </div>
-          <div className="text-3xl font-bold text-white mb-1">{labCount}</div>
-          <div className="text-sm text-slate-400">{t("dash_profile_labs_done") || "Bajarilgan lablar"}</div>
+          <div className="text-3xl font-bold theme-text mb-1">{labCount}</div>
+          <div className="text-sm theme-muted">{t("dash_profile_labs_done") || "Bajarilgan lablar"}</div>
         </div>
-        <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-yellow-500/50 transition-colors">
+        <div className="theme-card p-6 rounded-2xl border theme-border hover:border-yellow-500/50 transition-colors">
           <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-yellow-500/10 rounded-xl text-yellow-400"><Award size={24} /></div>
-            <span className="text-xs font-bold text-slate-400 bg-slate-900 px-2 py-1 rounded-lg">YUTUQLAR</span>
+            <div className="p-3 bg-yellow-500/10 rounded-xl text-yellow-500 dark:text-yellow-400"><Award size={24} /></div>
+            <span className="text-xs font-bold theme-muted bg-gray-200 dark:bg-slate-900 px-2 py-1 rounded-lg">Yutuqlar</span>
           </div>
-          <div className="text-3xl font-bold text-white mb-1">{unlockedCount}/10</div>
-          <div className="text-sm text-slate-400">{t("dash_profile_achievs_done") || "Ochilgan yutuqlar"}</div>
+          <div className="text-3xl font-bold theme-text mb-1">{unlockedCount}/10</div>
+          <div className="text-sm theme-muted">{t("dash_profile_achievs_done") || "Ochilgan yutuqlar"}</div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 bg-slate-800 rounded-2xl p-6 border border-slate-700">
-          <h3 className="text-xl font-bold mb-6 flex items-center gap-2"><Trophy className="text-yellow-500" />{t("dash_profile_my_achievs") || " Yutuqlarim"}</h3>
+        <div className="md:col-span-2 theme-card rounded-2xl p-6 border theme-border">
+          <h3 className="text-xl theme-text font-bold mb-6 flex items-center gap-2"><Trophy className="text-yellow-500" />{t("dash_profile_my_achievs") || " Yutuqlarim"}</h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {achievements.map(ach => (
               <AchievementCard key={ach.id} title={ach.title} icon={ach.icon} unlocked={ach.unlocked} />
             ))}
           </div>
         </div>
-        <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
-          <h3 className="text-xl font-bold mb-6">{t("dash_profile_stats") || "Statistika"}</h3>
+        <div className="theme-card rounded-2xl p-6 border theme-border">
+          <h3 className="text-xl theme-text font-bold mb-6">{t("dash_profile_stats") || "Statistika"}</h3>
           <ul className="space-y-4">
             <StatRow label={t("dash_profile_time_spent") || "O'qilgan vaqt"} value={(function (s) {
               if (!s) return "0m";
@@ -1343,8 +1332,8 @@ function UserProfile({ user, userXP, userLevel, userStats = { timeSpent: 0, test
               label={t("dash_profile_avg_score") || "O'rtacha baho"}
               value={`${userStats.testsSolved ? Math.round(userStats.totalScore / userStats.testsSolved) : 0}%`}
               color={
-                (userStats.testsSolved ? Math.round(userStats.totalScore / userStats.testsSolved) : 0) >= 80 ? "text-green-400" :
-                  (userStats.testsSolved ? Math.round(userStats.totalScore / userStats.testsSolved) : 0) >= 50 ? "text-yellow-400" : "text-red-400"
+                (userStats.testsSolved ? Math.round(userStats.totalScore / userStats.testsSolved) : 0) >= 80 ? "text-green-600 dark:text-green-400" :
+                  (userStats.testsSolved ? Math.round(userStats.totalScore / userStats.testsSolved) : 0) >= 50 ? "text-yellow-600 dark:text-yellow-400" : "text-red-600 dark:text-red-400"
               }
             />
           </ul>
@@ -1357,16 +1346,19 @@ function UserProfile({ user, userXP, userLevel, userStats = { timeSpent: 0, test
 function Badge({ label, color }) { return <span className={`px-4 py-1.5 rounded-lg text-sm backdrop-blur-sm ${color}`}>{label}</span> }
 function AchievementCard({ title, icon, unlocked }) {
   return (
-    <div className={`aspect-square rounded-xl flex flex-col items-center justify-center p-4 text-center border transition-all ${unlocked ? 'bg-gradient-to-br from-slate-700 to-slate-800 border-slate-700 text-white hover:border-blue-500 cursor-pointer' : 'bg-slate-800 border-slate-700 text-slate-600 grayscale'}`}>
-      <div className={`mb-3 p-3 rounded-full ${unlocked ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-800'}`}>{icon}</div>
+    <motion.div 
+      whileHover={unlocked ? { y: -5, scale: 1.05 } : {}}
+      className={`aspect-square rounded-xl flex flex-col items-center justify-center p-4 text-center border transition-all duration-300 ${unlocked ? 'bg-gradient-to-br from-teal-50/50 to-emerald-50/50 dark:from-slate-700 dark:to-slate-800 theme-border theme-text hover:border-teal-500 cursor-pointer shadow-md' : 'theme-surface theme-border theme-muted grayscale opacity-60'}`}
+    >
+      <div className={`mb-3 p-3 rounded-full transition-transform duration-300 ${unlocked ? 'bg-teal-500/20 text-teal-600 dark:text-teal-400 group-hover:scale-110' : 'bg-gray-200 dark:bg-slate-800'}`}>{icon}</div>
       <span className="text-xs font-bold">{title}</span>
-    </div>
+    </motion.div>
   )
 }
-function StatRow({ label, value, color = "text-white" }) {
+function StatRow({ label, value, color = "theme-text" }) {
   return (
-    <li className="flex justify-between items-center pb-3 border-b border-slate-700 last:border-0">
-      <span className="text-slate-400 text-sm">{label}</span>
+    <li className="flex justify-between items-center pb-3 border-b theme-border last:border-0">
+      <span className="theme-muted text-sm">{label}</span>
       <span className={`font-mono font-bold ${color}`}>{value}</span>
     </li>
   )
@@ -1374,7 +1366,7 @@ function StatRow({ label, value, color = "text-white" }) {
 
 
 // --- DASHBOARD COMPONENT ---
-function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStats, completedLessons = [], totalLessons = 24, assessmentResults, showAssessment, onAssessmentComplete, onAssessmentSkip }) {
+function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStats, completedLessons = [], totalLessons = 24, announcements, dismissAnnouncement }) {
   const { t } = useLanguage();
   const { user } = useAuth();
   const { totalXP } = useXP();
@@ -1444,19 +1436,20 @@ function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStat
   useEffect(() => {
     if (!user?.uid) return;
     const logsRef = collection(db, 'xpLogs', user.uid, 'logs');
-    const q = query(logsRef, orderBy('timestamp', 'desc'), limit(8));
+    const q = query(logsRef, orderBy('timestamp', 'desc'), limit(6));
     const unsub = onSnapshot(q, (snap) => {
       const REASON_META = {
         LESSON_COMPLETE: { title: "Darsni tugatdingiz", icon: CheckCircle, color: 'green' },
         TEST_COMPLETE: { title: "Testni tugatdingiz", icon: Trophy, color: 'yellow' },
         LAB_COMPLETE: { title: "Laboratoriya", icon: Zap, color: 'purple' },
-        DAILY_LOGIN: { title: "Kunlik kirish", icon: Activity, color: 'blue' },
+        DAILY_LOGIN: { title: "Kunlik kirish", icon: Activity, color: 'teal' },
         PERFECT_SCORE: { title: "Mukammal natija!", icon: Award, color: 'orange' },
         MISSION_DAILY: { title: "Kunlik missiya", icon: Target, color: 'indigo' },
         MISSION_WEEKLY: { title: "Haftalik missiya", icon: TrendingUp, color: 'indigo' },
         ACHIEVEMENT: { title: "Yutuq ochildi!", icon: Award, color: 'orange' },
-        AI_MESSAGE: { title: "AI Ustoz suhbati", icon: Brain, color: 'blue' },
+        AI_MESSAGE: { title: "AI Ustoz suhbati", icon: Brain, color: 'teal' },
         mission_complete: { title: "Missiya bajarildi", icon: CheckCircle, color: 'green' },
+        FORMULA_LEARNED: { title: "Formulalar", icon: Zap, color: 'teal' },
       };
       const items = snap.docs.map((d) => {
         const data = d.data();
@@ -1492,143 +1485,72 @@ function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStat
 
   return (
     <div className="space-y-8 pb-8">
-      {/* Welcome Header — modern gradient banner */}
-      <div className="relative overflow-hidden rounded-3xl p-6 md:p-8 border border-blue-500/20 bg-gradient-to-br from-blue-600/10 via-slate-800/60 to-purple-600/10 backdrop-blur-md shadow-xl">
-        {/* decorative orbs */}
-        <div className="absolute -top-12 -right-12 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-1 tracking-tight">
-              {getGreeting()}! 👋
-            </h2>
-            <p className="text-slate-400 text-sm md:text-base">
+      {/* Welcome Header — corporate banner */}
+      <motion.div 
+        whileHover={{ y: -2 }}
+        className="theme-card-premium rounded-3xl p-8 relative overflow-hidden group shadow-lg"
+      >
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-teal-500/10 transition-colors duration-500" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-teal-500/5 rounded-full -ml-24 -mb-24 blur-3xl" />
+        
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 relative z-10">
+          <div className="space-y-2">
+            <div className="flex items-center gap-3 mb-1">
+                <div className="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-600 dark:text-teal-400 border border-teal-500/20">
+                    <Sparkles size={20} />
+                </div>
+                <h2 className="text-[28px] md:text-[34px] font-black theme-text tracking-tight leading-tight">
+                  {getGreeting()}! 👋
+                </h2>
+            </div>
+            <p className="theme-text-secondary text-[16px] md:text-[17px] font-medium opacity-90 max-w-lg">
               {t("dash_lessons_done_1") || "Bugun"}{" "}
-              <span className="text-white font-semibold">{todayLessons}</span>{" "}
+              <span className="text-teal-600 dark:text-teal-400 font-bold underline decoration-teal-500/30 underline-offset-4">{todayLessons}</span>{" "}
               {t("dash_lessons_done_2") || "ta dars tugatdingiz - ajoyib ish!"}
             </p>
           </div>
 
           {/* Level + XP progress */}
-          <div className="sm:text-right shrink-0 min-w-[160px]">
-            <div className="flex items-center sm:justify-end gap-2 mb-2">
-              <div className="px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs font-bold shadow-lg">
+          <div className="sm:text-right shrink-0 bg-teal-500/5 dark:bg-teal-500/10 p-5 rounded-2xl border border-teal-500/10 backdrop-blur-sm min-w-[200px]">
+            <div className="flex items-center sm:justify-end gap-3 mb-3">
+              <div className="px-3 py-1.5 rounded-lg bg-teal-500 text-white text-[12px] font-black uppercase tracking-widest shadow-lg shadow-teal-500/20">
                 Level {userLevel}
               </div>
-              <span className="text-slate-300 font-bold text-sm">{totalXP.toLocaleString()} XP</span>
+              <span className="theme-text font-bold text-lg">{totalXP.toLocaleString()} <span className="text-xs theme-muted uppercase tracking-tighter">XP</span></span>
             </div>
             {/* XP progress bar towards next level */}
-            <div className="flex items-center gap-2">
-              <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-1000"
-                  style={{ width: `${Math.min(((totalXP % 1000) / 1000) * 100, 100)}%` }}
+            <div className="space-y-2">
+              <div className="flex justify-between text-[11px] font-bold theme-muted uppercase tracking-wider">
+                <span>Progress</span>
+                <span>{Math.round(((totalXP % 1000) / 1000) * 100)}%</span>
+              </div>
+              <div className="h-2.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden p-0.5 border border-teal-500/10">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${Math.min(((totalXP % 1000) / 1000) * 100, 100)}%` }}
+                  className="h-full bg-gradient-to-r from-teal-500 to-emerald-400 rounded-full shadow-[0_0_10px_rgba(20,184,166,0.3)]"
+                  transition={{ duration: 1.5, ease: "easeOut" }}
                 />
               </div>
-              <span className="text-xs text-slate-500 whitespace-nowrap">
-                {1000 - (totalXP % 1000)} XP
-              </span>
+              <p className="text-[10px] theme-muted font-medium text-center italic">
+                Keyingi darajaga {1000 - (totalXP % 1000)} XP qoldi
+              </p>
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Assessment Test Card (if not completed) */}
-      {showAssessment && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-purple-600/20 to-blue-600/20 border-2 border-purple-500/40 rounded-2xl p-6 md:p-8"
-        >
-          <div className="flex flex-col md:flex-row items-start gap-4">
-            <div className="p-4 bg-gradient-to-br from-purple-500 to-blue-600 rounded-2xl flex-shrink-0">
-              <Brain size={32} className="text-white" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-2xl font-bold text-white mb-2">
-                {t("dash_assess_title") || "🎯 Bilim Darajangizni Aniqlang!"}
-              </h3>
-              <p className="text-slate-300 mb-4">
-                {t('dash_assess_desc') || "15 ta savol orqali fizika bo'yicha bilimingizni baholaymiz va sizga mos o'quv rejasini tayyorlaymiz."}
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-                <div className="flex items-center gap-2 text-sm text-slate-300">
-                  <CheckCircle className="text-green-400" size={18} />
-                  <span>{t("dash_assess_f1") || "15 ta savol - barcha mavzulardan"}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-slate-300">
-                  <Clock className="text-blue-400" size={18} />
-                  <span>{t("dash_assess_f2") || "~10 daqiqa - vaqt cheklanmagan"}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-slate-300">
-                  <TrendingUp className="text-purple-400" size={18} />
-                  <span>{t('dash_assess_f3') || "Shaxsiy o'quv rejasi"}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-slate-300">
-                  <Sparkles className="text-yellow-400" size={18} />
-                  <span>{t("dash_assess_f4") || "AI tavsiyalar"}</span>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-3">
-                <button
-                  onClick={() => setActiveTab('assessment')}
-                  className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 rounded-xl font-bold transition-all shadow-lg shadow-purple-600/20 flex items-center gap-2"
-                >
-                  <Brain size={20} />
-                  {t("dash_assess_start") || "Testni Boshlash"}
-                </button>
-                <button
-                  onClick={onAssessmentSkip}
-                  className="px-6 py-3 bg-slate-800 hover:bg-slate-600 rounded-xl font-medium transition-colors"
-                >
-                  {t("dash_assess_later") || "Keyinroq"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      )}
 
-      {/* Assessment Results (if completed) */}
-      {assessmentResults && (
-        <div className="bg-gradient-to-br from-purple-600/10 to-blue-600/10 border border-purple-500/20 rounded-2xl p-6">
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-purple-500/10 rounded-xl">
-              <Award className="text-purple-400" size={24} />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-bold text-white mb-2">
-                Sizning bilim darajangiz: {assessmentResults.level === 'advanced' ? '⭐⭐⭐ Yuqori' : assessmentResults.level === 'intermediate' ? '⭐⭐ O\'rta' : '⭐ Boshlang\'ich'}
-              </h3>
-              <p className="text-slate-300 text-sm mb-3">
-                Test natijasi: {assessmentResults.overallScore}% ({assessmentResults.totalCorrect}/{assessmentResults.totalQuestions} to'g'ri)
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {Object.entries(assessmentResults.topicScores).map(([topic, score]) => (
-                  <span
-                    key={topic}
-                    className={`
-                      px-3 py-1 rounded-full text-xs font-medium
-                      ${score.percentage >= 80 ? 'bg-green-500/10 text-green-400 border border-green-500/30' : ''}
-                      ${score.percentage >= 50 && score.percentage < 80 ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30' : ''}
-                      ${score.percentage < 50 ? 'bg-red-500/10 text-red-400 border border-red-500/30' : ''}
-                    `}
-                  >
-                    {topic}: {score.percentage}%
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Today's Statistics */}
       <div>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-1 h-6 rounded-full bg-gradient-to-b from-blue-400 to-cyan-400" />
-          <h3 className="text-xl font-bold text-white">{t("dash_today_stats") || "Bugungi Statistika"}</h3>
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-1.5 h-8 rounded-full bg-gradient-to-b from-blue-500 to-cyan-500 shadow-[0_0_15px_rgba(59,130,246,0.4)]" />
+          <h3 className="text-2xl font-black theme-text tracking-tight uppercase tracking-widest text-[14px]">
+            {t("dash_today_stats") || "Bugungi statistika"}
+          </h3>
+          <div className="flex-1 h-[1px] bg-gradient-to-r from-blue-500/20 to-transparent" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
@@ -1666,9 +1588,12 @@ function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStat
 
       {/* Quick Actions */}
       <div>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-1 h-6 rounded-full bg-gradient-to-b from-purple-400 to-pink-400" />
-          <h3 className="text-xl font-bold text-white">{t("dash_quick_actions") || "Tezkor Harakatlar"}</h3>
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-1.5 h-8 rounded-full bg-gradient-to-b from-purple-500 to-pink-500 shadow-[0_0_15px_rgba(168,85,247,0.4)]" />
+          <h3 className="text-2xl font-black theme-text tracking-tight uppercase tracking-widest text-[14px]">
+            {t("dash_quick_actions") || "Tezkor harakatlar"}
+          </h3>
+          <div className="flex-1 h-[1px] bg-gradient-to-r from-purple-500/20 to-transparent" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           <QuickActionCard
@@ -1713,17 +1638,31 @@ function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStat
             color="purple"
             onClick={() => setActiveTab('ai-tutor')}
           />
+          <QuickActionCard
+            icon={Brain}
+            title={t("nav_tests") || "AI Testlar"}
+            description={t("dash_qa_quiz_desc") || "Bilimingizni sinab ko'ring"}
+            color="pink"
+            onClick={() => setActiveTab('quiz')}
+          />
+          <QuickActionCard
+            icon={FlaskConical}
+            title={t("nav_formulas") || "Formulalar"}
+            description={t("dash_qa_formulas_desc") || "Barcha fizika formulalari"}
+            color="emerald"
+            onClick={() => navigate('/formulalar')}
+          />
         </div>
       </div>
 
       {/* Recent Activity */}
       <div>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-1 h-6 rounded-full bg-gradient-to-b from-emerald-400 to-teal-400" />
-          <h3 className="text-xl font-bold text-white flex items-center gap-2">
-            <BarChart2 size={18} className="text-emerald-400" />
-            {t('dash_recent_activity') || "So'nggi Faoliyat"}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-1.5 h-8 rounded-full bg-gradient-to-b from-emerald-500 to-teal-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]" />
+          <h3 className="text-2xl font-black theme-text tracking-tight uppercase tracking-widest text-[14px]">
+            {t('dash_recent_activity') || "So'nggi faoliyat"}
           </h3>
+          <div className="flex-1 h-[1px] bg-gradient-to-r from-emerald-500/20 to-transparent" />
         </div>
         <div className="space-y-3">
           {recentActivities.map((activity, index) => (
@@ -1744,9 +1683,9 @@ function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStat
 
       {/* AI Recommendations */}
       <div>
-        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+        <h3 className="text-xl font-bold theme-text mb-4 flex items-center gap-2">
           <Sparkles className="text-purple-500" />
-          {t("dash_ai_recs") || "AI Shaxsiy Tavsiyalar"}
+          {t("dash_ai_recs") || "AI shaxsiy tavsiyalar"}
         </h3>
         <AIRecommendations
           userStats={userStats}
@@ -1767,33 +1706,41 @@ function SidebarItem({ icon, label, id, active, set }) {
     <button
       onClick={() => set(id)}
       className={`
-        w-full flex items-center gap-3 px-4 py-3 rounded-xl
-        transition-all duration-200 group relative
+        w-full flex items-center gap-3 px-4 py-3 mb-1.5 rounded-xl
+        transition-all duration-200 group relative overflow-hidden outline-none
         ${isActive
-          ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/30'
-          : 'text-slate-400 hover:text-white hover:bg-slate-800'
+          ? 'bg-gradient-to-r from-teal-500/15 to-transparent border border-teal-500/20 text-teal-600 dark:text-teal-400 font-bold shadow-sm'
+          : 'bg-transparent hover:bg-teal-500/5 html.light:hover:bg-teal-500/8 text-slate-600 dark:text-slate-400 hover:text-teal-700 dark:hover:text-teal-300 border border-transparent hover:border-teal-500/15 hover:shadow-sm hover:-translate-y-px'
         }
       `}
     >
+      {/* Active left indicator bar */}
+      {isActive && (
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-teal-500 rounded-r-full shadow-[0_0_8px_rgba(20,184,166,0.6)]" />
+      )}
+
+      {/* Hover shimmer sweep */}
+      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-500 ease-in-out bg-gradient-to-r from-transparent via-teal-500/5 to-transparent pointer-events-none" />
+
       {/* Icon */}
       <div className={`
-        flex-shrink-0 transition-transform duration-200
-        ${isActive ? 'scale-110' : 'group-hover:scale-110'}
+        flex-shrink-0 transition-all duration-200 relative z-10
+        ${isActive
+          ? 'scale-110 text-teal-500 drop-shadow-[0_0_5px_rgba(20,184,166,0.4)]'
+          : 'group-hover:scale-110 group-hover:text-teal-500 group-hover:drop-shadow-[0_0_4px_rgba(20,184,166,0.3)]'
+        }
       `}>
         {React.cloneElement(icon, { size: 20 })}
       </div>
 
       {/* Label */}
-      <span className={`
-        text-sm font-medium transition-all duration-200
-        ${isActive ? 'font-bold' : 'font-normal'}
-      `}>
+      <span className={`text-[14px] tracking-wide relative z-10 transition-all duration-200 ${isActive ? 'font-bold' : 'font-medium group-hover:translate-x-0.5'}`}>
         {label}
       </span>
-
-      {/* Active Indicator */}
+      
+      {/* Active glow */}
       {isActive && (
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-l-full" />
+        <div className="absolute inset-y-0 left-0 w-24 bg-teal-500/10 blur-2xl rounded-full pointer-events-none" />
       )}
     </button>
   );

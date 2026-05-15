@@ -1,6 +1,6 @@
 /**
  * NurFizika Live Test — AI savollar generatsiyasi
- * Gemini 2.5 Flash modeli
+ * NurFizika AI modeli
  */
 export const generateLiveQuestions = async (topic, difficulty = 'medium', count = 10) => {
     const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;

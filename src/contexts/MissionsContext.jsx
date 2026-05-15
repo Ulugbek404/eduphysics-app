@@ -10,13 +10,15 @@ import { useXP, pushXPToast } from './XPContext';
 export const DAILY_MISSIONS_TEMPLATE = [
     { id: 'daily_lesson', title: "Bitta dars tugalla", icon: 'BookOpen', target: 1, xp: 50, trigger: 'LESSON_COMPLETE' },
     { id: 'daily_test', title: "Test ishlat", icon: 'ClipboardList', target: 1, xp: 40, trigger: 'TEST_COMPLETE' },
-    { id: 'daily_ai', title: "AI Ustoz bilan suhbatlash", icon: 'Bot', target: 3, xp: 30, trigger: 'AI_MESSAGE' },
+    { id: 'daily_ai', title: "AI ustoz bilan suhbatlash", icon: 'Bot', target: 3, xp: 30, trigger: 'AI_MESSAGE' },
+    { id: 'daily_formula', title: "3 ta formulani o'rgan", icon: 'FlaskConical', target: 3, xp: 45, trigger: 'FORMULA_LEARNED' },
 ];
 
 export const WEEKLY_MISSIONS_TEMPLATE = [
     { id: 'week_streak', title: "5 kun ketma-ket login", icon: 'Flame', target: 5, xp: 100, trigger: 'DAILY_LOGIN' },
     { id: 'week_labs', title: "2 ta laboratoriya tugalla", icon: 'FlaskConical', target: 2, xp: 150, trigger: 'LAB_COMPLETE' },
     { id: 'week_lessons', title: "10 ta mavzu tugalla", icon: 'GraduationCap', target: 10, xp: 200, trigger: 'LESSON_COMPLETE' },
+    { id: 'week_formulas', title: "5 ta formulani o'rgan", icon: 'Atom', target: 5, xp: 120, trigger: 'FORMULA_LEARNED' },
 ];
 
 export const ACHIEVEMENTS_TEMPLATE = [
@@ -24,7 +26,7 @@ export const ACHIEVEMENTS_TEMPLATE = [
     { id: 'ten_lessons', title: "Izlanuvchan", desc: "10 ta dars tugalla", icon: '📚', xp: 300, trigger: 'LESSON_COMPLETE', conditionKey: 'totalLessons', conditionVal: 10 },
     { id: 'perfect', title: "Daho", desc: "Testda 90%+ natija ol", icon: '🧠', xp: 250, trigger: 'PERFECT_SCORE', conditionKey: null, conditionVal: 0 },
     { id: 'all_labs', title: "Laborant", desc: "Barcha 6 laboratoriyani tugalla", icon: '🥼', xp: 400, trigger: 'LAB_COMPLETE', conditionKey: 'totalLabs', conditionVal: 6 },
-    { id: 'week_streak_5', title: "Sodiq O'quvchi", desc: "5 kun ketma-ket kir", icon: '🔥', xp: 300, trigger: 'DAILY_LOGIN', conditionKey: 'streakDays', conditionVal: 5 },
+    { id: 'week_streak_5', title: "Sodiq o'quvchi", desc: "5 kun ketma-ket kir", icon: '🔥', xp: 300, trigger: 'DAILY_LOGIN', conditionKey: 'streakDays', conditionVal: 5 },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -47,7 +49,7 @@ export function MissionsProvider({ children }) {
     const [dailyMissions, setDailyMissions] = useState(freshTasks(DAILY_MISSIONS_TEMPLATE));
     const [weeklyMissions, setWeeklyMissions] = useState(freshTasks(WEEKLY_MISSIONS_TEMPLATE));
     const [achievements, setAchievements] = useState(ACHIEVEMENTS_TEMPLATE.map(a => ({ ...a, earned: false })));
-    const [userStats, setUserStats] = useState({ totalLessons: 0, totalLabs: 0, streakDays: 0 });
+    const [userStats, setUserStats] = useState({ totalLessons: 0, totalLabs: 0, streakDays: 0, totalFormulas: 0 });
 
     const addXPRef = useRef(addXP);
     useEffect(() => { addXPRef.current = addXP; }, [addXP]);
@@ -91,7 +93,7 @@ export function MissionsProvider({ children }) {
                         daily: { date: todayStr(), tasks: freshTasks(DAILY_MISSIONS_TEMPLATE) },
                         weekly: { weekStart: weekStart(), tasks: freshTasks(WEEKLY_MISSIONS_TEMPLATE) },
                         achievements: ACHIEVEMENTS_TEMPLATE.map(a => ({ ...a, earned: false })),
-                        stats: { totalLessons: 0, totalLabs: 0, streakDays: 0 },
+                        stats: { totalLessons: 0, totalLabs: 0, streakDays: 0, totalFormulas: 0 },
                     };
                     await setDoc(ref, initial);
                     if (!mounted) return;
@@ -156,6 +158,7 @@ export function MissionsProvider({ children }) {
         if (trigger === 'LESSON_COMPLETE') newStats.totalLessons = (newStats.totalLessons || 0) + 1;
         if (trigger === 'LAB_COMPLETE') newStats.totalLabs = (newStats.totalLabs || 0) + 1;
         if (trigger === 'DAILY_LOGIN') newStats.streakDays = (newStats.streakDays || 0) + 1;
+        if (trigger === 'FORMULA_LEARNED') newStats.totalFormulas = (newStats.totalFormulas || 0) + 1;
 
         const newDaily = (data.daily?.tasks || freshTasks(DAILY_MISSIONS_TEMPLATE)).map(task => {
             if (task.completed || task.trigger !== trigger) return task;

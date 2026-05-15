@@ -3,14 +3,14 @@ export const lesson9 = {
     id: '9-l-28', chapter_id: '9-ch-02',
     title: 'Ideal gaz holatining tenglamalari',
     description: "Klapeyron-Mendeleyev tenglamasining turli shakllari va qo'llanilishi.",
-    order_number: 9, duration_minutes: 50, video_url: 'https://www.youtube.com/embed/8_XmkR3Y6wU', has_lab: false, test_count: 8, difficulty: 'hard',
+    order_number: 9, duration_minutes: 50, video_url: '', has_lab: false, test_count: 8, difficulty: 'hard',
     content: {
         key_concepts: ['Klapeyron-Mendeleyev tenglamasi', "Tenglamaning turli shakllari", 'Birlashtirilgan gaz qonuni', 'Amaliy qo\'llash'],
         theory: `Bu darsda ideal gaz tenglamasining barcha shakllarini batafsil o'rganamiz va ularni turli vaziyatlarda qo'llashni o'rganamiz.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-KLAPEYRON-MENDELEYEV TENGLAMASI
+Klapeyron-Mendeleyev tenglamasi
 
 Ideal gazning asosiy tenglamasi:
 
@@ -33,7 +33,7 @@ Bu tenglamani turli shakllarda yozish mumkin:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-BIRLASHTILGAN GAZ QONUNI
+Birlashtirilgan gaz qonuni
 
 Agar gazning massasi o'zgarmasa (m = const), quyidagi tenglik o'rinli:
 
@@ -51,7 +51,7 @@ Bu birlashtilgan gaz qonunidan maxsus holatlar kelib chiqadi:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-NORMAL SHAROIT (N.SH.)
+Normal sharoit (n.sh.)
 
 Normal sharoit — bu standart bosim va temperaturada gazning holati:
 • P₀ = 101325 Pa = 1 atm
@@ -64,7 +64,7 @@ Bu barcha ideal gazlar uchun bir xil! 1 mol vodorod ham, 1 mol kislorod ham norm
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-AMALIY QO'LLANISHLAR
+Amaliy qo'llanishlar
 
 Havo shari: Issiq havo kengayib, balon ko'tariladi (V va T bog'liq)
 Avtomobil shinasi: Harorat oshsa, shina bosimi oshadi (P va T bog'liq)
@@ -73,7 +73,7 @@ Suv osti sho'ng'in: Chuqurlikda bosim oshadi, havo pufaklari kichrayadi
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-XULOSA
+Xulosa
 1. PV = νRT — asosiy shakl
 2. Turli shakllarda yozish mumkin: massa, zichlik, molekulalar soni orqali
 3. P₁V₁/T₁ = P₂V₂/T₂ — birlashtilgan gaz qonuni

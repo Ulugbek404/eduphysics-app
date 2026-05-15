@@ -1,4 +1,4 @@
-// 9-Sinf Fizika Dasturi - To'liq Yangilangan Darslar Ma'lumotlari
+// 9-Sinf Fizika Dasturi - To'liq Yangilangan Darslar ma'lumotlari
 
 export const lessonsData = {
     chapters: [
@@ -282,7 +282,7 @@ Bunda:
 - **s** - yo'l (m yoki km)
 - **t** - vaqt (s yoki soat)
 
-### Boshqa Formulalar:
+### Boshqa formulalar:
 
 **Yo'lni topish:**
 \`\`\`
@@ -562,7 +562,7 @@ Bunda:
 
 **Tekis tezlanuvchan harakat** - tezlanish o'zgarmas bo'lgan harakat.
 
-### Asosiy Formulalar:
+### Asosiy formulalar:
 
 **1. Tezlik:**
 \`\`\`
@@ -691,7 +691,7 @@ g ≈ 10 m/s²
 
 **Masalalar yechishda:** g = 10 m/s² ishlatamiz
 
-## Erkin Tushish Formulalari
+## Erkin Tushish formulalari
 
 Erkin tushishda **a = g** bo'lgani uchun:
 
@@ -970,7 +970,7 @@ Bunda:
 - **m** - massa (kg)
 - **V** - hajm (m³)
 
-### Boshqa Formulalar:
+### Boshqa formulalar:
 
 **Massani topish:**
 \`\`\`

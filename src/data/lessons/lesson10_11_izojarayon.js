@@ -3,14 +3,14 @@ export const lesson10 = {
     id: '9-l-29', chapter_id: '9-ch-02',
     title: 'Izotermik jarayon',
     description: "Boyl-Mariot qonuni — o'zgarmas temperaturada bosim va hajm bog'liqligi.",
-    order_number: 10, duration_minutes: 45, video_url: 'https://www.youtube.com/embed/-l68WYDtSbk', has_lab: false, test_count: 6, difficulty: 'medium',
+    order_number: 10, duration_minutes: 45, video_url: '', has_lab: false, test_count: 6, difficulty: 'medium',
     content: {
         key_concepts: ['Izotermik jarayon', 'Boyl-Mariot qonuni', "P-V diagramma (izoterma)", 'Bosim va hajm teskari proporsional'],
         theory: `Endi izojarayonlarni — gazning holatida bitta parametr o'zgarmas qolgandagi jarayonlarni o'rganamiz. Birinchisi — IZOTERMIK JARAYON.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-IZOTERMIK JARAYON NIMA?
+Izotermik jarayon nima?
 
 Izotermik jarayon — bu temperatura o'zgarmas qolgan (T = const) holda bosim va hajmning o'zgarishi.
 
@@ -20,7 +20,7 @@ Izotermik jarayon — bu temperatura o'zgarmas qolgan (T = const) holda bosim va
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-BOYL-MARIOT QONUNI
+Boyl-Mariot qonuni
 
 Bu qonunni 1662 yilda Robert Boyl (Angliya) va 1676 yilda Edm Mariot (Fransiya) mustaqil ravishda kashf etishgan.
 
@@ -37,7 +37,7 @@ Bu nimani anglatadi?
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-GRAFIK — IZOTERMA
+Grafik — izoterma
 
 P-V diagrammada izotermik jarayon GIPERBOLA shaklida chiziladi.
 
@@ -51,7 +51,7 @@ V-T diagrammada: gorizontal to'g'ri chiziq (T o'zgarmaydi)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-HAYOTIY MISOLLAR
+Hayotiy misollar
 
 1. Shprits: Shprits og'zini yopib porshenni bosganingizda — hajm kamayadi, bosim oshadi (T ≈ const)
 2. Suv osti cho'milish: Chuqurlikka tushganda bosim oshadi, o'pkadagi havo siqiladi (hajm kamayadi)
@@ -59,7 +59,7 @@ HAYOTIY MISOLLAR
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-XULOSA
+Xulosa
 • Izotermik: T = const
 • PV = const (Boyl-Mariot)
 • P va V teskari proporsional
@@ -94,14 +94,14 @@ export const lesson11 = {
     id: '9-l-30', chapter_id: '9-ch-02',
     title: 'Izobarik jarayon',
     description: "Gay-Lyussak qonuni — o'zgarmas bosimda hajm va temperatura bog'liqligi.",
-    order_number: 11, duration_minutes: 45, video_url: 'https://www.youtube.com/embed/rLfFPFVT6t0', has_lab: false, test_count: 6, difficulty: 'medium',
+    order_number: 11, duration_minutes: 45, video_url: '', has_lab: false, test_count: 6, difficulty: 'medium',
     content: {
         key_concepts: ['Izobarik jarayon', 'Gay-Lyussak qonuni', 'V-T diagramma (izobara)', 'Hajm va temperatura proporsional'],
         theory: `Ikkinchi izojarayonni o'rganamiz — IZOBARIK JARAYON. Bu safar bosim o'zgarmas.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-IZOBARIK JARAYON NIMA?
+Izobarik jarayon nima?
 
 Izobarik jarayon — bu bosim o'zgarmas qolgan (P = const) holda hajm va temperaturaning o'zgarishi.
 
@@ -111,7 +111,7 @@ Izobarik jarayon — bu bosim o'zgarmas qolgan (P = const) holda hajm va tempera
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-GAY-LYUSSAK QONUNI
+Gay-Lyussak qonuni
 
 Bu qonunni fransuz fizigi Jozef Gay-Lyussak 1802 yilda kashf etgan.
 
@@ -130,7 +130,7 @@ DIQQAT: Temperatura KELVIN da bo'lishi kerak!
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-GRAFIK — IZOBARA
+Grafik — izobara
 
 V-T diagrammada izobarik jarayon TO'G'RI CHIZIQ shaklida chiziladi (0 nuqtadan boshlanadi).
 
@@ -144,7 +144,7 @@ P-T diagrammada: gorizontal to'g'ri chiziq (P o'zgarmaydi)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-HAYOTIY MISOLLAR
+Hayotiy misollar
 
 1. Havo shari: Issiq havo yuborganda balon kengayadi (P = const — atmosfera bosimi)
 2. Termometr: Simob isiganda kengayadi va naycha bo'ylab ko'tariladi
@@ -153,7 +153,7 @@ HAYOTIY MISOLLAR
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-XULOSA
+Xulosa
 • Izobarik: P = const
 • V/T = const (Gay-Lyussak)
 • V va T to'g'ridan proporsional

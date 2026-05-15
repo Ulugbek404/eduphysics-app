@@ -18,6 +18,21 @@ html.light {
   color-scheme: light;
 }
 
+/* LIGHT MODE — color variable overrides */
+html.light {
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #F8FAFC;
+  --color-bg-tertiary: #F1F5F9;
+  --color-bg-elevated: #E2E8F0;
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94A3B8;
+  --color-text-disabled: #CBD5E1;
+  --color-border: #E2E8F0;
+  --color-border-light: #CBD5E1;
+  --color-border-dark: #94A3B8;
+}
+
 
 /* ============================================
    🎨 NURFIZIKA DESIGN SYSTEM
@@ -72,7 +87,7 @@ html.light {
   --color-info-light: #CFFAFE;
   --color-info-dark: #0891B2;
 
-  /* Neutral Colors - Dark Theme */
+  /* Neutral Colors - Dark Theme (default) */
   --color-bg-primary: #0B1120;
   --color-bg-secondary: #1E293B;
   --color-bg-tertiary: #334155;
@@ -683,8 +698,9 @@ code {
    🌙 THEME VARIATIONS
    ============================================ */
 
-/* Light Theme */
-[data-theme="light"] {
+/* Light Theme — both [data-theme] and html.light class */
+[data-theme="light"],
+html.light {
   --color-bg-primary: #FFFFFF;
   --color-bg-secondary: #F8FAFC;
   --color-bg-tertiary: #F1F5F9;

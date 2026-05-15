@@ -31,7 +31,7 @@ function TopicSelect({ value, onChange }) {
     const { t } = useLanguage();
     return (
         <select value={value} onChange={e => onChange(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors text-sm">
+            className="w-full theme-bg border theme-border theme-text rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors text-sm">
             <option value="">{t('homework_topic_select') || 'Mavzuni tanlang (ixtiyoriy)'}</option>
             {PHYSICS_TOPICS.map(t => <option key={t} value={t}>{t}</option>)}
         </select>
@@ -42,7 +42,7 @@ function Textarea({ value, onChange, placeholder, rows = 5 }) {
     return (
         <textarea value={value} onChange={e => onChange(e.target.value)}
             placeholder={placeholder} rows={rows}
-            className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors text-sm resize-none placeholder:text-slate-500"
+            className="w-full theme-bg border theme-border theme-text rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors text-sm resize-none placeholder:theme-text-secondary"
         />
     );
 }
@@ -58,10 +58,10 @@ function ActionBtn({ onClick, disabled, loading, label, loadingLabel }) {
 
 function FinalAnswer({ text, label = "Javob" }) {
     return (
-        <div className="relative overflow-hidden bg-gradient-to-r from-emerald-950/50 to-green-950/50 border border-emerald-500/30 rounded-2xl p-5">
+        <div className="relative overflow-hidden bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950/50 dark:to-green-950/50 border border-emerald-300 dark:border-emerald-500/30 rounded-2xl p-5">
             <div className="absolute -top-4 -right-4 w-20 h-20 bg-emerald-500/10 rounded-full blur-2xl" />
-            <h4 className="text-emerald-400 font-bold text-sm mb-2">{label}:</h4>
-            <p className="text-white font-semibold">{text}</p>
+            <h4 className="text-emerald-600 dark:text-emerald-400 font-bold text-sm mb-2">{label}:</h4>
+            <p className="theme-text font-semibold">{text}</p>
         </div>
     );
 }
@@ -93,7 +93,7 @@ function SolverTab({ addNotification }) {
                 <ActionBtn onClick={handleSolve} disabled={!problem.trim()} loading={loading}
                     label={t('homework_solve_btn') || "Yechish"} loadingLabel={t('homework_solving') || "Yechilmoqda..."} />
                 <button onClick={() => { setProblem(''); setSolution(null); }}
-                    className="p-3 bg-slate-800 border border-slate-700 rounded-xl text-slate-400 hover:text-white transition-all">
+                    className="p-3 theme-card border theme-border rounded-xl theme-text-secondary hover:theme-text transition-all">
                     <Trash2 size={18} />
                 </button>
             </div>
@@ -170,11 +170,11 @@ function CheckerTab({ addNotification, addXP }) {
     return (
         <div className="space-y-4">
             <div>
-                <label className="text-slate-400 text-xs font-medium mb-2 block">{t('homework_problem_label') || "Masala matni"}</label>
+                <label className="theme-text-secondary text-xs font-medium mb-2 block">{t('homework_problem_label') || "Masala matni"}</label>
                 <Textarea value={problem} onChange={setProblem} placeholder={t('homework_problem_placeholder2') || "Masalani kiriting..."} rows={3} />
             </div>
             <div>
-                <label className="text-slate-400 text-xs font-medium mb-2 block">{t('homework_your_solution_label') || "Sizning yechimingiz"}</label>
+                <label className="theme-text-secondary text-xs font-medium mb-2 block">{t('homework_your_solution_label') || "Sizning yechimingiz"}</label>
                 <Textarea value={myAnswer} onChange={setMyAnswer} placeholder={t('homework_your_solution_placeholder') || "Yechimingizni yozing..."} rows={5} />
             </div>
             <div className="flex gap-3">
@@ -182,7 +182,7 @@ function CheckerTab({ addNotification, addXP }) {
                     label={t('homework_check') || "Tekshirish"} loadingLabel={t('homework_checking') || "Tekshirilmoqda..."} />
                 {(problem.trim() || myAnswer.trim() || result) && (
                     <button onClick={handleClear}
-                        className="p-3 bg-slate-800 border border-slate-700 rounded-xl text-red-400 hover:text-red-300 hover:bg-slate-700 transition-all shadow-lg">
+                        className="p-3 theme-card border theme-border rounded-xl text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all shadow-lg">
                         <Trash2 size={18} />
                     </button>
                 )}
@@ -190,28 +190,28 @@ function CheckerTab({ addNotification, addXP }) {
 
             {result && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
-                    <div className="flex items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
+                    <div className="flex items-center gap-4 rounded-2xl border theme-border theme-card p-4">
                         {result.score >= 80 ? <CheckCircle size={28} className="text-emerald-400" /> : <XCircle size={28} className="text-red-400" />}
                         <div>
-                            <p className="text-slate-400 text-xs">{t('homework_result') || "Natija"}</p>
+                            <p className="theme-text-secondary text-xs">{t('homework_result') || "Natija"}</p>
                             <p className={`text-2xl font-black ${scoreColor}`}>{result.score}/100</p>
                         </div>
-                        <span className={`ml-auto px-3 py-1 rounded-full text-xs font-bold border ${result.status === 'correct' ? 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10' :
-                            result.status === 'partial' ? 'text-amber-400 border-amber-500/30 bg-amber-500/10' :
-                                'text-red-400 border-red-500/30 bg-red-500/10'}`}>
-                            {result.status === 'correct' ? `✓ ${t('tests_correct')}` : result.status === 'partial' ? `~ ${t('homework_partial') || 'Qisman'}` : `✗ ${t('tests_wrong')}`}
+                        <span className={`ml-auto px-3 py-1 rounded-full text-xs font-bold border ${result.status === 'correct' ? 'text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10' :
+                            result.status === 'partial' ? 'text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10' :
+                                'text-red-600 dark:text-red-400 border-red-300 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10'}`}>
+                            {result.status === 'correct' ? t('homework_correct') || "To'g'ri" : result.status === 'partial' ? t('homework_partial') || "Qisman" : t('homework_wrong') || "Xato"}
                         </span>
                     </div>
                     {result.feedback && (
-                        <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-4 text-slate-300 text-sm">{result.feedback}</div>
+                        <div className="rounded-xl border theme-border theme-card p-4 theme-text-secondary text-sm">{result.feedback}</div>
                     )}
                     {result.errors?.length > 0 && (
                         <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 space-y-2">
                             <p className="text-amber-400 text-xs font-bold">{t('homework_mistakes') || "Xatolar"}:</p>
                             {result.errors.map((e, i) => (
-                                <div key={i} className="text-slate-400 text-sm">
+                                <div key={i} className="theme-text-secondary text-sm">
                                     <span className="text-amber-400">→ </span>{e.description}
-                                    {e.suggestion && <p className="text-slate-500 text-xs mt-0.5 ml-4">💡 {e.suggestion}</p>}
+                                    {e.suggestion && <p className="theme-text-secondary text-xs mt-0.5 ml-4">💡 {e.suggestion}</p>}
                                 </div>
                             ))}
                         </div>
@@ -301,7 +301,7 @@ function PracticeTab({ addNotification, addXP }) {
             <div className="grid grid-cols-2 gap-3">
                 <TopicSelect value={topic} onChange={setTopic} />
                 <select value={difficulty} onChange={e => setDifficulty(e.target.value)}
-                    className="bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 text-sm">
+                    className="theme-bg border theme-border theme-text rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 text-sm">
                     <option value="easy">🟢 {t('tests_easy')}</option>
                     <option value="medium">🟡 {t('tests_medium')}</option>
                     <option value="hard">🔴 {t('tests_hard')}</option>
@@ -312,7 +312,7 @@ function PracticeTab({ addNotification, addXP }) {
                     label={t('homework_generate_btn') || "Masala Yaratish"} loadingLabel={t('homework_generating') || "Yaratilmoqda..."} />
                 {problem && (
                     <button onClick={handleClear}
-                        className="p-3 bg-slate-800 border border-slate-700 rounded-xl text-red-400 hover:text-red-300 hover:bg-slate-700 transition-all shadow-lg">
+                        className="p-3 theme-card border theme-border rounded-xl text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all shadow-lg">
                         <Trash2 size={18} />
                     </button>
                 )}
@@ -320,18 +320,18 @@ function PracticeTab({ addNotification, addXP }) {
 
             {problem && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-                    <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 space-y-3">
-                        <p className="text-white font-semibold text-sm">{problem.problem}</p>
+                    <div className="rounded-2xl border theme-border theme-card p-5 space-y-3">
+                        <p className="theme-text font-semibold text-sm">{problem.problem}</p>
                         {problem.given?.length > 0 && (
                             <div>
-                                <p className="text-slate-500 text-xs mb-1">{t('homework_given') || "Berilganlar:"}</p>
-                                <ul className="space-y-1">{problem.given.map((g, i) => <li key={i} className="text-slate-300 text-sm">• {g}</li>)}</ul>
+                                <p className="theme-text-secondary text-xs mb-1">{t('homework_given') || "Berilganlar:"}</p>
+                                <ul className="space-y-1">{problem.given.map((g, i) => <li key={i} className="theme-text-secondary text-sm">• {g}</li>)}</ul>
                             </div>
                         )}
                         {problem.hints?.length > 0 && (
                             <details className="group">
                                 <summary className="text-indigo-400 text-xs cursor-pointer">💡 {t('homework_show_hint') || "Maslahat ko'rish"}</summary>
-                                <ul className="mt-2 space-y-1">{problem.hints.map((h, i) => <li key={i} className="text-slate-400 text-xs">→ {h}</li>)}</ul>
+                                <ul className="mt-2 space-y-1">{problem.hints.map((h, i) => <li key={i} className="theme-text-secondary text-xs">→ {h}</li>)}</ul>
                             </details>
                         )}
                     </div>
@@ -341,10 +341,10 @@ function PracticeTab({ addNotification, addXP }) {
                     {checkResult && (
                         <div className="space-y-3">
                             <div className={`rounded-xl border p-4 text-sm ${checkResult.score >= 70
-                                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
-                                : 'border-red-500/30 bg-red-500/10 text-red-300'}`}>
+                                ? 'border-emerald-300 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                                : 'border-red-300 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400'}`}>
                                 <p className="font-bold mb-1">{checkResult.score}/100 {t('live_score')?.toLowerCase() || 'ball'}</p>
-                                <p className="text-slate-400">{checkResult.feedback}</p>
+                                <p className="theme-text-secondary">{checkResult.feedback}</p>
                             </div>
                             <button onClick={handleSave} disabled={saving}
                                 className="w-full mt-2 flex items-center justify-center gap-2 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold text-sm transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50">
@@ -387,7 +387,7 @@ function ExplainerTab({ addNotification }) {
                     label={t('homework_explain_btn') || "Tushuntir"} loadingLabel={t('homework_explaining') || "Tushuntirilmoqda..."} />
                 {(question.trim() || context.trim() || result) && (
                     <button onClick={() => { setQuestion(''); setContext(''); setResult(null); }}
-                        className="p-3 bg-slate-800 border border-slate-700 rounded-xl text-red-400 hover:text-red-300 hover:bg-slate-700 transition-all shadow-lg">
+                        className="p-3 theme-card border theme-border rounded-xl text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all shadow-lg">
                         <Trash2 size={18} />
                     </button>
                 )}
@@ -396,33 +396,33 @@ function ExplainerTab({ addNotification }) {
             {result && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
                     {result.explanation && (
-                        <div className="rounded-2xl border border-indigo-800/30 bg-indigo-950/30 p-5">
-                            <p className="text-slate-400 text-xs mb-2 font-medium">📖 {t('homework_explanation') || "Tushuntirish"}</p>
-                            <p className="text-slate-100 text-sm leading-relaxed">{result.explanation}</p>
+                        <div className="rounded-2xl border border-indigo-200 dark:border-indigo-800/30 bg-indigo-50 dark:bg-indigo-950/30 p-5">
+                            <p className="theme-text-secondary text-xs mb-2 font-medium">📖 {t('homework_explanation') || "Tushuntirish"}</p>
+                            <p className="theme-text text-sm leading-relaxed">{result.explanation}</p>
                         </div>
                     )}
                     {result.analogy && (
-                        <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-4">
-                            <p className="text-slate-500 text-xs mb-1">🔗 {t('homework_analogy') || "Analogiya"}</p>
-                            <p className="text-slate-300 text-sm">{result.analogy}</p>
+                        <div className="rounded-xl border theme-border theme-card p-4">
+                            <p className="theme-text-secondary text-xs mb-1">🔗 {t('homework_analogy') || "Analogiya"}</p>
+                            <p className="theme-text-secondary text-sm">{result.analogy}</p>
                         </div>
                     )}
                     {result.formula && (
-                        <div className="rounded-xl border border-violet-500/20 bg-violet-500/10 p-4">
-                            <p className="text-purple-400 text-xs mb-1">📐 {t('homework_formula') || "Formula"}</p>
-                            <p className="text-white font-mono">{result.formula}</p>
+                        <div className="rounded-xl border border-violet-300 dark:border-violet-500/20 bg-violet-50 dark:bg-violet-500/10 p-4">
+                            <p className="text-purple-600 dark:text-purple-400 text-xs mb-1">📐 {t('homework_formula') || "Formula"}</p>
+                            <p className="theme-text font-mono">{result.formula}</p>
                         </div>
                     )}
                     {result.examples?.length > 0 && (
-                        <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-4">
-                            <p className="text-slate-500 text-xs mb-2">💡 {t('homework_examples') || "Misollar"}</p>
-                            <ul className="space-y-1">{result.examples.map((ex, i) => <li key={i} className="text-slate-300 text-sm">• {ex}</li>)}</ul>
+                        <div className="rounded-xl border theme-border theme-card p-4">
+                            <p className="theme-text-secondary text-xs mb-2">💡 {t('homework_examples') || "Misollar"}</p>
+                            <ul className="space-y-1">{result.examples.map((ex, i) => <li key={i} className="theme-text-secondary text-sm">• {ex}</li>)}</ul>
                         </div>
                     )}
                     {result.tips?.length > 0 && (
-                        <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
-                            <p className="text-amber-400 text-xs mb-2">⚡ {t('homework_tips') || "Maslahatlar"}</p>
-                            <ul className="space-y-1">{result.tips.map((t, i) => <li key={i} className="text-slate-300 text-sm">→ {t}</li>)}</ul>
+                        <div className="rounded-xl border border-amber-300 dark:border-amber-500/20 bg-amber-50 dark:bg-amber-500/5 p-4">
+                            <p className="text-amber-600 dark:text-amber-400 text-xs mb-2">⚡ {t('homework_tips') || "Maslahatlar"}</p>
+                            <ul className="space-y-1">{result.tips.map((t, i) => <li key={i} className="theme-text-secondary text-sm">→ {t}</li>)}</ul>
                         </div>
                     )}
                 </motion.div>
@@ -433,10 +433,10 @@ function ExplainerTab({ addNotification }) {
 
 // ─── GRADE STYLES ──────────────────────────────────────────────────────────
 const GRADE_STYLES = {
-    A: { bg: 'bg-emerald-500/20', border: 'border-emerald-500/40', text: 'text-emerald-400' },
-    B: { bg: 'bg-blue-500/20', border: 'border-blue-500/40', text: 'text-blue-400' },
-    C: { bg: 'bg-yellow-500/20', border: 'border-yellow-500/40', text: 'text-yellow-400' },
-    D: { bg: 'bg-red-500/20', border: 'border-red-500/40', text: 'text-red-400' },
+    A: { bg: 'bg-emerald-50 dark:bg-emerald-500/20', border: 'border-emerald-300 dark:border-emerald-500/40', text: 'text-emerald-600 dark:text-emerald-400' },
+    B: { bg: 'bg-blue-50 dark:bg-blue-500/20', border: 'border-blue-300 dark:border-blue-500/40', text: 'text-blue-600 dark:text-blue-400' },
+    C: { bg: 'bg-yellow-50 dark:bg-yellow-500/20', border: 'border-yellow-300 dark:border-yellow-500/40', text: 'text-yellow-600 dark:text-yellow-400' },
+    D: { bg: 'bg-red-50 dark:bg-red-500/20', border: 'border-red-300 dark:border-red-500/40', text: 'text-red-600 dark:text-red-400' },
 };
 
 // ─── AI NATIJASI KOMPONENTI ────────────────────────────────────────────────
@@ -448,34 +448,35 @@ function HomeworkResult({ result, onSave, saving }) {
             {/* Asosiy baho */}
             <div className={`p-5 rounded-2xl border-2 ${gc.bg} ${gc.border} flex items-center justify-between gap-3`}>
                 <div className="text-center">
-                    <p className="text-slate-400 text-xs mb-1">{t('homework_grade') || "Baho"}</p>
+                    <p className="theme-text-secondary text-xs mb-1">{t('homework_grade') || "Baho"}</p>
                     <p className={`text-5xl font-black ${gc.text}`}>{result.grade}</p>
                 </div>
                 <div className="flex-1 text-center">
                     <p className={`text-3xl font-bold ${gc.text}`}>{result.score}%</p>
-                    <p className="text-slate-400 text-xs mt-1 leading-relaxed">{result.summary}</p>
+                    <p className="theme-text-secondary text-xs mt-1 leading-relaxed">{result.summary}</p>
                 </div>
                 <div className="text-center">
                     <p className="text-yellow-400 text-2xl font-bold">+{result.xpEarned}</p>
-                    <p className="text-slate-400 text-xs">XP</p>
+                    <p className="theme-text-secondary text-xs">XP</p>
                 </div>
             </div>
-            {result.correct?.length > 0 && (
-                <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4">
-                    <p className="text-emerald-400 font-semibold text-sm mb-2">✅ {t('homework_correct_steps') || "To'g'ri bajarilgan"}</p>
-                    {result.correct.map((c, i) => <p key={i} className="text-slate-300 text-sm">• {c}</p>)}
+            {/* AI Fikrlar va tavsiyalar */}
+            <div className="space-y-3">
+                <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-300 dark:border-emerald-500/30 rounded-xl p-4">
+                    <p className="text-emerald-600 dark:text-emerald-400 text-xs font-bold mb-1">✅ {t('homework_strengths') || "Yutuqlar"}</p>
+                    <p className="theme-text text-sm">{result.feedback?.strengths || "Yaxshi natija!"}</p>
                 </div>
-            )}
+                {result.feedback?.actionPlan && (
+                    <div className="bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-300 dark:border-indigo-500/30 rounded-xl p-4">
+                        <p className="text-indigo-600 dark:text-indigo-400 text-xs font-bold mb-1">🚀 {t('homework_action_plan') || "Harakatlar rejasi"}</p>
+                        <p className="theme-text text-sm">{result.feedback.actionPlan}</p>
+                    </div>
+                )}
+            </div>
             {result.mistakes?.length > 0 && (
-                <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
-                    <p className="text-red-400 font-semibold text-sm mb-2">❌ {t('homework_mistakes') || "Xatolar"}</p>
-                    {result.mistakes.map((m, i) => <p key={i} className="text-slate-300 text-sm">• {m}</p>)}
-                </div>
-            )}
-            {result.tips?.length > 0 && (
-                <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-4">
-                    <p className="text-indigo-400 font-semibold text-sm mb-2">💡 {t('homework_tips') || "Maslahatlar"}</p>
-                    {result.tips.map((t, i) => <p key={i} className="text-slate-300 text-sm">• {t}</p>)}
+                <div className="bg-red-50 dark:bg-red-500/10 border border-red-300 dark:border-red-500/30 rounded-xl p-4">
+                    <p className="text-red-600 dark:text-red-400 font-semibold text-sm mb-2">❌ {t('homework_mistakes') || "Xatolar"}</p>
+                    {result.mistakes.map((m, i) => <p key={i} className="theme-text-secondary text-sm">• {m}</p>)}
                 </div>
             )}
             <button onClick={onSave} disabled={saving}
@@ -563,11 +564,11 @@ function PhotoSubmitTab() {
     return (
         <div className="space-y-4">
             {/* Sub-nav */}
-            <div className="flex bg-slate-950/60 rounded-xl p-1 gap-1">
+            <div className="flex theme-bg border theme-border rounded-xl p-1 gap-1">
                 {[['submit', Camera, t('homework_submit') || 'Topshirish'], ['history', History, t('homework_history') || "Tarixim"]].map(([v, Icon, label]) => (
                     <button key={v} onClick={() => { setActiveView(v); if (v === 'history') loadHistory(); }}
                         className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold transition-all
-                            ${activeView === v ? 'bg-violet-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}>
+                            ${activeView === v ? 'bg-violet-600 text-white' : 'theme-text-secondary hover:theme-text'}`}>
                         <Icon size={14} /> {label}
                     </button>
                 ))}
@@ -591,28 +592,28 @@ function PhotoSubmitTab() {
                                 <Loader size={28} className="text-violet-400 animate-spin" />
                             </div>
                             <div className="text-center">
-                                <p className="text-white font-semibold">{t('homework_checking') || "AI Tekshirayapti..."}</p>
-                                <p className="text-slate-400 text-xs mt-1">{t('homework_gemini_reading') || "Gemini Vision yechimingizni o'qimoqda"}</p>
+                                <p className="theme-text font-semibold">{t('homework_checking') || "AI Tekshirayapti..."}</p>
+                                <p className="theme-text-secondary text-xs mt-1">{t('homework_gemini_reading') || "Gemini Vision yechimingizni o'qimoqda"}</p>
                             </div>
                         </div>
                     )}
 
                     {step === 'result' && aiResult && (
                         <div className="space-y-3">
-                            {capturedImage && <img src={capturedImage} alt="Yechim" className="w-full rounded-xl max-h-40 object-contain bg-slate-950" />}
+                            {capturedImage && <img src={capturedImage} alt="Yechim" className="w-full rounded-xl max-h-40 object-contain theme-bg" />}
                             <HomeworkResult result={aiResult} onSave={handleSave} saving={saving} />
                         </div>
                     )}
 
                     {step === 'saved' && (
                         <div className="flex flex-col items-center gap-4 py-8 text-center">
-                            <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center">
-                                <CheckCircle size={32} className="text-emerald-400" />
+                            <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-500/20 rounded-full flex items-center justify-center">
+                                <CheckCircle size={32} className="text-emerald-500" />
                             </div>
                             <div>
-                                <p className="text-white font-bold text-lg">{t('homework_saved') || "Saqlandi! 🎉"}</p>
+                                <p className="theme-text font-bold text-lg">{t('homework_saved') || "Saqlandi! 🎉"}</p>
                                 <p className="text-emerald-400 font-semibold">+{aiResult?.xpEarned} XP qo'shildi</p>
-                                <p className="text-slate-400 text-xs mt-1">{t('homework_grade') || "Baho"}: {aiResult?.grade} ({aiResult?.score}%)</p>
+                                <p className="theme-text-secondary text-xs mt-1">{t('homework_grade') || "Baho"}: {aiResult?.grade} ({aiResult?.score}%)</p>
                             </div>
                             <button onClick={() => { setCapturedImage(null); setAiResult(null); setStep('camera'); }}
                                 className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-semibold transition-all">
@@ -629,7 +630,7 @@ function PhotoSubmitTab() {
                     {loadingHistory ? (
                         <div className="flex justify-center py-8"><Loader size={24} className="text-indigo-400 animate-spin" /></div>
                     ) : history.length === 0 ? (
-                        <div className="text-center py-8 text-slate-500">
+                        <div className="text-center py-8 theme-text-secondary">
                             <History size={32} className="mx-auto mb-2 opacity-40" />
                             <p className="text-sm">{t('homework_no_history') || "Hali topshiriq yo'q"}</p>
                         </div>
@@ -637,14 +638,14 @@ function PhotoSubmitTab() {
                         const gc = GRADE_STYLES[item.grade] || GRADE_STYLES.D;
                         return (
                             <div key={item.id} onClick={() => setDetailModal(item)}
-                                className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 flex items-center gap-4 cursor-pointer hover:border-violet-500/40 transition-all">
+                                className="theme-card border theme-border rounded-xl p-4 flex items-center gap-4 cursor-pointer hover:border-violet-500/40 transition-all">
                                 {item.imageUrl
-                                    ? <img src={item.imageUrl} alt="" className="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-slate-900" />
-                                    : <div className="w-12 h-12 rounded-lg bg-slate-700 flex items-center justify-center flex-shrink-0"><Camera size={18} className="text-slate-500" /></div>
+                                    ? <img src={item.imageUrl} alt="" className="w-12 h-12 rounded-lg object-cover flex-shrink-0 theme-bg" />
+                                    : <div className="w-12 h-12 rounded-lg bg-slate-200 dark:bg-slate-700 flex items-center justify-center flex-shrink-0"><Camera size={18} className="theme-text-secondary" /></div>
                                 }
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-slate-400 text-xs">{fmtDate(item.submittedAt)}</p>
-                                    <p className="text-slate-300 text-sm truncate mt-0.5">{item.feedback?.summary || t('homework_title') || 'Uy vazifasi'}</p>
+                                    <p className="theme-text-secondary text-xs">{fmtDate(item.submittedAt)}</p>
+                                    <p className="theme-text-secondary text-sm truncate mt-0.5">{item.feedback?.summary || t('homework_title') || 'Uy vazifasi'}</p>
                                 </div>
                                 <div className="text-right flex-shrink-0 space-y-1">
                                     <div className={`inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-bold ${gc.bg} ${gc.text} border ${gc.border}`}>
@@ -662,29 +663,29 @@ function PhotoSubmitTab() {
             {detailModal && (
                 <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
                     onClick={() => setDetailModal(null)}>
-                    <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full max-h-[85vh] overflow-y-auto p-5 space-y-4"
+                    <div className="theme-bg border theme-border rounded-2xl max-w-md w-full max-h-[85vh] overflow-y-auto p-5 space-y-4"
                         onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between">
-                            <p className="text-white font-bold">{t('homework_detail_title') || "Topshiriq Tafsiloti"}</p>
-                            <button onClick={() => setDetailModal(null)} className="text-slate-500 hover:text-white"><X size={18} /></button>
+                            <p className="theme-text font-bold">{t('homework_detail_title') || "Topshiriq Tafsiloti"}</p>
+                            <button onClick={() => setDetailModal(null)} className="theme-text-secondary hover:theme-text"><X size={18} /></button>
                         </div>
-                        {detailModal.imageUrl && <img src={detailModal.imageUrl} alt="Yechim" className="w-full rounded-xl max-h-48 object-contain bg-slate-950" />}
+                        {detailModal.imageUrl && <img src={detailModal.imageUrl} alt="Yechim" className="w-full rounded-xl max-h-48 object-contain theme-bg" />}
                         <div className={`p-4 rounded-xl border-2 ${GRADE_STYLES[detailModal.grade]?.bg} ${GRADE_STYLES[detailModal.grade]?.border} flex justify-between items-center`}>
                             <span className={`text-4xl font-black ${GRADE_STYLES[detailModal.grade]?.text}`}>{detailModal.grade}</span>
                             <span className={`text-2xl font-bold ${GRADE_STYLES[detailModal.grade]?.text}`}>{detailModal.score}%</span>
                             <span className="text-yellow-400 font-bold">+{detailModal.xpEarned} XP</span>
                         </div>
-                        {detailModal.feedback?.summary && <p className="text-slate-400 text-sm leading-relaxed">{detailModal.feedback.summary}</p>}
+                        {detailModal.feedback?.summary && <p className="theme-text-secondary text-sm leading-relaxed">{detailModal.feedback.summary}</p>}
                         {detailModal.feedback?.correct?.length > 0 && (
                             <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3">
                                 <p className="text-emerald-400 text-xs font-semibold mb-1">✅ {t('tests_correct')}</p>
-                                {detailModal.feedback.correct.map((c, i) => <p key={i} className="text-slate-300 text-xs">• {c}</p>)}
+                                {detailModal.feedback.correct.map((c, i) => <p key={i} className="theme-text-secondary text-xs">• {c}</p>)}
                             </div>
                         )}
                         {detailModal.feedback?.mistakes?.length > 0 && (
                             <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
                                 <p className="text-red-400 text-xs font-semibold mb-1">❌ {t('homework_mistakes') || "Xatolar"}</p>
-                                {detailModal.feedback.mistakes.map((m, i) => <p key={i} className="text-slate-300 text-xs">• {m}</p>)}
+                                {detailModal.feedback.mistakes.map((m, i) => <p key={i} className="theme-text-secondary text-xs">• {m}</p>)}
                             </div>
                         )}
                     </div>
@@ -717,8 +718,8 @@ export default function HomeworkHelper({ addNotification, addXP }) {
                     <Sparkles size={20} className="text-white" />
                 </div>
                 <div>
-                    <h2 className="text-white font-bold">{t('homework_ai_tutor') || "AI Uy Vazifasi Yordamchisi"}</h2>
-                    <p className="text-slate-400 text-xs">Gemini 2.5 Flash · O'zbek tilida</p>
+                    <h2 className="theme-text font-bold">{t('homework_ai_tutor') || "AI Uy Vazifasi Yordamchisi"}</h2>
+                    <p className="theme-text-secondary text-xs">NurFizika AI · O'zbek tilida</p>
                 </div>
             </div>
 
@@ -735,7 +736,7 @@ export default function HomeworkHelper({ addNotification, addXP }) {
                                     ? isPhoto
                                         ? 'border-violet-500 bg-violet-600/20 text-violet-300 shadow-lg shadow-violet-500/10'
                                         : 'border-indigo-500 bg-indigo-600/20 text-indigo-300 shadow-lg shadow-indigo-500/10'
-                                    : 'border-slate-700 bg-slate-900/60 text-slate-400 hover:border-slate-600 hover:text-slate-200'
+                                    : 'theme-border theme-card theme-text-secondary hover:theme-text'
                                 }`}>
                             <Icon size={18} />
                             {tab.label}
@@ -752,7 +753,7 @@ export default function HomeworkHelper({ addNotification, addXP }) {
                         <div 
                             key={tab.id}
                             style={{ display: activeTab === tab.id ? 'block' : 'none' }}
-                            className="rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur-sm p-5"
+                            className="rounded-2xl border theme-border theme-card p-5"
                         >
                             <Component addNotification={addNotification} addXP={addXP} />
                         </div>

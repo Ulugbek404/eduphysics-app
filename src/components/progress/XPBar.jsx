@@ -17,18 +17,18 @@ const XPBar = ({ currentXP = 0, neededXP = 100, level = 1 }) => {
             {/* Level and XP Info */}
             <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-yellow-400" fill="currentColor" />
-                    <span className="text-sm font-bold text-white">
+                    <Zap className="w-4 h-4 text-yellow-500 dark:text-yellow-400" fill="currentColor" />
+                    <span className="text-sm font-bold theme-text">
                         Level {level}
                     </span>
                 </div>
-                <span className="text-xs font-medium text-slate-400">
+                <span className="text-xs font-medium theme-text-secondary">
                     {currentXP.toLocaleString()} / {neededXP.toLocaleString()} XP
                 </span>
             </div>
 
             {/* XP Progress Bar */}
-            <div className="relative w-full h-3 bg-slate-700 rounded-full overflow-hidden border border-slate-600">
+            <div className="relative w-full h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden border border-slate-300 dark:border-slate-600">
                 {/* Gradient Fill */}
                 <motion.div
                     className="absolute inset-y-0 left-0 bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 rounded-full"
@@ -56,11 +56,11 @@ const XPBar = ({ currentXP = 0, neededXP = 100, level = 1 }) => {
             </div>
 
             {/* Next Level Info */}
-            <div className="mt-1 text-xs text-slate-500 text-right">
+            <div className="mt-1 text-xs theme-text-secondary text-right">
                 {neededXP - currentXP > 0 ? (
                     <span>{(neededXP - currentXP).toLocaleString()} XP to Level {level + 1}</span>
                 ) : (
-                    <span className="text-green-400 font-bold">Level Up! 🎉</span>
+                    <span className="text-green-500 dark:text-green-400 font-bold">Level Up! 🎉</span>
                 )}
             </div>
         </div>

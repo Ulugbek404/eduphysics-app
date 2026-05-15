@@ -36,7 +36,7 @@ service cloud.firestore {
       return val is string && val.size() <= maxLen;
     }
 
-    // Foydalanuvchi profili validatsiyasi
+    // Foydalanuvchi profili validatsiyasi (UPDATE uchun — role o'zgartirilmaydi)
     function isValidUserUpdate() {
       let data = request.resource.data;
       return (
@@ -44,14 +44,27 @@ service cloud.firestore {
         (!('bio' in data)         || isValidText(data.bio, 300)) &&
         (!('school' in data)      || isValidText(data.school, 150)) &&
         (!('phone' in data)       || isValidText(data.phone, 20)) &&
+        (!('learnedFormulas' in data) || data.learnedFormulas is list) && // formula o'rganish
         (!('role' in data)        || false)  // role o'zgartirishga yo'l yo'q!
+      );
+    }
+
+    // Yangi profil yaratish validatsiyasi (CREATE uchun — role 'student' bo'lishi shart)
+    function isValidUserCreate() {
+      let data = request.resource.data;
+      return (
+        data.uid == request.auth.uid &&
+        (!('role' in data) || data.role == 'student') &&
+        (!('displayName' in data) || isValidText(data.displayName, 100))
       );
     }
 
     // ─── USERS ───────────────────────────────────────────────────────────────
     match /users/{userId} {
       allow read:   if isLoggedIn() && (isOwner(userId) || isAdminOrTeacher());
-      allow create: if isLoggedIn() && isOwner(userId) && isValidUserUpdate();
+      // Yangi hujjat yaratishda (ro'yxatdan o'tish / sinxronizatsiya):
+      // faqat o'z UID i bo'lishi va role='student' bo'lishi shart
+      allow create: if isLoggedIn() && isOwner(userId) && isValidUserCreate();
       // Foydalanuvchi o'zini yangilay oladi, LEKIN role ni emas!
       allow update: if isLoggedIn() && (
         (isOwner(userId) && isValidUserUpdate()) ||

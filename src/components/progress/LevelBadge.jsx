@@ -81,13 +81,13 @@ const LevelBadge = ({ level = 1, size = 'md', showLabel = true }) => {
                 whileHover={{ scale: 1.1, rotate: 5 }}
             >
                 {/* Level Number */}
-                <div className={`font-bold text-white ${sizeClass.text} z-10`}>
+                <div className={`font-bold text-white-fixed ${sizeClass.text} z-10`}>
                     {level}
                 </div>
 
                 {/* Icon in corner */}
-                <div className="absolute -top-1 -right-1 bg-slate-900 rounded-full p-1">
-                    <Icon size={sizeClass.icon / 1.5} className="text-white" />
+                <div className="absolute -top-1 -right-1 bg-slate-900 dark:bg-slate-800 rounded-full p-1">
+                    <Icon size={sizeClass.icon / 1.5} className="text-white-fixed" />
                 </div>
 
                 {/* Pulse animation */}
@@ -113,8 +113,8 @@ const LevelBadge = ({ level = 1, size = 'md', showLabel = true }) => {
                     transition={{ delay: 0.3 }}
                     className="text-center"
                 >
-                    <div className="text-xs text-slate-500 font-medium">Level</div>
-                    <div className="text-sm text-slate-300 font-bold">{tier.label}</div>
+                    <div className="text-xs theme-text-secondary font-medium">Level</div>
+                    <div className="text-sm theme-text font-bold">{tier.label}</div>
                 </motion.div>
             )}
         </div>

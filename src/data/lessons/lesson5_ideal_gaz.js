@@ -3,14 +3,14 @@ export const lesson5 = {
    id: '9-l-24', chapter_id: '9-ch-02',
    title: 'Ideal gaz',
    description: "Ideal gaz modeli, uning xususiyatlari, Klapeyron-Mendeleyev tenglamasi va real gazlardan farqi.",
-   order_number: 5, duration_minutes: 50, video_url: 'https://www.youtube.com/embed/B7xsuFR8bk0', has_lab: false, test_count: 8, difficulty: 'hard',
+   order_number: 5, duration_minutes: 50, video_url: '', has_lab: false, test_count: 8, difficulty: 'hard',
    content: {
       key_concepts: ['Ideal gaz modeli', 'Ideal gazning 3 ta xususiyati', 'Klapeyron-Mendeleyev tenglamasi', 'Universal gaz doimiysi', 'Real va ideal gaz farqi'],
       theory: `Oldingi darslarda biz molekulalar, ularning massasi va modda miqdori haqida o'rgandik. Endi eng muhim tushunchalardan biriga o'tamiz — IDEAL GAZ modeli.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-IDEAL GAZ NIMA ?
+Ideal gaz nima?
 
    Ideal gaz — bu real gazning soddalashtirilgan matematik modeli.Bu modelda ba'zi haqiqiy xususiyatlar e'tiborga olinmaydi, lekin natijalar amaliyotga yaqin chiqadi.
 
@@ -18,7 +18,7 @@ Nima uchun model kerak ? Chunki real gazlar juda murakkab — milliardlab moleku
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-IDEAL GAZNING XUSUSIYATLARI
+Ideal gazning xususiyatlari
 
 Ideal gaz modelida 3 ta asosiy taxmin(faraz) qabul qilinadi:
 
@@ -33,7 +33,7 @@ Ideal gaz modelida 3 ta asosiy taxmin(faraz) qabul qilinadi:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-REAL VA IDEAL GAZ FARQI
+Real va ideal gaz farqi
 
 Ideal gaz modeli qachon yaxshi ishlaydi ?
 • Past bosimda(molekulalar uzoq, ta'sirlashish kam)
@@ -47,7 +47,7 @@ Havo, kislorod, azot, vodorod — odatiy sharoitlarda ideal gazga yaqin.Shuning 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-   ASOSIY PARAMETRLAR
+   Asosiy parametrlar
 
 Gazning holati uchta asosiy parametr bilan tavsiflanadi:
 
@@ -68,7 +68,7 @@ Gazning holati uchta asosiy parametr bilan tavsiflanadi:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-   KLAPEYRON - MENDELEYEV TENGLAMASI
+   Klapeyron-Mendeleyev tenglamasi
 
 Bu ideal gazning asosiy tenglamasi:
 
@@ -91,7 +91,7 @@ Bu yerda k = 1.38 × 10⁻²³ J / K — Boltsman doimiysi.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-   UNIVERSAL GAZ DOIMIYSI
+   Universal gaz doimiysi
 
 R = 8.314 J / (mol·K)
 
@@ -104,13 +104,13 @@ k = R / NA = 8.314 / (6.02 × 10²³) = 1.38 × 10⁻²³ J / K
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-   GAZ QONUNLARI GRAFIKLARI
+   Gaz qonunlari grafiklari
 
 Ideal gaz uchun P - V, P - T va V - T diagrammalar muhim ahamiyatga ega.Keyingi darslarda har bir izojarayonda bu grafiklar batafsil o'rganiladi.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-   XULOSA
+   Xulosa
 
 1. Ideal gaz — soddalashtirilgan gaz modeli
 2. Uchta asosiy xususiyat: nuqtaviy zarrachalar, faqat to'qnashishda ta'sir, elastik to'qnashish

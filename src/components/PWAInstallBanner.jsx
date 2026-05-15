@@ -60,7 +60,7 @@ const PWAInstallBanner = () => {
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: 100, opacity: 0 }}
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className="w-full max-w-sm bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl"
+                            className="w-full max-w-sm theme-bg border theme-border rounded-3xl p-6 shadow-2xl"
                             onClick={(e) => e.stopPropagation()}
                         >
                             {/* Header */}
@@ -70,13 +70,13 @@ const PWAInstallBanner = () => {
                                         ⚡
                                     </div>
                                     <div>
-                                        <h3 className="text-white font-bold text-base">iPhone ga O'rnatish</h3>
-                                        <p className="text-slate-400 text-xs">3 ta oddiy qadam</p>
+                                        <h3 className="theme-text font-bold text-base">iPhone ga O'rnatish</h3>
+                                        <p className="theme-text-secondary text-xs">3 ta oddiy qadam</p>
                                     </div>
                                 </div>
                                 <button
                                     onClick={() => setShowIOSGuide(false)}
-                                    className="text-slate-500 hover:text-slate-300 transition-colors p-1"
+                                    className="theme-text-secondary hover:theme-text transition-colors p-1"
                                 >
                                     <X size={18} />
                                 </button>
@@ -88,26 +88,26 @@ const PWAInstallBanner = () => {
                                     {
                                         step: '1',
                                         icon: <Share size={16} className="text-indigo-400" />,
-                                        desc: <>Safari pastidagi <strong className="text-white">«Share»</strong> tugmasini bosing</>
+                                        desc: <>Safari pastidagi <strong className="theme-text">«Share»</strong> tugmasini bosing</>
                                     },
                                     {
                                         step: '2',
                                         icon: <span className="text-indigo-400 text-sm font-bold">+</span>,
-                                        desc: <><strong className="text-white">«Add to Home Screen»</strong> ni tanlang</>
+                                        desc: <><strong className="theme-text">«Add to Home Screen»</strong> ni tanlang</>
                                     },
                                     {
                                         step: '3',
                                         icon: <span className="text-emerald-400 text-sm">✓</span>,
-                                        desc: <><strong className="text-white">«Add»</strong> ni bosing — tayyor!</>
+                                        desc: <><strong className="theme-text">«Add»</strong> ni bosing — tayyor!</>
                                     }
                                 ].map(({ step, icon, desc }) => (
-                                    <div key={step} className="flex items-start gap-4 p-3 bg-slate-800/60 rounded-2xl">
-                                        <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                                    <div key={step} className="flex items-start gap-4 p-3 theme-card rounded-2xl">
+                                        <div className="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-600 dark:bg-slate-700 dark:text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
                                             {step}
                                         </div>
                                         <div className="flex items-center gap-2 mt-1">
                                             {icon}
-                                            <p className="text-slate-300 text-sm">{desc}</p>
+                                            <p className="theme-text-secondary text-sm">{desc}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -134,15 +134,15 @@ const PWAInstallBanner = () => {
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                         className="fixed bottom-4 left-4 right-4 z-[100] sm:left-auto sm:right-4 sm:w-96"
                     >
-                        <div className="relative bg-slate-900/95 backdrop-blur-xl border border-indigo-500/30 rounded-3xl p-4 shadow-2xl shadow-indigo-500/10 overflow-hidden">
+                        <div className="relative theme-card backdrop-blur-xl border border-indigo-500/30 rounded-3xl p-4 shadow-2xl shadow-indigo-500/10 overflow-hidden">
 
                             {/* Orqa gradient bezak */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/20 via-transparent to-purple-900/10 pointer-events-none" />
+                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 dark:from-indigo-900/20 dark:to-purple-900/10 pointer-events-none" />
 
                             {/* Yopish tugmasi */}
                             <button
                                 onClick={handleDismiss}
-                                className="absolute top-3 right-3 z-10 w-7 h-7 flex items-center justify-center text-slate-500 hover:text-slate-300 hover:bg-slate-800 rounded-full transition-all"
+                                className="absolute top-3 right-3 z-10 w-7 h-7 flex items-center justify-center theme-text-secondary hover:theme-text hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-all"
                             >
                                 <X size={14} />
                             </button>
@@ -160,14 +160,14 @@ const PWAInstallBanner = () => {
                                 <div className="flex-1 min-w-0 pr-6">
                                     {/* Sarlavha + yulduzlar */}
                                     <div className="flex items-center gap-1.5 mb-0.5">
-                                        <p className="text-white font-bold text-sm">NurFizika</p>
+                                        <p className="theme-text font-bold text-sm">NurFizika</p>
                                         <div className="flex gap-0.5">
                                             {[...Array(5)].map((_, i) => (
                                                 <Star key={i} size={9} className="text-yellow-400 fill-yellow-400" />
                                             ))}
                                         </div>
                                     </div>
-                                    <p className="text-slate-400 text-xs mb-1">
+                                    <p className="theme-text-secondary text-xs mb-1">
                                         Ilovani o'rnating — tezroq, qulay!
                                     </p>
                                     <div className="flex items-center gap-1.5">

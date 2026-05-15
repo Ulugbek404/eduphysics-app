@@ -641,7 +641,7 @@ export default function TeacherDashboard() {
                         {assignments.length > 0 && (
                             <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
                                 <div className="p-4 border-b border-slate-800">
-                                    <h3 className="text-white font-semibold">📋 Yuborilgan Vazifalar</h3>
+                                    <h3 className="text-white font-semibold">📋 Yuborilgan vazifalar</h3>
                                 </div>
                                 <div className="divide-y divide-slate-800">
                                     {assignments.map(a => (

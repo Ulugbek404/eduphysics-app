@@ -6,12 +6,12 @@ import { useGeminiAI } from '../hooks/useGeminiAI';
 function TypingDots() {
     return (
         <div className="flex items-center gap-1.5 px-4 py-3">
-            <Bot size={16} className="text-indigo-400 flex-shrink-0" />
-            <span className="text-slate-400 text-sm">AI o'ylayapti</span>
+            <Bot size={16} className="text-teal-500 flex-shrink-0" />
+            <span className="theme-muted text-sm">AI o'ylayapti</span>
             <div className="flex gap-1 ml-1">
                 {[0, 1, 2].map(i => (
                     <div key={i}
-                        className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"
+                        className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-bounce"
                         style={{ animationDelay: `${i * 0.15}s` }}
                     />
                 ))}
@@ -26,21 +26,21 @@ function MessageBubble({ msg }) {
     return (
         <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3`}>
             {!isUser && (
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center flex-shrink-0 mr-2 mt-1">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-600 to-emerald-600 flex items-center justify-center flex-shrink-0 mr-2 mt-1">
                     <Bot size={16} className="text-white" />
                 </div>
             )}
-            <div className={`max-w-[82%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-md ${isUser
-                ? 'bg-indigo-600 text-white rounded-br-none'
-                : 'bg-slate-800 text-slate-100 rounded-bl-none border border-slate-700/60'
+            <div className={`max-w-[88%] px-5 py-3.5 rounded-2xl text-[15px] leading-relaxed shadow-lg ${isUser
+                ? 'bg-teal-600 text-white rounded-br-none'
+                : 'theme-card theme-text rounded-bl-none border theme-border'
                 }`}>
                 {msg.text.split('\n').map((line, i) => (
                     <p key={i} className={line ? 'mb-1 last:mb-0' : 'h-2'}>{line}</p>
                 ))}
             </div>
             {isUser && (
-                <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0 ml-2 mt-1">
-                    <User size={16} className="text-slate-300" />
+                <div className="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center flex-shrink-0 ml-2 mt-1">
+                    <User size={16} className="text-teal-600 dark:text-teal-400" />
                 </div>
             )}
         </div>
@@ -105,37 +105,40 @@ export default function AITutorModule({ topic = '', messages: propMessages, setM
     }, []);
 
     return (
-        <div className="border border-slate-700 rounded-2xl bg-slate-900/50 backdrop-blur-sm flex flex-col h-full min-h-[400px] overflow-hidden shadow-xl">
+        <div className="border theme-border rounded-3xl theme-card flex flex-col h-[calc(100vh-180px)] min-h-[600px] overflow-hidden shadow-2xl relative">
+            {/* Background pattern for premium feel */}
+            <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" 
+                 style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-900/80">
+            <div className="flex items-center justify-between p-4 border-b theme-border theme-card">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-600 to-emerald-600 flex items-center justify-center shadow-lg shadow-teal-500/30">
                         <Bot size={20} className="text-white" />
                     </div>
                     <div>
-                        <h2 className="text-white font-bold text-base">AI Fizik Ustoz</h2>
+                        <h2 className="theme-text font-bold text-base">NurFizika AI</h2>
                         <div className="flex items-center gap-1.5">
                             <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                            <span className="text-slate-400 text-xs">Onlayn · Gemini 2.5 Flash</span>
+                            <span className="theme-muted text-xs">Onlayn · NurFizika AI</span>
                         </div>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <span className="text-slate-500 text-xs hidden sm:block">{messages.length - 1} xabar</span>
+                    <span className="theme-muted text-xs hidden sm:block">{messages.length - 1} xabar</span>
                     <button onClick={clearChat} title="Suhbatni tozalash"
-                        className="p-2 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-800 transition-all">
+                        className="p-2 rounded-lg theme-muted hover:theme-text hover:theme-card transition-all">
                         <Trash2 size={16} />
                     </button>
                 </div>
             </div>
 
             {/* Chat area */}
-            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-6 sm:p-8 custom-scrollbar relative z-10">
                     {messages.map((msg, idx) => <MessageBubble key={idx} msg={msg} />)}
 
                     {isLoading && (
                         <div className="flex justify-start mb-3">
-                            <div className="bg-slate-800 border border-slate-700/60 rounded-2xl rounded-bl-none">
+                            <div className="theme-card border theme-border rounded-2xl rounded-bl-none">
                                 <TypingDots />
                             </div>
                         </div>
@@ -154,31 +157,31 @@ export default function AITutorModule({ topic = '', messages: propMessages, setM
                 </div>
 
                 {/* Input */}
-                <div className="p-4 border-t border-slate-800 bg-slate-900/80">
-                    <div className="flex items-end gap-2">
+                <div className="p-6 border-t theme-border theme-card relative z-10">
+                    <div className="flex items-end gap-3">
                         <textarea
                             ref={inputRef}
                             value={input}
                             onChange={e => setInput(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            placeholder="Fizikadan savol bering... (Enter — yuborish)"
+                            placeholder="Savol bering..."
                             rows={1}
-                            className="flex-1 bg-slate-800 text-white text-sm rounded-xl px-4 py-3 border border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none transition-all placeholder:text-slate-500 resize-none max-h-32"
+                            className="flex-1 theme-input text-[15px] rounded-2xl px-5 py-4 border-2 border-teal-500/50 dark:border-teal-500/30 focus:border-teal-500 focus:ring-4 focus:ring-teal-500/15 focus:outline-none transition-all placeholder:text-slate-500 dark:placeholder:text-slate-400 placeholder:opacity-80 resize-none max-h-48 shadow-md theme-surface"
                             style={{ height: 'auto', overflowY: 'auto' }}
                             onInput={e => {
                                 e.target.style.height = 'auto';
-                                e.target.style.height = Math.min(e.target.scrollHeight, 128) + 'px';
+                                e.target.style.height = Math.min(e.target.scrollHeight, 192) + 'px';
                             }}
                         />
                         <button
                             onClick={handleSend}
                             disabled={isLoading || !input.trim()}
-                            className="p-3 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl text-white hover:from-indigo-500 hover:to-violet-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
+                            className="p-4 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-2xl text-white hover:from-teal-500 hover:to-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-xl shadow-teal-500/30 active:scale-95 group border border-teal-400/20"
                         >
-                            <Send size={18} />
+                            <Send size={22} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                         </button>
                     </div>
-                    <p className="text-center text-slate-600 text-[10px] mt-2">
+                    <p className="text-center theme-muted text-[11px] mt-3 font-medium">
                         AI xato qilishi mumkin. Muhim ma'lumotlarni tekshiring.
                     </p>
                 </div>

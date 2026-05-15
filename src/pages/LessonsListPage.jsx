@@ -46,7 +46,7 @@ export default function LessonsListPage() {
     const gradient = colorGradients[chapter.color] || colorGradients.blue;
 
     return (
-        <div className="h-screen overflow-y-auto custom-scrollbar font-sans text-slate-100">
+        <div className="h-screen overflow-y-auto custom-scrollbar font-sans theme-bg theme-text">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -58,9 +58,9 @@ export default function LessonsListPage() {
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => navigate(`/darsliklar/${gradeId}`)}
-                            className="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 transition-all border border-slate-700/50 hover:border-slate-600 active:scale-95"
+                            className="p-2.5 rounded-xl theme-card hover:bg-blue-50 dark:hover:bg-slate-700 transition-all border theme-border active:scale-95"
                         >
-                            <ArrowLeft size={20} className="text-slate-300" />
+                            <ArrowLeft size={20} className="theme-muted" />
                         </button>
                         <BreadcrumbNav items={[
                             { label: grade.name, href: `/darsliklar/${gradeId}` },
@@ -83,26 +83,26 @@ export default function LessonsListPage() {
                             <div className="flex-1">
                                 <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-4 py-1.5 mb-4 border border-white/20">
                                     <span className="text-xl">{chapter.icon}</span>
-                                    <span className="text-sm font-semibold text-white/90">{t('chapter_word') || 'Bob'} {chapter.order_number || ''}</span>
+                                    <span className="text-sm font-semibold text-white-fixed/90">{t('chapter_word') || 'Bob'} {chapter.order_number || ''}</span>
                                 </div>
 
-                                <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">{chapter.name}</h1>
-                                <p className="text-white/70 text-base max-w-lg leading-relaxed mb-5">{chapter.description}</p>
+                                <h1 className="text-3xl md:text-4xl font-bold text-white-fixed mb-3">{chapter.name}</h1>
+                                <p className="text-white-fixed text-base max-w-lg leading-relaxed mb-5">{chapter.description}</p>
 
                                 {/* Stats badges */}
                                 <div className="flex flex-wrap items-center gap-3">
-                                    <div className="flex items-center gap-1.5 bg-white/15 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/10">
-                                        <BookOpen size={14} className="text-white/80" />
-                                        <span className="text-sm font-medium text-white">{lessons.length} {t('lessons_count_word') || 'ta dars'}</span>
+                                    <div className="flex items-center gap-1.5 bg-white-fixed/15 backdrop-blur-sm rounded-lg px-3 py-2 border border-white-fixed/10">
+                                        <BookOpen size={14} className="text-white-fixed/80" />
+                                        <span className="text-sm font-medium text-white-fixed">{lessons.length} {t('lessons_count_word') || 'ta dars'}</span>
                                     </div>
-                                    <div className="flex items-center gap-1.5 bg-white/15 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/10">
-                                        <ClipboardList size={14} className="text-white/80" />
-                                        <span className="text-sm font-medium text-white">{chapter.total_tests || 0} {t('tests_count_word') || 'ta test'}</span>
+                                    <div className="flex items-center gap-1.5 bg-white-fixed/15 backdrop-blur-sm rounded-lg px-3 py-2 border border-white-fixed/10">
+                                        <ClipboardList size={14} className="text-white-fixed/80" />
+                                        <span className="text-sm font-medium text-white-fixed">{chapter.total_tests || 0} {t('tests_count_word') || 'ta test'}</span>
                                     </div>
                                     {chapter.total_labs > 0 && (
-                                        <div className="flex items-center gap-1.5 bg-white/15 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/10">
-                                            <FlaskConical size={14} className="text-white/80" />
-                                            <span className="text-sm font-medium text-white">{chapter.total_labs} {t('labs_count_word') || 'ta tajriba'}</span>
+                                        <div className="flex items-center gap-1.5 bg-white-fixed/15 backdrop-blur-sm rounded-lg px-3 py-2 border border-white-fixed/10">
+                                            <FlaskConical size={14} className="text-white-fixed/80" />
+                                            <span className="text-sm font-medium text-white-fixed">{chapter.total_labs} {t('labs_count_word') || 'ta tajriba'}</span>
                                         </div>
                                     )}
                                 </div>
@@ -121,10 +121,10 @@ export default function LessonsListPage() {
                                         />
                                     </svg>
                                     <div className="absolute inset-0 flex items-center justify-center">
-                                        <span className="text-xl font-bold text-white">{progress}%</span>
+                                        <span className="text-xl font-bold text-white-fixed">{progress}%</span>
                                     </div>
                                 </div>
-                                <span className="text-white/50 text-xs font-medium">{completedCount}/{lessons.length} {t('completed_word') || 'tugatildi'}</span>
+                                <span className="text-white-fixed/50 text-xs font-medium">{completedCount}/{lessons.length} {t('completed_word') || 'tugatildi'}</span>
                             </div>
                         </div>
                     </div>
@@ -132,8 +132,8 @@ export default function LessonsListPage() {
 
                 {/* Section Title */}
                 <div className="flex items-center justify-between mb-5">
-                    <h2 className="text-lg font-bold text-white">{t('common_lessons_list') || "Darslar ro'yxati"}</h2>
-                    <span className="text-sm text-slate-500">{completedCount}/{lessons.length} {t('completed_word') || 'tugatildi'}</span>
+                    <h2 className="text-lg font-bold theme-text">{t('common_lessons_list') || "Darslar ro'yxati"}</h2>
+                    <span className="text-sm theme-muted">{completedCount}/{lessons.length} {t('completed_word') || 'tugatildi'}</span>
                 </div>
 
                 {/* Lessons List */}

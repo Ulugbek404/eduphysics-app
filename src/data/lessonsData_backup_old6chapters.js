@@ -1,4 +1,4 @@
-// 9-Sinf Fizika Dasturi - To'liq Yangilangan Darslar Ma'lumotlari
+// 9-Sinf Fizika Dasturi - To'liq Yangilangan Darslar ma'lumotlari
 
 export const lessonsData = {
     chapters: [
@@ -282,7 +282,7 @@ Bunda:
 - **s** - yo'l (m yoki km)
 - **t** - vaqt (s yoki soat)
 
-### Boshqa Formulalar:
+### Boshqa formulalar:
 
 **Yo'lni topish:**
 \`\`\`
@@ -562,7 +562,7 @@ Bunda:
 
 **Tekis tezlanuvchan harakat** - tezlanish o'zgarmas bo'lgan harakat.
 
-### Asosiy Formulalar:
+### Asosiy formulalar:
 
 **1. Tezlik:**
 \`\`\`
@@ -691,7 +691,7 @@ g ≈ 10 m/s²
 
 **Masalalar yechishda:** g = 10 m/s² ishlatamiz
 
-## Erkin Tushish Formulalari
+## Erkin Tushish formulalari
 
 Erkin tushishda **a = g** bo'lgani uchun:
 
@@ -970,7 +970,7 @@ Bunda:
 - **m** - massa (kg)
 - **V** - hajm (m³)
 
-### Boshqa Formulalar:
+### Boshqa formulalar:
 
 **Massani topish:**
 \`\`\`
@@ -1083,14 +1083,14 @@ V = 1000 sm³ = 1 litr
             lessons: [
                 {
                     id: 'dyn-1',
-                    title: 'Nyutonning Birinchi Qonuni (Inersiya Qonuni)',
+                    title: 'Nyutonning Birinchi qonuni (Inersiya qonuni)',
                     description: 'Inersiya, inersial sanoq sistemasi',
                     duration: '20 min',
                     xp: 50,
                     content: {
-                        theory: `# Nyutonning Birinchi Qonuni
+                        theory: `# Nyutonning Birinchi qonuni
 
-## Inersiya Qonuni
+## Inersiya qonuni
 
 **Nyutonning birinchi qonuni (Inersiya qonuni):**
 
@@ -1166,12 +1166,12 @@ c) **Tezlanayotgan lift:**
                 },
                 {
                     id: 'dyn-2',
-                    title: 'Kuch. Nyutonning Ikkinchi Qonuni',
+                    title: 'Kuch. Nyutonning Ikkinchi qonuni',
                     description: 'Kuch tushunchasi, F=ma formulasi',
                     duration: '25 min',
                     xp: 50,
                     content: {
-                        theory: `# Kuch va Nyutonning Ikkinchi Qonuni
+                        theory: `# Kuch va Nyutonning Ikkinchi qonuni
 
 ## Kuch
 
@@ -1182,7 +1182,7 @@ c) **Tezlanayotgan lift:**
 - Birlik: Nyuton (N)
 - Belgilanishi: F
 
-## Nyutonning Ikkinchi Qonuni
+## Nyutonning Ikkinchi qonuni
 
 **Formulasi:**
 \`\`\`
@@ -1215,7 +1215,7 @@ F_umumiy = F₁ + F₂
 F_umumiy = F₁ - F₂
 \`\`\`
 
-## Boshqa Formulalar
+## Boshqa formulalar
 
 **Tezlanishni topish:**
 \`\`\`
@@ -1288,12 +1288,12 @@ F_umumiy = 50 N
                 },
                 {
                     id: 'dyn-3',
-                    title: 'Nyutonning Uchinchi Qonuni',
+                    title: 'Nyutonning Uchinchi qonuni',
                     description: 'Ta\'sir va aks ta\'sir kuchlari',
                     duration: '20 min',
                     xp: 50,
                     content: {
-                        theory: `# Nyutonning Uchinchi Qonuni
+                        theory: `# Nyutonning Uchinchi qonuni
 
 ## Ta'sir va Aks Ta'sir
 
@@ -1392,14 +1392,14 @@ F_devor→odam = 50 N (qarama-qarshi yo'nalishda)
                 },
                 {
                     id: 'dyn-4',
-                    title: 'Butun Olam Tortishish Qonuni',
+                    title: 'Butun Olam Tortishish qonuni',
                     description: 'Gravitatsiya qonuni, G konstanta',
                     duration: '25 min',
                     xp: 50,
                     content: {
-                        theory: `# Butun Olam Tortishish Qonuni
+                        theory: `# Butun Olam Tortishish qonuni
 
-## Gravitatsiya Qonuni
+## Gravitatsiya qonuni
 
 **Nyutonning butun olam tortishish qonuni:**
 

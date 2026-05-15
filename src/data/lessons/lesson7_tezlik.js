@@ -3,14 +3,14 @@ export const lesson7 = {
     id: '9-l-26', chapter_id: '9-ch-02',
     title: 'Gaz molekulalarining harakat tezligi',
     description: "O'rtacha kvadratik tezlik, Maxwell taqsimoti, tezlik va temperaturaning bog'liqligi.",
-    order_number: 7, duration_minutes: 50, video_url: 'https://www.youtube.com/embed/5JEr0jx29Yg', has_lab: false, test_count: 8, difficulty: 'hard',
+    order_number: 7, duration_minutes: 50, video_url: '', has_lab: false, test_count: 8, difficulty: 'hard',
     content: {
         key_concepts: ["O'rtacha kvadratik tezlik", 'Maxwell taqsimoti', 'Tezlik va temperatura bog\'liqligi', 'Tezlik va massa bog\'liqligi'],
         theory: `Oldingi darsda biz temperaturaning molekulalarning kinetik energiyasi bilan bog'liqligini o'rgandik. Endi muhim savol: molekulalar qanday TEZLIKDA harakat qiladi?
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-MOLEKULALAR TEZLIGI
+Molekulalar tezligi
 
 Gaz molekulalari juda tez harakat qiladi! Lekin hamma molekula bir xil tezlikda emas — ba'zilari tez, ba'zilari sekin.
 
@@ -24,7 +24,7 @@ Nima uchun yengil molekulalar tezroq? Chunki bir xil temperaturada barcha moleku
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-O'RTACHA KVADRATIK TEZLIK
+O'rtacha kvadratik tezlik
 
 Molekulalarning tezligini ifodalash uchun o'rtacha kvadratik tezlik ishlatiladi:
 
@@ -42,7 +42,7 @@ Nima uchun "kvadratik"? Chunki avval tezliklarning kvadratlari o'rtachalanadi, k
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-BOSHQA TEZLIK TURLARI
+Boshqa tezlik turlari
 
 Fizikada uchta muhim tezlik tushunchasi bor:
 
@@ -62,7 +62,7 @@ Bir-biriga nisbati: v_eht < <v> < v_kv
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-MAXWELL TAQSIMOTI
+Maxwell taqsimoti
 
 Jeyms Klerk Maxwell 1860-yilda molekulalar tezligining taqsimotini kashf qildi.
 
@@ -78,21 +78,21 @@ Temperatura oshganda Maxwell egri chizig'i:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-TEZLIK VA TEMPERATURA BOG'LIQLIGI
+Tezlik va temperatura bog'liqligi
 
 v = √(3RT/M) formulasidan ko'rinib turibdiki:
 • Temperatura oshsa → tezlik oshadi (lekin T ga emas, √T ga proporsional)
 • T 4 marta oshsa → v 2 marta oshadi (√4 = 2)
 • T 9 marta oshsa → v 3 marta oshadi (√9 = 3)
 
-TEZLIK VA MASSA BOG'LIQLIGI
+Tezlik va massa bog'liqligi
 
 • Massa katta bo'lsa → tezlik kichik (teskari proporsional √M ga)
 • Vodorod (M = 2) kislorod (M = 32) dan 4 marta tez: √(32/2) = √16 = 4
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-AMALIY TATBIQLAR
+Amaliy tatbiqlar
 
 Molekulalar tezligi hayotda muhim ahamiyatga ega:
 
@@ -102,7 +102,7 @@ Molekulalar tezligi hayotda muhim ahamiyatga ega:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-XULOSA
+Xulosa
 
 1. Gaz molekulalari juda tez harakat qiladi (yuzlab m/s)
 2. O'rtacha tezlik: v = √(3RT/M)

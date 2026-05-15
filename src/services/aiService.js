@@ -121,7 +121,49 @@ Barcha javoblar o'zbek tilida bo'lsin.`;
     }
 }
 
+// ─── 4. Formula Explainer ──────────────────────────────────────────────────
+/**
+ * Formulani AI orqali oddiy tushuntiradi
+ * @param {object} formula - { name, formula, variables, description, tags }
+ * @param {string} lang - 'uz' | 'ru' | 'en'
+ */
+export async function explainFormula(formula, lang = 'uz') {
+    const langMap = {
+        uz: "o'zbek tilida, 9-sinf o'quvchisiga tushunarli qilib",
+        ru: 'на русском языке, понятно для ученика 9 класса',
+        en: 'in English, easy to understand for a 9th grade student',
+    };
+    const langNote = langMap[lang] || langMap.uz;
+
+    const varList = formula.variables
+        ?.map(v => `  • ${v.symbol} — ${v.name} (${v.unit})`)
+        .join('\n') || '';
+
+    const prompt = `Sen fizika o'qituvchisisan. Bu formulani ${langNote} tushuntir:
+
+Formula: ${formula.formula}
+Nomi: ${formula.name}
+O'zgaruvchilar:
+${varList}
+Qisqa tavsif: ${formula.description || ''}
+
+Quyidagi tartibda javob ber:
+1. **Formulaning mohiyati** — bu formula nimani hisoblaydi yoki ifodalaydi (2-3 gap)
+2. **Oddiy misol** — kundalik hayotdan konkret son bilan misol (masalan: "2 kg massa, 5 m/s tezlik bilan ...")
+3. **Eslab qolish uchun maslahat** — formulani qanday oson yod olish mumkin (1-2 gap)
+
+Javob qisqa (150-200 so'z), do'stona va rag'batlantiruvchi bo'lsin. LaTeX ishlatma, oddiy matn yoz.`;
+
+    try {
+        const answer = await generateContent(prompt, TUTOR_SYSTEM);
+        return { success: true, explanation: answer };
+    } catch (error) {
+        return { success: false, error: error.message || 'Tushuntirish olinmadi' };
+    }
+}
+
 // ─── Legacy export (Netlify-based — endi ishlatilmaydi) ───────────────────
+
 export async function testAPIConnection() {
     try {
         const res = await generateContent('Salom');

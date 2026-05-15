@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { doc, onSnapshot, updateDoc, increment, collection, addDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc, increment, arrayUnion, collection, addDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from './AuthContext';
 
@@ -14,6 +14,7 @@ export const XP_REWARDS = {
     MISSION_WEEKLY: 150,
     ACHIEVEMENT: 200,
     AI_MESSAGE: 5,
+    FORMULA_LEARNED: 25,
 };
 
 // ─── Level hisoblash ──────────────────────────────────────────────────────────
@@ -90,9 +91,15 @@ export function XPProvider({ children }) {
     const addXP = useCallback(async (amount, reason = 'misc') => {
         if (!user?.uid || amount <= 0) return;
         try {
-            // 1. Firestore ga yoz
+            // 1. Firestore ga yoz — xp VA totalXP ham, activeDates ham
+            const today = new Date().toISOString().split('T')[0]; // "2026-05-04"
             const userRef = doc(db, 'users', user.uid);
-            await updateDoc(userRef, { xp: increment(amount) });
+            await updateDoc(userRef, {
+                xp: increment(amount),
+                totalXP: increment(amount),          // Admin panel shu fieldni o'qiydi
+                activeDates: arrayUnion(today),      // "Bugun faol" hisoblagichi uchun
+                lastLogin: serverTimestamp(),
+            });
 
             // 2. XP loglari
             const logsRef = collection(db, 'xpLogs', user.uid, 'logs');
@@ -170,6 +177,7 @@ const XP_REASON_LABELS = {
     MISSION_WEEKLY: "Haftalik missiya bajarildi!",
     ACHIEVEMENT: "Yutuq ochildi!",
     AI_MESSAGE: "AI bilan suhbat",
+    FORMULA_LEARNED: "Formula o'rganildi! 🧪",
     mission_complete: "Missiya bajarildi!",
 };
 
