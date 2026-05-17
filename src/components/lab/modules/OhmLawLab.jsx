@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Zap, Atom, Sparkles } from 'lucide-react';
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateContent } from '../../../services/geminiClient';
 import OhmLawGraph from '../OhmLawGraph';
 
 /**
@@ -9,12 +9,6 @@ import OhmLawGraph from '../OhmLawGraph';
  * Interactive simulation for I = U / R
  */
 export default function OhmLawLab({ addNotification, updateStats, theme }) {
-    const API_KEYS = [
-        "AIzaSyCC8uEzh1px6KKsXP8FEkh_JS_3F1ErtDQ",
-        "AIzaSyBUzgU8ARMbZX1OYGv0f_cIqQJqaWdlGVM"
-    ];
-    const MODEL_NAME = "gemini-2.5-flash";
-
     const [voltage, setVoltage] = useState(12);
     const [resistance, setResistance] = useState(4);
     const [isRunning, setIsRunning] = useState(true);
@@ -39,23 +33,17 @@ export default function OhmLawLab({ addNotification, updateStats, theme }) {
         setIsAnalyzing(true);
         setAiAnalysis(null);
 
-        const prompt = `Men 9 - sinf fizika laboratoriyasida tajriba o'tkazyapman. 
-    NATIJALAR:
-    - Kuchlanish(U): ${voltage} Volt
-    - Qarshilik(R): ${resistance} Om
-    - Tok kuchi(I): ${current} Amper.
+        const prompt = `Men 9-sinf fizika laboratoriyasida tajriba o'tkazyapman. 
+NATIJALAR:
+- Kuchlanish(U): ${voltage} Volt
+- Qarshilik(R): ${resistance} Om
+- Tok kuchi(I): ${current} Amper.
 
-      VAZIFA:
-    Ushbu natijani Om qonuniga(I = U / R) asosan qisqa, ilmiy va tushunarli tahlil qilib ber.Nega tok kuchi aynan shunday chiqdi ? Agar qarshilikni oshirsak nima bo'ladi? Javobni o'zbek tilida ber.`;
+VAZIFA:
+Ushbu natijani Om qonuniga(I = U / R) asosan qisqa, ilmiy va tushunarli tahlil qilib ber. Nega tok kuchi aynan shunday chiqdi? Agar qarshilikni oshirsak nima bo'ladi? Javobni o'zbek tilida ber.`;
 
         try {
-            const apiKey = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
-            const genAI = new GoogleGenerativeAI(apiKey);
-            const model = genAI.getGenerativeModel({ model: MODEL_NAME });
-
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            const analysisText = response.text();
+            const analysisText = await generateContent(prompt);
 
             if (!analysisText) {
                 throw new Error("AI javob bo'sh qaytardi.");

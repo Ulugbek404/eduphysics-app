@@ -1193,7 +1193,7 @@ export default function AdminDashboard() {
                         <img 
                             src="/assets/nurfizika.jpg" 
                             alt="NurFizika Logo" 
-                            className="w-11 h-11 object-cover transform group-hover:scale-110 transition-transform duration-500"
+                            className="w-14 h-14 object-cover transform group-hover:scale-110 transition-transform duration-500"
                         />
                     </div>
                     <div>

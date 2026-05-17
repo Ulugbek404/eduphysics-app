@@ -1,18 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause, RefreshCw, Sparkles, Activity } from 'lucide-react';
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateContent } from '../../../services/geminiClient';
 
 /**
  * Newton's Second Law Laboratory Module (Mechanics)
  * Interactive simulation for F = m * a
  */
 export default function NewtonsLawLab({ addNotification, updateStats, theme }) {
-    const API_KEYS = [
-        "AIzaSyCC8uEzh1px6KKsXP8FEkh_JS_3F1ErtDQ",
-        "AIzaSyBUzgU8ARMbZX1OYGv0f_cIqQJqaWdlGVM"
-    ];
-    const MODEL_NAME = "gemini-2.5-flash";
 
     // State
     const [force, setForce] = useState(50); // Newtons
@@ -95,13 +90,7 @@ export default function NewtonsLawLab({ addNotification, updateStats, theme }) {
     Vazifa: Ushbu natijani tahlil qiling. Kuch va massa tezlanishga qanday ta'sir qiladi? Agar massani 2 barobar oshirsak, tezlanish qanday o'zgaradi? Javobni o'zbek tilida, o'quvchi uchun tushunarli qilib bering.`;
 
         try {
-            const apiKey = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
-            const genAI = new GoogleGenerativeAI(apiKey);
-            const model = genAI.getGenerativeModel({ model: MODEL_NAME });
-
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            const analysisText = response.text();
+            const analysisText = await generateContent(prompt);
 
             setAiAnalysis(analysisText);
             if (updateStats) updateStats({ labCompleted: true });

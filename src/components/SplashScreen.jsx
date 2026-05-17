@@ -56,7 +56,7 @@ const SplashScreen = ({ onFinish }) => {
                 <div className="absolute -inset-2 rounded-[2rem] border border-indigo-500/30 animate-pulse" />
 
                 {/* Asosiy ikonka — o'zimizning logo */}
-                <div className="w-28 h-28 rounded-[2rem] overflow-hidden shadow-2xl shadow-indigo-500/50 relative z-10">
+                <div className="w-40 h-40 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-indigo-500/50 relative z-10">
                     <img
                         src="/icons/icon-512x512.png"
                         alt="NurFizika"
@@ -72,10 +72,10 @@ const SplashScreen = ({ onFinish }) => {
                         ? 'opacity-100 translate-y-0'
                         : 'opacity-0 translate-y-6'}`}
             >
-                <h1 className="text-white text-4xl font-bold tracking-tight">
+                <h1 className="text-white text-5xl font-extrabold tracking-tight">
                     Nur<span className="text-indigo-400">Fizika</span>
                 </h1>
-                <p className="text-indigo-400/70 text-sm mt-2 tracking-widest uppercase font-medium">
+                <p className="text-indigo-400/80 text-base mt-3 tracking-widest uppercase font-semibold">
                     Fizika — yangicha nigohda
                 </p>
             </div>

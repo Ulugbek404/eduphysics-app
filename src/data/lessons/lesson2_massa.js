@@ -8,140 +8,133 @@ export const lesson2 = {
     description: "Avogadro soni, molyar massa, bir molekulaning massasini hisoblash va molekulalar sonini aniqlash.",
     order_number: 2,
     duration_minutes: 50,
-    video_url: '',
+    video_url: 'https://www.youtube.com/embed/vWaVF5QaDsk',
     has_lab: false,
     test_count: 8,
     difficulty: 'medium',
 
     content: {
         key_concepts: [
-            'Avogadro soni',
-            'Molyar massa',
-            "Bir molekulaning massasi",
-            'Molekulalar sonini hisoblash',
-            "Molekulaning o'lchami"
+            'Broun harakati va amaliy modellar',
+            'Molekula o\'lchamlari va zaytun moyi tajribasi',
+            'IBM firmasi va Tunnelli mikroskop kashfiyoti',
+            'Massa atom birligi (u)',
+            'Nisbiy atom va molekulyar massa'
         ],
 
-        theory: `Oldingi darsda biz moddalarning molekula va atomlardan tashkil topganligini o'rgandik. Endi muhim savol tug'iladi: molekulaning massasi qancha? O'lchami qanday?
+        theory: `🔹 **Broun harakatini kuzatish (Oddiy amaliy tajriba)**
 
-Molekulalar juda kichik bo'lgani uchun ularni oddiy tarozida o'lchab bo'lmaydi. Shuning uchun fiziklar maxsus usullar va birliklar ishlab chiqishgan.
+🧪 **Uy sharoitidagi kuzatish:** Kechasi yotoqxonangizdagi chiroqni o‘chirib, fonar yordamida nur shu’lasini hosil qiling. Biror gazlama matoni nur shu’lasi yo‘liga silkiting. Yorug‘lik nurida havodagi chang zarralarining **to‘xtovsiz va tartibsiz harakat** qilayotganini ko‘rasiz. Bu tajriba modda zarralarining to‘xtovsiz harakatchanligini isbotlaydi.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🧪 **Mexanik model asosida molekulalarning tartibsiz harakatini ko‘rsatish:**
+• **Kerakli jihozlar:** oq va qora rangdagi sharchalar (taxminan 20 tadan), tekis asosli chuqurroq idish (tarelka), flomaster.
+• **Maqsad:** molekulalar tartibsiz harakatlanadi, degan gipotezani mexanik model asosida o‘rganish.
+• **Bajarish tartibi:** Idishning ichki asosini flomasterda chizib, teng ikkiga ajrating. Idish asosining birinchi yarmiga oq rangdagi sharcha donalarini, ikkinchi yarmiga qora rangdagi sharcha donalarini soling. Idishni silkitib uning ichidagi sharcha donalarini harakatga keltiring.
+• **Kuzatish va Xulosa:** Silkitish natijasida oq va qora sharchalar butunlay aralashib ketadi. Bu mexanik model molekulalarning tartibsiz harakati natijasida moddalarning o‘zaro aralashishini (diffuziyani) yaqqol tushuntiradi.
 
-Avogadro soni
+━━━
 
-Italiyalik olim Amedeo Avogadro (1776-1856) moddalar bilan ishlashda muhim tushunchani kiritdi.
+🔹 **Molekulalar**
 
-Avogadro soni (NA) — 1 mol moddada bo'ladigan zarrachalar (atom yoki molekulalar) soni.
+Moddalar mayda zarralardan — **molekula** va **atom**lardan tashkil topganligini bilib oldingiz.
 
-NA = 6.02 × 10²³ mol⁻¹
+📌 Moddaning kimyoviy xossasini o‘zida saqlab qoladigan eng kichik zarrasiga **molekula** deyiladi.
 
-Bu son juda katta! Qanday tasavvur qilish mumkin?
-• Agar siz sekundiga 1 tadan sanasangiz, 6.02 × 10²³ ta sanash uchun 19 × 10¹⁵ yil kerak bo'ladi — bu yerning umridan million marta ko'p!
-• Agar 6.02 × 10²³ ta guruch donini Yer yuziga yoysangiz, butun Yer 1 km qalinlikda guruch bilan qoplanadi
+Molekula bir xil yoki har xil kimyoviy elementlarning bir necha atomidan tashkil topadi. **Metallar** va **inert gazlar** tabiatda atom holda uchraydi. Metall va inert gazlardan boshqa moddalarning molekulasi eng kamida ikkita atomdan tashkil topgan bo‘ladi:
+• **Vodorod gazi:** vodorod (H₂) molekulalaridan, har bir vodorod molekulasi esa 2 ta vodorod (H) atomidan iborat.
+• **Kislorod moddasi:** kislorod (O₂) molekulalaridan, har bir kislorod molekulasi 2 ta kislorod (O) atomidan tuzilgan.
+• **Suv moddasi:** suv (H₂O) molekulalaridan tashkil topgan. Har bir suv molekulasi 2 ta vodorod (H) va 1 ta kislorod (O) atomidan iborat.
 
-Avogadro soni tabiiy doimiylardan biri bo'lib, u barcha moddalar uchun bir xil. 1 mol vodorodni olsangiz ham, 1 mol temirni olsangiz ham — ikkalasida 6.02 × 10²³ ta zarracha bo'ladi.
+━━━
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔹 **Molekulalarning o‘lchami**
 
-Mol nima?
+Molekulalar juda kichik bo‘lganligidan ularni ko‘z bilan ko‘rib bo‘lmaydi. Ammo mana shu ko‘zga ko‘rinmas, nihoyatda mayda zarralar birikib, biz ko‘ra oladigan jismlar va moddalarni hosil qiladi. Molekulalarning o‘lchamini aniqlash imkonini beradigan ko‘pgina usullar mavjud. Shunday usullardan biri — **zaytun moyi tomchisining suv sirtida yoyilishi**ni ko‘rib chiqaylik. Agar idish katta bo‘lsa, moy qatlami suv ustini to‘liq qoplamaydi.
 
-Mol — xalqaro birliklar tizimida (SI) modda miqdorining o'lchov birligi.
+☕ **Moy qatlami tajribasi:** Hajmi 1 mm³ bo‘lgan zaytun moyi tomchisi suv sirtida taxminan 0,6 m² yuzani egallar ekan. Moy tomchisi suv yuzida eng katta yuzaga yoyilganda moy qatlamining qalinligini bitta molekula diametriga yaqin deb tasavvur qilish mumkin. Demak, moy qatlamining qalinligini aniqlab, molekula o‘lchamini taqriban hisoblash mumkin.
 
-1 mol — shunday miqdordagi moddaki, unda 6.02 × 10²³ ta zarracha (atom yoki molekula) bor.
+Moy qatlamining qalinligini quyidagicha aniqlaymiz. Moy qatlamining hajmi V, uning yoyilgan yuzasi S bilan qalinligi d ning ko‘paytmasiga teng:
+**V = S · d   (1)**
 
-Mol — bu o'nlab, yuzlab kabi sanash birligi, faqat juda katta miqdorlar uchun:
-• 1 o'nlab = 12 ta
-• 1 mol = 602 000 000 000 000 000 000 000 ta
+Bu tenglikdan moy qatlamining qalinligi, ya’ni zaytun moyi molekulasining diametri quyidagiga teng bo‘ladi:
+**d = V / S = 1 mm³ / 0,6 m² = 10⁻⁹ m³ / 0,6 m² ≈ 1,7 · 10⁻⁹ m**
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Bunday o‘lchamdagi molekulani eng kuchli optik mikroskopda ham ilg‘ab bo‘lmaydi. O‘lchashda olingan natijalar asosida biz atomni radiusi **10⁻¹⁰ m** ga yaqin bo‘lgan shar ko‘rinishida tasavvur qilishimiz mumkin. Molekulalar bir nechta atomlardan tarkib topganligi uchun ularning diametri atomning diametridan kattaroq bo‘ladi.
+• Vodorod molekulasining diametri: **d ≈ 2,3 · 10⁻¹⁰ m**
+• Suv molekulasining diametri: **d ≈ 3 · 10⁻¹⁰ m**
 
-Molyar massa
+💡 **Kattalashtirishni tasavvur qilish:** Bu o‘lchamlar shu qadar kichikki, ularni tasavvur qilish juda qiyin. Masalan, agar molekulani olmadek bo‘lguncha kattalashtirilsa, shuncha marta kattalashtirilgan olma **Yer sayyorasi**dek bo‘ladi! Yana shunday bir qiyoslash: agar tabiatdagi hamma narsa 10⁸ marta kattalashsa, bo‘yi 1 m bo‘lgan bolaning bo‘yi **100 000 km** ga yetadi.
 
-Molyar massa (M) — 1 mol moddaning massasi.
+📖 **Tunnelli Mikroskop:** Hozirgi kunda maxsus asboblar yordamida alohida atomlar va molekulalarning joylashish manzarasini hamda ularning o‘lchamini aniq o‘lchash imkoni mavjud. Shunday zamonaviy asboblardan biri **tunnelli mikroskop** bo‘lib, u 1980-yillarda mashhur *IBM (International Business Machines)* firmasi xodimlari tomonidan yaratilgan. Bu kashfiyotning mualliflari bo‘lgan *Gerd Binning* va *Geynrix Rorer*ga **1986-yili Nobel mukofoti** berilgan. Tunnelli mikroskop o‘lchamni **100 million marta** kattalashtirish imkoniyatiga ega. U yordamida uglerod atomining diametri **1,4 · 10⁻¹⁰ m** ga teng ekanligi va boshqa atomlarning o‘lchamlari ham aniqlangan. Tunnelli mikroskop yordamida moddani tashkil qilgan zarra tasvirining olinishi, moddaning atom va molekulalardan tashkil topganligiga ishonch hosil qilindi.
 
-Birlik: g/mol yoki kg/mol
+━━━
 
-Molyar massa qiymatini davriy jadvaldan olish mumkin:
-• Vodorod (H): M = 1 g/mol = 0.001 kg/mol
-• Kislorod (O): M = 16 g/mol = 0.016 kg/mol
-• Uglerod (C): M = 12 g/mol = 0.012 kg/mol
-• Azot (N): M = 14 g/mol = 0.014 kg/mol
-• Temir (Fe): M = 56 g/mol = 0.056 kg/mol
+🔹 **Molekulaning massasi**
 
-Murakkab molekulalar uchun molyar massani atomlar massasini qo'shib topamiz:
-• Suv (H₂O): M = 2×1 + 16 = 18 g/mol
-• Karbonat angidrid (CO₂): M = 12 + 2×16 = 44 g/mol
-• Kislorod gazi (O₂): M = 2×16 = 32 g/mol
+Molekulaning o‘lchami haqidagi ma’lumotlardan foydalanib, ularning massasini hisoblaymiz. Aytaylik, suv molekulasining diametri taxminan d ≈ 3 · 10⁻¹⁰ m bo‘lsa, u holda uning hajmi ham taxminan V ≈ d³ ≈ (3 · 10⁻¹⁰ m)³ ga teng bo‘ladi. Suv molekulalari bir-biriga zich tegib turadi deb, 1 m³ suvdagi molekulalar sonini hisoblaymiz:
+**N = 1 m³ / (3 · 10⁻¹⁰ m)³ ≈ 3,7 · 10²⁸ ta**
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1 m³ suvning massasi 1000 kg ga teng ekanligidan suv molekulasining massasini hisoblaymiz:
+**m₀ = 1000 kg / (3,7 · 10²⁸) ≈ 2,7 · 10⁻²⁶ kg**
 
-Bir molekulaning massasi
+Hisoblash natijasiga ko‘ra, suv molekulasining massasi nihoyatda kichik ekanligi ko‘rinib turibdi. Atom (yoki molekula)larning o‘lchamlari qanchalik kichik bo‘lmasin, ularning massalari aniqlangan:
+• Suv molekulasining massasi: **m₀(suv) ≈ 2,7 · 10⁻²⁶ kg**
+• Kislorod molekulasining massasi: **m₀(kislorod) ≈ 5,32 · 10⁻²⁶ kg**
+• Uglerod atomining massasi: **m₀(uglerod) ≈ 1,992 · 10⁻²⁶ kg**
+• Simob atomining massasi: **m₀(simob) ≈ 3,337 · 10⁻²⁵ kg**
 
-Bir molekulaning massasini quyidagi formula bilan topamiz:
+━━━
 
-m₀ = M / NA
+🔹 **Nisbiy atom (molekular) massa**
 
-Bu yerda:
-• m₀ — bir molekulaning massasi (kg)
-• M — molyar massa (kg/mol)
-• NA — Avogadro soni (6.02 × 10²³ mol⁻¹)
+Yuqorida moddani tashkil qilgan molekulaning massasi juda kichik ekanligi ta’kidlab o‘tildi. Ammo bunday kichik massani oddiy tarozida o‘lchab bo‘lmaydi. Shu sababli atomning massasini ifodalash uchun maxsus **massa atom birligi (u)** tushunchasi kiritilgan.
 
-Misol: Suv molekulasining massasi:
-m₀ = 0.018 / (6.02 × 10²³) = 2.99 × 10⁻²⁶ kg
+📌 **Massa atom birligi (m.a.b.):** Xalqaro kelishuvga muvofiq barcha modda atomlarining massasini ¹²C uglerod atomi massasining 1/12 qismi bilan taqqoslash qabul qilingan. Massa atom birligi qiymati: **1 u ≈ 1,66 · 10⁻²⁷ kg** ga teng.
 
-Ko'ryapsizmi, molekula massasi juda kichik!
+📌 **Nisbiy atom massasi:** Berilgan modda atomi massasining (m₀) uglerod atom massasi (m₀_C) 1/12 qismining nisbatiga, shu moddaning nisbiy atom massasi deyiladi.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Formulasi:
+**A_r = m₀ / ( (1/12) · m₀_C )   (2)**
 
-Molekulalar sonini hisoblash
+(2) ifodaga ko‘ra kislorod atomining nisbiy atom massasi:
+**A_r = 5,32 · 10⁻²⁶ kg / (1,66 · 10⁻²⁷ kg) ≈ 16 u**
 
-Berilgan massadagi molekulalar sonini topish formulasi:
+Nisbiy atom massa o‘lchovsiz kattalikdir. Barcha kimyoviy elementlarning nisbiy atom massasi *D.I.Mendeleyev*ning kimyoviy elementlar davriy sistemasida berilgan. Murakkab modda molekulasining nisbiy molekulyar massasini topish uchun uning tarkibiga kiruvchi elementlarning nisbiy atom massalarini qo‘shish kerak.
+• **Suv (H₂O) molekulasining nisbiy molekulyar massasi:** ikkita vodorod atomining nisbiy massasiga bitta kislorod atomining nisbiy massasini qo‘shamiz:
+**Mr(H₂O) = 1 · 2 + 16 = 18 u**
 
-N = (m × NA) / M
+━━━
 
-Bu yerda:
-• N — molekulalar soni
-• m — moddaning massasi (kg)
-• NA — Avogadro soni
-• M — molyar massa (kg/mol)
+🔹 **Masala yechish namunasi**
 
-Boshqa foydali formulalar:
-• N = ν × NA (bu yerda ν — modda miqdori, mol)
-• ν = m / M (modda miqdori)
+✏️ **Masala:** Bir dona suv molekulasining massasi 3 · 10⁻²⁶ kg ga teng bo‘lsa, 12 cm³ suvda qancha molekula bor?
+• **Berilgan:**
+  m₀ = 3 · 10⁻²⁶ kg
+  V = 12 cm³ = 12 · 10⁻⁶ m³
+  ρ = 1000 kg/m³
+• **Topish kerak:** N = ?
+• **Formulasi:** m = ρ · V;   N = m / m₀  =>  **N = (ρ · V) / m₀**
+• **Birliklar:** [N] = (kg/m³ · m³) / kg = birliklar
+• **Hisoblash:** N = (10³ · 12 · 10⁻⁶) / (3 · 10⁻²⁶) = **4 · 10²³ ta**
+• **Javob:** N = 4 · 10²³ ta
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━
 
-Molekulaning o'lchami
+❓ **Savol va topshiriqlar:**
+1. Molekulaga ta’rif bering va misollar keltiring.
+2. Molekulaning o‘lchamini qanday aniqlash mumkin?
+3. Atom va molekulaning o‘lchami qanday tartibda bo‘ladi?
+4. Massaning atom birligi qilib qanday kattalik olingan?
+5. Moddaning nisbiy molekulyar massasi qanday aniqlanadi?
 
-Molekulalar juda kichik, ularni oddiy ko'z bilan ko'rib bo'lmaydi.
+🔹 **Mashqlar va amaliy masalalar:**
+1. Massasi 2,4 kg bo‘lgan ko‘mirda qancha uglerod atomi borligini hisoblang. Uglerod atomining massasini 2 · 10⁻²⁶ kg ga teng deb oling.
+2. Hajmi 0,2 mm³ bo‘lgan moy suv ustida yoyilib, taxminan 0,8 m² yuzali yupqa parda hosil qildi. Moy molekulalari suv yuzasida bir qavat bo‘lib tekis yoyilgan deb hisoblab, moy molekulasining chiziqli o‘lchamini aniqlang.
+3. Bitta suv molekulasining massasi 3 · 10⁻²⁶ kg. Hajmi 5 cm³ bo‘lgan suvda qancha suv molekulasi bor?
+4. Idishdagi suvda 10²⁴ ta suv molekulasi bo‘lsa, suvning hajmi qanday? Suv molekulasining diametrini 3 · 10⁻¹⁰ m ga teng deb oling.
+5. Moy molekulasining diametri taxminan 2,6 · 10⁻¹⁰ m bo‘lsa, 35 cm³ moyda qancha moy molekulasi borligini aniqlang.`,
 
-Molekulaning diametri taxminan: d ≈ 10⁻¹⁰ m = 0.1 nm (nanometr)
-
-Taqqoslash uchun:
-• Soch tolasining diametri ≈ 0.05 mm = 5 × 10⁻⁵ m
-• Molekula diametri ≈ 10⁻¹⁰ m
-• Soch tolasi molekuladan 500 000 marta yo'g'on!
-
-Molekulaning hajmini sferaga yaqinlashtirish usulida hisoblash mumkin:
-V₀ = (4/3)π(d/2)³ = πd³/6
-
-Amaliy usullar bilan molekula o'lchamini aniqlash:
-1. Moy tomchisi usuli — suvga moy tomchisi tomiziladi, u yupqa qatlam bo'lib tarqaladi
-2. Rentgen nurlari usuli — kristallardagi atom oralig'ini o'lchaydi
-3. Elektron mikroskop — zamonaviy usul
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Asosiy xulosa
-
-1. Avogadro soni NA = 6.02 × 10²³ mol⁻¹ — 1 moldagi zarrachalar soni
-2. Molyar massa M — 1 mol moddaning massasi (g/mol)
-3. Bir molekulaning massasi: m₀ = M / NA
-4. Molekulalar soni: N = (m × NA) / M
-5. Molekulaning diametri: d ≈ 10⁻¹⁰ m
-
-KEYINGI DARSDA: Modda miqdori — mol bilan ishlash va masalalar yechish.`,
+        
 
         formulas: [
             {

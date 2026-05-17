@@ -66,9 +66,11 @@ const PWAInstallBanner = () => {
                             {/* Header */}
                             <div className="flex items-center justify-between mb-5">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-xl">
-                                        ⚡
-                                    </div>
+                                    <img
+                                        src="/icons/icon-192x192.png"
+                                        alt="NurFizika"
+                                        className="w-10 h-10 rounded-2xl object-cover shadow-md"
+                                    />
                                     <div>
                                         <h3 className="theme-text font-bold text-base">iPhone ga O'rnatish</h3>
                                         <p className="theme-text-secondary text-xs">3 ta oddiy qadam</p>
@@ -149,8 +151,12 @@ const PWAInstallBanner = () => {
 
                             <div className="relative flex items-start gap-3">
                                 {/* App ikonasi */}
-                                <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-500/30">
-                                    <span className="text-2xl">⚡</span>
+                                <div className="relative w-14 h-14 flex-shrink-0">
+                                    <img
+                                        src="/icons/icon-192x192.png"
+                                        alt="NurFizika"
+                                        className="w-14 h-14 rounded-2xl object-cover shadow-lg shadow-indigo-500/30"
+                                    />
                                     {/* Badge */}
                                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center">
                                         <span className="text-[7px] font-bold text-white">✓</span>

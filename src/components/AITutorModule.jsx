@@ -105,7 +105,7 @@ export default function AITutorModule({ topic = '', messages: propMessages, setM
     }, []);
 
     return (
-        <div className="border theme-border rounded-3xl theme-card flex flex-col h-[calc(100vh-180px)] min-h-[600px] overflow-hidden shadow-2xl relative">
+        <div className="border theme-border rounded-2xl theme-card flex flex-col h-[calc(100vh-220px)] md:h-[650px] min-h-[500px] overflow-hidden shadow-lg relative">
             {/* Background pattern for premium feel */}
             <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" 
                  style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>

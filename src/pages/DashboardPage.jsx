@@ -466,12 +466,12 @@ function EduPhysicsAppContent() {
             <img 
               src="/assets/nurfizika.jpg" 
               alt="NurFizika Logo" 
-              className="w-8 h-8 rounded-lg object-cover"
-              style={{ filter: 'drop-shadow(0 2px 4px rgba(13, 148, 136, 0.2))' }}
+              className="w-11 h-11 rounded-xl object-cover"
+              style={{ filter: 'drop-shadow(0 4px 6px rgba(13, 148, 136, 0.3))' }}
             />
             <div className="flex flex-col">
               <span className="text-[#0d9488] font-bold text-[18px] tracking-tight">{t('app_name') || 'NurFizika'}</span>
-              <span className="text-[9px] sm:text-[10px] font-serif italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 drop-shadow-[0_1px_1px_rgba(251,191,36,0.2)] mt-0.5">{t('app_slogan') || 'Fizika — yangicha nigohda'}</span>
+              <span className="text-[11px] sm:text-[12px] font-semibold italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-600 drop-shadow-[0_1px_2px_rgba(251,191,36,0.3)] mt-0.5">{t('app_slogan') || 'Fizika — yangicha nigohda'}</span>
             </div>
           </div>
           {/* Close button - only on mobile */}
@@ -579,8 +579,8 @@ function EduPhysicsAppContent() {
             <img
               src="/assets/nurfizika.jpg"
               alt="NurFizika Logo"
-              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-cover"
-              style={{ filter: 'drop-shadow(0 2px 5px rgba(255, 215, 0, 0.3))' }}
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg object-cover shadow-lg"
+              style={{ filter: 'drop-shadow(0 2px 8px rgba(255, 215, 0, 0.4))' }}
             />
             <span className="theme-text font-medium text-base">NurFizika</span>
           </div>
@@ -977,11 +977,6 @@ function VideoContent({ url }) {
 // --- MUKAMMAL AI TEST TUZUVCHI (Quiz) ---
 function QuizModule({ setUserXP, addNotification, setShowSettings, updateStats }) {
   const { t } = useLanguage();
-  const API_KEYS = [
-    import.meta.env.VITE_GEMINI_API_KEY_1 || "AIzaSyBy1_ST87s7uMpMWvM9Iq06eTVM8imBaao",
-    import.meta.env.VITE_GEMINI_API_KEY_2 || "AIzaSyB5McpyvgDYOu3GodFsw025i1UYvEB1Jqo",
-    import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyAkl2vISoMfAf1Rb0LGVvHFPJegcnQVygI",
-  ];
   // Boshlang'ich (default) savollar
   const defaultQuestions = [
     { id: 1, q: "Elektr zanjirida kuchlanishni o'lchovchi asbob nima?", options: ["Ampermetr", "Voltmetr", "Ommetr", "Reostat"], ans: 1 },

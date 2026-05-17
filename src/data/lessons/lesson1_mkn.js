@@ -1,5 +1,5 @@
 // DARS 1: MODDA TUZILISHINING MOLEKULYAR-KINETIK NAZARIYASI
-// TO'LIQ KONTENT — ~3500 so'z
+// TO'LIQ KONTENT
 
 export const lesson1 = {
     id: '9-l-20',
@@ -8,7 +8,7 @@ export const lesson1 = {
     description: "Molekulyar-kinetik nazariyaning asosiy g'oyalari, Browncha harakati, diffuziya hodisasi va moddaning uch holati.",
     order_number: 1,
     duration_minutes: 45,
-    video_url: '',
+    video_url: 'https://www.youtube.com/embed/rpacNAgLEoA',
     has_lab: true,
     test_count: 5,
     difficulty: 'easy',
@@ -22,195 +22,62 @@ export const lesson1 = {
             'Moddaning uch holati'
         ],
 
-        theory: `Atrofimizda ko'rayotgan barcha narsalar — havo, suv, daraxt, tosh, hatto o'zimiz — moddalardan iborat. Lekin modda nima? Modda nimalardan tashkil topgan?
+        theory: `Modda tuzilishi to‘g‘risidagi ta’limotga dastlab miloddan oldingi V–IV asrlarda yashagan grek faylasufi *Demokrit* tomonidan asos solingan. *Demokrit* tabiat hodisalarini o‘rganish uchun jismlarning ichki tuzilishini o‘rganish zarurligini o‘z asarlarida yozgan. Uning fikricha, barcha moddalar juda kichik zarralardan tashkil topgan. U moddaning eng kichik bo‘linmas zarrasini **atom** deb ataganligi haqidagi ma’lumot bilan siz 6-sinfda tanishgansiz.
 
-Qadim zamonlardan beri odamlar bu savol ustida o'ylashgan. Yunoniston faylasufi Demokrit (miloddan avvalgi 460-370 yillar) moddalarni cheksiz bo'laklash mumkin emasligini, eng kichik zarrachalar — atomlar mavjudligini aytgan edi.
+📌 **Ta'rif:** Moddaning tuzilishi va xossalarini uni tashkil qilgan molekulalarning harakatiga hamda molekulalar orasidagi o‘zaro ta’sir kuchining mavjudligiga bog‘lab o‘rganuvchi nazariya **molekular-kinetik nazariya (MKN)** deb ataladi.
 
-Lekin ilmiy dalillar bilan asoslangan nazariyani birinchi marta rus olimi Mixail Vasilyevich Lomonosov (1711-1765) yaratdi. U 1748 yilda yozgan:
+📖 Modda tuzilishining molekular-kinetik nazariyasi XVIII asrdan uzviy nazariya sifatida rivojlana boshladi. Molekular-kinetik nazariyaning rivojlanishida rus olimlari *M.V.Lomonosov*, *D.I.Mendeleyev*, ingliz olimlari *D.Dalton*, *J.Maksvell*, nemis olimi *O.Shtern*, avstriya fizigi *L.Bolsman*, italyan olimi *A.Avogadro* va boshqalar o‘zlarining hissalarini qo‘shganlar.
 
-"Barcha jismlarning eng kichik zarrachalari mavjud bo'lib, ular o'zgarmas va bo'linmasdir"
+━━━
 
-Bu nazariya Molekulyar-kinetik nazariya deb ataladi.
+🔹 **Molekular-kinetik nazariya tajribalarda isbotlangan uchta qoidaga asoslanadi:**
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. **Moddalar zarralardan — atom va molekulalardan tashkil topgan.**
+2. **Atom va molekulalar to‘xtovsiz va tartibsiz harakat qiladi.**
+3. **Atom va molekulalar orasida o‘zaro tortishish va itarilish kuchlari mavjud.**
 
-Molekulyar-kinetik nazariyaning asosiy qoidalari
+━━━
 
-Molekulyar-kinetik nazariya (MKN) — bu moddalarning tuzilishi va xossalarini molekulalar va atomlarning harakati orqali tushuntiradigan nazariya.
+📍 **Bu qoidalar quyidagi amaliy misollarda yaqqol ko‘rinadi:**
 
-🔹 BIRINCHI QOIDA: Moddalar zarrachalardan tashkil topgan
+🧪 **Xonaning bir chekkasiga atir sepilsa**, uning hidi xonaning boshqa chekkasiga ham yetib keladi. Bu hid, atir molekulalaridan tashkil topgan. Atir molekulalari xona bo‘ylab **to‘xtovsiz va tartibsiz** harakat qilishi natijasida tarqaladi. Atir hidi bizga yetib kelguncha ma’lum vaqt o‘tadi. Bunga sabab — atir molekulalari o‘z yo‘lida son-sanoqsiz havo molekulalari bilan to‘qnashadi va o‘z harakat yo‘nalishini ko‘p marta o‘zgartiradi.
 
-Barcha moddalar juda kichik zarrachalar — molekula va atomlardan iborat.
+☕ **Stakandagi suv ustiga bir choy qoshiq sut quysak**, suv bilan sut tezda aralashib ketmaydi. Ularning aralashishi uchun ma’lum vaqt o‘tadi. Suv va sutning o‘zaro aralashishi ular **zarralardan tashkil topganligi** va bu zarralar **to‘xtovsiz va tartibsiz harakatda** ekanligini ko‘rsatadi. Aralashishiga vaqt ketishi esa zarralarning o‘zaro ta’sirlashib harakatlanishini ko‘rsatadi.
 
-Molekula — moddaning kimyoviy xossalarini saqlaydigan eng kichik zarrasi.
-Atom — kimyoviy element zarrachasi.
+🌱 **Oltin va qo‘rg‘oshin metallarining sirtlari silliqlanib**, ustma-ust joylashtirilgan holda ularning ustiga og‘ir yuk qo‘yilgan. Besh yildan keyin metallar ustidagi yuk olinganda, ularning **bir-biriga yopishib qolganligi** kuzatilgan. Oltin atomlari qo‘rg‘oshin moddasi ichiga, qo‘rg‘oshin atomlari esa oltin moddasining ichiga taxminan **1 mm** kirib borgan. Bu esa oltin va qo‘rg‘oshin moddalarining aralashishi qattiq jismlarning ham zarralardan tashkil topganligini bildiradi. Qattiq jism zarralarining sekin aralashishi esa, metall zarralarining o‘zaro ta’sir kuchi suyuqlik yoki gazlarga nisbatan kuchliroq ekanligini ko‘rsatadi.
 
-Misollar:
-• Suv molekulasi (H₂O) — 2 ta vodorod atomi + 1 ta kislorod atomi
-• Oltingugurt molekulasi (S₈) — 8 ta oltingugurt atomi
-• Temir — temir atomlaridan tashkil topgan
+━━━
 
-Molekulalar juda kichik:
-• Bir molekulaning o'lchami: ~10⁻¹⁰ m (0.0000000001 metr)
-• 1 mm uzunlikka ~10 million molekula sig'adi!
-• Bir tomchi suvda ~10²¹ (million trillion) molekula bor
+🔹 **Broun harakati**
 
-🔹 IKKINCHI QOIDA: Molekulalar doimo harakatda
+🔬 Moddadagi molekulalarning tartibsiz harakatini tasdiqlovchi tajriba ingliz botanigi *Robert Broun* tomonidan **1827-yilda** kuzatilgan. Broun suv ustiga o‘simlik gulining changi (spora-urug‘)ni sepib, uni mikroskopda kuzatadi. Broun gul changining suv ustida to‘xtovsiz va tartibsiz harakatini ko‘rib, uni biror mayda jonzot deb o‘ylagan. Harakatlanayotgan narsa nimaligini va bunday harakat sabablarini aniqlash uchun Broun qator tajribalar o‘tkazgan. U tajribalar asosida tabiatda zarralarning uzluksiz va tartibsiz (xaotik) harakat qilishini aniqlagan. Bunday harakat fanda **Broun harakati** degan nom oldi.
 
-Molekulalar bir joyda turmaydi — ular doimo tartibsiz harakat qiladi. Bu harakat to'xtamaydi!
+📌 **Ta'rif:** Suyuqlik yoki gazdagi atom va molekulalarning to‘xtovsiz va tartibsiz harakati **xaotik harakat** deb ataladi.
 
-Harakat turi moddaning holatiga bog'liq:
+💡 «Xaotik» so‘zi lotincha «xaos» so‘zidan olingan bo‘lib, «tartibsiz» degan ma’noni bildiradi. Broun harakatining yuzaga kelish sabablari modda tuzilishining molekular-kinetik nazariyasi asosida quyidagicha tushuntiriladi. Broun harakatining molekular-kinetik nazariyasi **1905-yili** *Albert Eynshteyn* tomonidan yaratilgan. Suyuqlikda muallaq turgan gul changi (Broun zarrasi)ga modda molekulalari uzluksiz va tartibsiz urilib turadi.
 
-📍 Qattiq jismlarda:
-• Molekulalar o'z o'rnida tebranadi
-• Joyidan ko'p harakat qilmaydi
-• Qattiq bog'langan
+💨 Agar Broun zarrasining o‘lchami **1 mikrometrdan katta** bo‘lsa, unga turli tomonlardan urilayotgan molekulalarning zarb kuchlari zarrani harakatga keltira olmaydi. Broun zarrasining o‘lchami **1 nanometr atrofida** bo‘lsa, unga bir tomondan urilayotgan molekulalar soni boshqa tomondan urilayotgan molekulalar sonidan farq qiladi. Broun zarrasiga ta’sir etuvchi natijaviy kuch zarrani harakatlantiradi. Demak, **Broun harakati** biror muhitda muallaq turgan zarraga, shu muhit molekulalarining to‘xtovsiz urilishlari natijasida yuzaga keladi.
 
-🌊 Suyuqliklarda:
-• Molekulalar erkinroq harakat qiladi
-• Bir-birining atrofida aylanib, sirg'alib yuradi
-• O'z o'rnini o'zgartirishi mumkin
+📖 Modda tuzilishini o‘rganishga oid tadqiqotlarda Broun harakatining kashf etilishi katta ahamiyatga ega bo‘ldi. Broun harakati molekulalarning tartibsiz harakat qilishidan tashqari, moddaning molekulalardan tashkil topganligini ham tasdiqlaydi.
 
-💨 Gazlarda:
-• Molekulalar juda tez va erkin harakat qiladi
-• To'g'ri chiziq bo'ylab uchadi, keyin to'qnashadi
-• Juda katta masofaga tarqaladi
+📖 Broun harakatini fransuz fizigi *Jan Perren* tajribada o‘rganib, xaotik harakat qilayotgan zarranning teng vaqtlar oralig‘idagi holatlarini suratga olgan. Bunda Broun zarrasining trayektoriyasi tasvirlangandek turli uzunliklardagi siniq chiziqlardan iborat ekan. **1926-yili** *J.Perrenga* moddaning molekulalardan tashkil topganligining tajribaviy isboti uchun **Nobel mukofoti** berilgan.
 
-Muhim: Temperatura qancha yuqori bo'lsa, molekulalar shuncha tez harakat qiladi!
+━━━
 
-🔹 UCHINCHI QOIDA: Molekulalar o'zaro ta'sirlashadi
+🔹 **Broun harakatining asosiy xususiyatlari:**
 
-Molekulalar o'rtasida ikki xil kuch mavjud:
+• **Broun harakati to‘xtovsiz va tartibsiz harakatdan iborat.**
+• **Broun harakatining trayektoriyasi murakkab siniq chiziqlardan iborat.**
+• **Broun harakati zarranning o‘lchamiga bog‘liq.**
 
-1. Tortishish kuchlari — molekulalarni bir-biriga yaqinlashtiradi
-2. Itarish kuchlari — molekulalarni bir-biridan uzoqlashtiradi
+━━━
 
-Bu kuchlarning nisbati moddaning holatini belgilaydi:
-• Qattiq jism: Tortishish >> Itarish → Molekulalar mahkam bog'langan
-• Suyuqlik: Tortishish ≈ Itarish → Molekulalar erkin lekin yaqin
-• Gaz: Tortishish << Itarish → Molekulalar juda uzoq, deyarli ta'sirlashmaydi
+❓ **Savol va topshiriqlar:**
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Browncha harakati
-
-1827-yil. Ingliz botanik Robert Brown mikroskop ostida suvdagi gulchangning zarrachalarini kuzatardi. U ajablanarli narsani ko'rdi: kichik zarrachalar tartibsiz tebranib, zigzag yo'llar bo'ylab harakatlanardi!
-
-Bu harakat Browncha harakati deb nomlandi.
-
-Sababi nima?
-
-Suv molekulalari ko'zga ko'rinmaydi, lekin ular doimo harakatda. Ular har tomondan zarrachaga urilib turadi. Ba'zi paytlarda bir tomondan ko'proq uriladi — zarrach o'sha tomonga siljiydi. Keyingi paytda boshqa tomondan ko'proq uriladi — zarrach boshqa tomonga o'tadi.
-
-Natija: Tartibsiz, to'xtamaydigan harakat!
-
-1905-yil. Albert Einstein bu harakatni matematik jihatdan tahlil qildi va molekulalarning mavjudligini matematik isbotladi.
-
-1908-yil. Fransuz fizigi Jean Perrin tajribalar orqali Eynshteyn nazariyasini tasdiqladi va Avogadro sonini aniq o'lchadi. Bu ishi uchun 1926-yilda Nobel mukofotiga sazovor bo'ldi.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Diffuziya
-
-Xonada atr purkaganingizda, bir necha soniyadan keyin butun xona hid bilan to'ladi. Bu qanday sodir bo'ladi?
-
-Bu diffuziya hodisasi!
-
-Diffuziya — bir moddaning molekulalarining boshqa modda molekulalari orasiga o'z-o'zidan kirib borishi.
-
-Diffuziya qonuniyatlari:
-
-1. Temperatura ortsa, diffuziya tezlashadi
-   • Issiq choyda shakar tezroq eriydi
-   • Yozda atir tezroq tarqaladi
-
-2. Diffuziya gazdarda eng tez, qattiq jismlarda eng sekin
-   • Gazda: bir necha soniya/daqiqa
-   • Suyuqlikda: bir necha daqiqa/soat
-   • Qattiq jismda: bir necha yil!
-
-3. Molekulalar qanchalik kichik bo'lsa, diffuziya shunchalik tez
-
-Hayotiy Misollar:
-☕ Choyda shakar: Shakar molekulalari suvning har qismiga tarqaladi.
-🌸 Gul hidi: Gul efir moylari molekulalarini chiqaradi, ular havoda tarqalib, burningizga etib keladi.
-🌊 Okeanda tuz: Okean suvida tuz bir xil tarqalgan — bu million yillar davomidagi diffuziya natijasi.
-🩸 Qondagi kislorod: O'pkadan qonga o'tgan kislorod diffuziya orqali barcha hujayralarga yetib boradi.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Tarixiy rivojlanish
-
-Molekulyar-kinetik nazariyaning shakllanishi:
-
-• Miloddan avvalgi 460-370 yillar — Demokrit (Yunoniston) atom g'oyasini ilgari surdi
-• 1748-yil — M.V. Lomonosov (Rossiya) molekulyar nazariya asoslarini yaratdi
-• 1827-yil — Robert Brown (Angliya) Browncha harakatini kashf etdi
-• 1860-1870 yillar — J.K. Maxwell, L. Boltzmann MKN ning matematik asoslarini yaratdi
-• 1905-yil — Albert Einstein (Germaniya) Browncha harakatining nazariy tahlilini berdi
-• 1908-yil — Jean Perrin (Fransiya) Avogadro sonini o'lchadi, 1926 yilda Nobel mukofoti
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Moddaning uch holati
-
-MKN orqali moddaning qattiq, suyuq va gaz holatlarini tushuntiramiz:
-
-🧊 Qattiq holat
-Molekulyar rasm:
-• Molekulalar juda yaqin joylashgan
-• Tartibli tuzilish (kristall panjara)
-• Faqat o'z o'rnida tebranadi
-• Tortishish kuchlari juda kuchli
-
-Xossalar:
-• Shaklni saqlaydi
-• Hajmni saqlaydi
-• Siqilmaydi (deyarli)
-• Qattiq
-
-💧 Suyuq holat
-Molekulyar rasm:
-• Molekulalar yaqin lekin tartibsiz
-• Sirg'alib, aylanib yuradi
-• Erkin harakat qiladi
-• Tortishish va itarish muvozanatda
-
-Xossalar:
-• Shaklni saqlamaydi (idish shaklini oladi)
-• Hajmni saqlaydi
-• Oz siqiladi
-• Oqadi
-
-💨 Gaz holati
-Molekulyar rasm:
-• Molekulalar juda uzoq
-• To'g'ri chiziq bo'ylab tez uchadi
-• To'qnashadi va yo'nalishni o'zgartiradi
-• Tortishish juda zaif
-
-Xossalar:
-• Shaklni saqlamaydi
-• Hajmni saqlamaydi (idishni to'ldiradi)
-• Oson siqiladi
-• Yengil
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Asosiy xulosa
-
-Molekulyar-kinetik nazariya bizga quyidagilarni tushuntiradi:
-
-1. ✅ Modda nimadan iborat (molekula va atomlar)
-2. ✅ Molekulalar qanday harakat qiladi (tartibsiz, to'xtamaydigan)
-3. ✅ Molekulalar o'rtasida qanday kuchlar bor (tortishish va itarish)
-4. ✅ Diffuziya qanday sodir bo'ladi (molekulalarning aralashishi)
-5. ✅ Browncha harakati nima (molekulalarning ta'siri)
-6. ✅ Moddaning uch holati qanday farqlanadi (molekulalar orasidagi masofa va kuchlar)
-
-Eng muhim g'oya: Barcha moddalar kichik zarrachalardan iborat va bu zarrachalar doimo harakatda!
-
-KEYINGI DARSDA: Molekulaning massasi va o'lchami — Avogadro soni, molyar massa, molekulalar sonini hisoblash.`,
+1. Qanday tajribalar modda tuzilishining molekular-kinetik nazariyasining asosiy qoidalarini tasdiqlaydi?
+2. Broun harakatining yuzaga kelish sababini tushuntirib bering.
+3. Nima uchun ikkiga bo‘lingan plastilinni bir-biriga biriktirish mumkin, ammo ikkiga bo‘lingan qalam bo‘laklarini bir-biriga qaytadan biriktirib bo‘lmaydi?
+4. Qattiq jismlarning ham zarralari to‘xtovsiz va tartibsiz harakat qiladi. Nega qattiq jismlar sochilib ketmaydi?`,
 
         formulas: [
             {

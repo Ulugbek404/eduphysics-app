@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Atom, Menu, X, LogIn, UserPlus, Sun, Moon } from 'lucide-react';
+import { Menu, X, LogIn, UserPlus, Sun, Moon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -105,14 +105,14 @@ const Navbar = () => {
                             <img
                                 src="/assets/nurfizika.jpg"
                                 alt="NurFizika"
-                                className="h-12 md:h-14 rounded-2xl transition-transform group-hover:scale-110"
-                                style={{ filter: 'drop-shadow(0 4px 10px rgba(255, 215, 0, 0.3))' }}
+                                className="h-14 md:h-16 rounded-2xl transition-transform group-hover:scale-110 shadow-lg"
+                                style={{ filter: 'drop-shadow(0 6px 15px rgba(255, 215, 0, 0.4))' }}
                             />
                             <div className="flex flex-col items-start">
                                 <span className={`text-xl md:text-2xl font-bold ${isLight ? 'text-slate-800' : 'text-white'}`}>
                                     {t('app_name')}
                                 </span>
-                                <span className="text-xs text-yellow-500 italic">{t('hero_slogan')}</span>
+                                <span className="text-sm text-yellow-500 font-medium italic drop-shadow-sm">{t('hero_slogan')}</span>
                             </div>
                         </button>
 
@@ -251,9 +251,11 @@ const Navbar = () => {
                             {/* Header */}
                             <div className={`flex items-center justify-between p-4 border-b ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
                                 <div className="flex items-center space-x-2">
-                                    <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg">
-                                        <Atom size={20} className="text-white" />
-                                    </div>
+                                    <img
+                                        src="/icons/icon-192x192.png"
+                                        alt="NurFizika"
+                                        className="w-10 h-10 rounded-xl object-cover shadow-md"
+                                    />
                                     <div className="flex flex-col">
                                         <span className={`text-lg font-bold ${isLight ? 'text-slate-800' : 'text-white'}`}>
                                             {t('app_name')}
