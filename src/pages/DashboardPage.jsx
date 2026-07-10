@@ -1418,12 +1418,13 @@ function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStat
 
   const todayTime = userStats?.timeSpent || 0; // seconds
 
-  // Format time
+  // Vaqtni o'qiladigan ko'rinishga keltirish ("21s 53d" emas — "21 soat 53 daq")
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    if (hours > 0) return `${hours}s ${minutes}d`;
-    return `${minutes}d ${seconds % 60}s`;
+    if (hours > 0) return `${hours} soat ${minutes} daq`;
+    if (minutes > 0) return `${minutes} daqiqa`;
+    return `${seconds} soniya`;
   };
 
 
@@ -1519,14 +1520,14 @@ function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStat
           {/* Level + XP progress */}
           <div className="sm:text-right shrink-0 bg-teal-500/5 dark:bg-teal-500/10 p-5 rounded-2xl border border-teal-500/10 backdrop-blur-sm min-w-[200px]">
             <div className="flex items-center sm:justify-end gap-3 mb-3">
-              <div className="px-3 py-1.5 rounded-lg bg-teal-500 text-white text-[12px] font-black uppercase tracking-widest shadow-lg shadow-teal-500/20">
-                Level {userLevel}
+              <div className="px-3 py-1.5 rounded-lg bg-xp-500/15 text-xp-600 dark:text-xp-400 border border-xp-500/25 text-[12px] font-bold">
+                {userLevel}-daraja
               </div>
               <span className="theme-text font-bold text-lg">{totalXP.toLocaleString()} <span className="text-xs theme-muted uppercase tracking-tighter">XP</span></span>
             </div>
             {/* XP progress bar towards next level */}
             <div className="space-y-2">
-              <div className="flex justify-between text-[11px] font-bold theme-muted uppercase tracking-wider">
+              <div className="flex justify-between text-[11px] font-medium theme-muted">
                 <span>Progress</span>
                 <span>{Math.round(((totalXP % 1000) / 1000) * 100)}%</span>
               </div>
@@ -1551,11 +1552,11 @@ function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStat
       {/* Today's Statistics */}
       <div>
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-1.5 h-8 rounded-full bg-gradient-to-b from-blue-500 to-cyan-500 shadow-[0_0_15px_rgba(59,130,246,0.4)]" />
-          <h3 className="text-2xl font-black theme-text tracking-tight uppercase tracking-widest text-[14px]">
+          <div className="w-1.5 h-8 rounded-full bg-brand-500" />
+          <h3 className="text-lg font-bold theme-text tracking-tight">
             {t("dash_today_stats") || "Bugungi statistika"}
           </h3>
-          <div className="flex-1 h-[1px] bg-gradient-to-r from-blue-500/20 to-transparent" />
+          <div className="flex-1 h-[1px] bg-gradient-to-r from-teal-500/20 to-transparent" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
@@ -1578,7 +1579,6 @@ function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStat
             label={t("dash_study_time") || "O'qish vaqti"}
             value={formatTime(todayTime)}
             subtitle={t("dash_today_label") || "bugun"}
-            trend="+2s"
             color="orange"
           />
           <StatsCard
@@ -1594,11 +1594,11 @@ function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStat
       {/* Quick Actions */}
       <div>
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-1.5 h-8 rounded-full bg-gradient-to-b from-purple-500 to-pink-500 shadow-[0_0_15px_rgba(168,85,247,0.4)]" />
-          <h3 className="text-2xl font-black theme-text tracking-tight uppercase tracking-widest text-[14px]">
+          <div className="w-1.5 h-8 rounded-full bg-brand-500" />
+          <h3 className="text-lg font-bold theme-text tracking-tight">
             {t("dash_quick_actions") || "Tezkor harakatlar"}
           </h3>
-          <div className="flex-1 h-[1px] bg-gradient-to-r from-purple-500/20 to-transparent" />
+          <div className="flex-1 h-[1px] bg-gradient-to-r from-teal-500/20 to-transparent" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           <QuickActionCard
@@ -1663,11 +1663,11 @@ function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStat
       {/* Recent Activity */}
       <div>
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-1.5 h-8 rounded-full bg-gradient-to-b from-emerald-500 to-teal-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]" />
-          <h3 className="text-2xl font-black theme-text tracking-tight uppercase tracking-widest text-[14px]">
+          <div className="w-1.5 h-8 rounded-full bg-brand-500" />
+          <h3 className="text-lg font-bold theme-text tracking-tight">
             {t('dash_recent_activity') || "So'nggi faoliyat"}
           </h3>
-          <div className="flex-1 h-[1px] bg-gradient-to-r from-emerald-500/20 to-transparent" />
+          <div className="flex-1 h-[1px] bg-gradient-to-r from-teal-500/20 to-transparent" />
         </div>
         <div className="space-y-3">
           {recentActivities.map((activity, index) => (

@@ -109,7 +109,7 @@ export default function LessonPage() {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`flex items-center gap-2 px-5 py-3 flex-shrink-0 rounded-t-xl font-medium transition-all whitespace-nowrap ${activeTab === tab.id
-                                    ? 'text-blue-500 bg-blue-50 dark:bg-slate-800 border-b-2 border-blue-500'
+                                    ? 'text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-slate-800 border-b-2 border-brand-500'
                                     : 'theme-muted hover:theme-text hover:bg-gray-100 dark:hover:bg-slate-800/50'
                                     }`}
                             >
@@ -132,9 +132,9 @@ export default function LessonPage() {
 
                         {/* DARS TAB */}
                         {activeTab === 'dars' && (
-                            <div className="prose prose-slate dark:prose-invert max-w-none">
-                                <div className="bg-blue-50 dark:bg-blue-500/10 border-l-4 border-blue-500 p-4 mb-6 rounded-r-xl">
-                                    <h3 className="text-blue-600 dark:text-blue-400 font-bold m-0">{t('lesson_goal') || 'Dars maqsadi:'}</h3>
+                            <div className="prose prose-slate dark:prose-invert max-w-[75ch] mx-auto">
+                                <div className="bg-brand-50 dark:bg-brand-500/10 border-l-4 border-brand-500 p-4 mb-6 rounded-r-xl">
+                                    <h3 className="text-brand-600 dark:text-brand-400 font-bold m-0">{t('lesson_goal') || 'Dars maqsadi:'}</h3>
                                     <p className="m-0 theme-text-secondary">{lesson.description}</p>
                                 </div>
 

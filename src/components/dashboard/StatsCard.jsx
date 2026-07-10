@@ -27,7 +27,7 @@ export default function StatsCard({
             <div className="absolute top-0 right-0 w-24 h-24 bg-teal-500/5 rounded-full -mr-10 -mt-10 blur-2xl" />
 
             <div className="flex items-center justify-between mb-4 relative z-10">
-                <div className="text-[13px] font-bold theme-text-secondary uppercase tracking-wider">
+                <div className="text-[13px] font-medium theme-text-secondary">
                     {label}
                 </div>
                 <div className="flex items-center justify-center w-11 h-11 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/10 shadow-inner">
@@ -35,7 +35,7 @@ export default function StatsCard({
                 </div>
             </div>
 
-            <div className="text-[28px] font-bold theme-text mb-1">
+            <div className="text-[28px] font-bold theme-text mb-1 tabular-nums tracking-tight">
                 {value}
             </div>
 

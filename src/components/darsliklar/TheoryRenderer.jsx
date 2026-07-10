@@ -15,7 +15,7 @@ function parseInlineStyles(text) {
     return splitText.map((part, index) => {
         if (part.startsWith('**') && part.endsWith('**')) {
             return (
-                <strong key={index} className="font-bold text-blue-600 dark:text-blue-400">
+                <strong key={index} className="font-bold text-brand-600 dark:text-brand-400">
                     {part.slice(2, -2)}
                 </strong>
             );
@@ -161,7 +161,7 @@ export default function TheoryRenderer({ text }) {
                                         <span className="text-lg">📌</span>
                                         <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Ta'rif / Qoida</span>
                                     </div>
-                                    <p className="theme-text font-medium text-base md:text-lg leading-relaxed text-justify m-0">
+                                    <p className="theme-text font-medium text-base md:text-lg leading-relaxed m-0">
                                         {parseInlineStyles(mainText.replace(/^(Ta'rif:)?\s*/i, ''))}
                                     </p>
                                 </div>
@@ -178,7 +178,7 @@ export default function TheoryRenderer({ text }) {
                                     </div>
                                     <div className="flex-1">
                                         <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">Tarixiy Ma'lumot / Qiziqarli Fakt</span>
-                                        <p className="theme-text text-base leading-relaxed text-justify mt-1.5 mb-0">
+                                        <p className="theme-text text-base leading-relaxed mt-1.5 mb-0">
                                             {parseInlineStyles(mainText)}
                                         </p>
                                     </div>
@@ -198,7 +198,7 @@ export default function TheoryRenderer({ text }) {
                                             <p className="text-xs text-slate-400 dark:text-slate-500 m-0">Mavzuni o'zlashtirish darajasini tekshirish</p>
                                         </div>
                                     </div>
-                                    <p className="theme-text text-base leading-relaxed text-justify m-0">
+                                    <p className="theme-text text-base leading-relaxed m-0">
                                         {parseInlineStyles(mainText.replace(/^(Savol va topshiriqlar:)?\s*/i, ''))}
                                     </p>
                                 </div>
@@ -224,7 +224,7 @@ export default function TheoryRenderer({ text }) {
                                 <div className="text-2xl shrink-0 p-2.5 bg-blue-500/10 dark:bg-blue-500/5 rounded-xl flex items-center justify-center">
                                     {emoji}
                                 </div>
-                                <p className="theme-text text-base leading-relaxed text-justify m-0 flex-1">
+                                <p className="theme-text text-base leading-relaxed m-0 flex-1">
                                     {parseInlineStyles(mainText)}
                                 </p>
                             </div>
@@ -237,7 +237,7 @@ export default function TheoryRenderer({ text }) {
                                 {el.items.map((item, idx) => (
                                     <li key={idx} className="flex items-start gap-3 theme-text text-base">
                                         <span className="flex-shrink-0 mt-2 w-2 h-2 rounded-full bg-blue-500" />
-                                        <span className="leading-relaxed text-justify flex-1">{parseInlineStyles(item)}</span>
+                                        <span className="leading-relaxed flex-1">{parseInlineStyles(item)}</span>
                                     </li>
                                 ))}
                             </ul>
@@ -251,7 +251,7 @@ export default function TheoryRenderer({ text }) {
                                         <span className="flex-shrink-0 w-6 h-6 rounded-lg bg-blue-500/10 text-blue-500 dark:text-blue-400 flex items-center justify-center text-xs font-bold">
                                             {idx + 1}
                                         </span>
-                                        <span className="leading-relaxed text-justify flex-1 mt-0.5">{parseInlineStyles(item)}</span>
+                                        <span className="leading-relaxed flex-1 mt-0.5">{parseInlineStyles(item)}</span>
                                     </li>
                                 ))}
                             </ol>
@@ -261,7 +261,7 @@ export default function TheoryRenderer({ text }) {
                         return (
                             <blockquote key={el.key} className="relative p-6 my-6 bg-amber-500/5 border border-amber-500/20 rounded-2xl">
                                 <span className="absolute -top-3 -left-1 text-5xl text-amber-500/30 leading-none font-serif select-none">"</span>
-                                <p className="theme-text text-base italic leading-relaxed text-justify pl-4 m-0">
+                                <p className="theme-text text-base italic leading-relaxed pl-4 m-0">
                                     {parseInlineStyles(el.content)}
                                 </p>
                             </blockquote>
@@ -270,7 +270,7 @@ export default function TheoryRenderer({ text }) {
                     case 'paragraph':
                     default:
                         return (
-                            <p key={el.key} className="theme-text text-base leading-relaxed text-justify md:text-justify mb-5">
+                            <p key={el.key} className="theme-text text-[16px] md:text-[17px] leading-relaxed mb-5">
                                 {parseInlineStyles(el.content)}
                             </p>
                         );
