@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, lazy, Suspense, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Book, Atom, Brain, Trophy, User, ChevronRight, Play,
@@ -130,6 +130,16 @@ function EduPhysicsAppContent() {
   // --- NAV STATE ---
   const [activeTab, setActiveTab] = useState('dashboard');
   const [targetChapter, setTargetChapter] = useState(null);
+
+  // Tashqi sahifadan (AppShell/BottomNav) tab hint bilan kelinganda uni qo'llash
+  const routerLocation = useLocation();
+  useEffect(() => {
+    const hint = sessionStorage.getItem('dashboardTab');
+    if (hint) {
+      sessionStorage.removeItem('dashboardTab');
+      setActiveTab(hint);
+    }
+  }, [routerLocation.key]);
 
   // --- PROGRESS STATE ---
   const [userXP, setUserXP] = useState(0);

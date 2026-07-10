@@ -41,6 +41,7 @@ import FormulalarPage from './pages/FormulalarPage';
 // Route Guards
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import AdminRoute from './components/auth/AdminRoute';
+import AppShell from './components/layout/AppShell';
 import { useSystemSettings } from './hooks/useSystemSettings';
 import { Loader } from 'lucide-react';
 
@@ -132,21 +133,21 @@ function AppRoutes() {
                     }
                 />
 
-                {/* Protected — Student Routes */}
-                <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
-                <Route path="/darsliklar" element={<ProtectedRoute><CoursesPage /></ProtectedRoute>} />
-                <Route path="/darsliklar/:gradeId" element={<ProtectedRoute><ChaptersPage /></ProtectedRoute>} />
-                <Route path="/darsliklar/:gradeId/:chapterId" element={<ProtectedRoute><LessonsListPage /></ProtectedRoute>} />
-                <Route path="/darsliklar/:gradeId/:chapterId/:lessonId" element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
-                <Route path="/kutubxona" element={<ProtectedRoute><KutubxonaPage /></ProtectedRoute>} />
-                <Route path="/laboratoriya" element={<ProtectedRoute><LaboratoriyaPage /></ProtectedRoute>} />
+                {/* Protected — Student Routes (AppShell: desktop sidebar + mobile bottom nav) */}
+                <Route path="/progress" element={<ProtectedRoute><AppShell><ProgressPage /></AppShell></ProtectedRoute>} />
+                <Route path="/darsliklar" element={<ProtectedRoute><AppShell><CoursesPage /></AppShell></ProtectedRoute>} />
+                <Route path="/darsliklar/:gradeId" element={<ProtectedRoute><AppShell><ChaptersPage /></AppShell></ProtectedRoute>} />
+                <Route path="/darsliklar/:gradeId/:chapterId" element={<ProtectedRoute><AppShell><LessonsListPage /></AppShell></ProtectedRoute>} />
+                <Route path="/darsliklar/:gradeId/:chapterId/:lessonId" element={<ProtectedRoute><AppShell><LessonPage /></AppShell></ProtectedRoute>} />
+                <Route path="/kutubxona" element={<ProtectedRoute><AppShell><KutubxonaPage /></AppShell></ProtectedRoute>} />
+                <Route path="/laboratoriya" element={<ProtectedRoute><AppShell><LaboratoriyaPage /></AppShell></ProtectedRoute>} />
                 <Route path="/laboratoriya/ohm" element={<ProtectedRoute><OhmQonuni /></ProtectedRoute>} />
                 <Route path="/laboratoriya/gaz" element={<ProtectedRoute><MolekulyarFizika /></ProtectedRoute>} />
-                <Route path="/missiyalar" element={<ProtectedRoute><MissionsPage /></ProtectedRoute>} />
-                <Route path="/testlar" element={<ProtectedRoute><TestlarPage /></ProtectedRoute>} />
+                <Route path="/missiyalar" element={<ProtectedRoute><AppShell><MissionsPage /></AppShell></ProtectedRoute>} />
+                <Route path="/testlar" element={<ProtectedRoute><AppShell><TestlarPage /></AppShell></ProtectedRoute>} />
                 <Route path="/testlar/live/:roomCode" element={<ProtectedRoute><LiveRoom /></ProtectedRoute>} />
-                <Route path="/formulalar" element={<ProtectedRoute><FormulalarPage /></ProtectedRoute>} />
-                <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+                <Route path="/formulalar" element={<ProtectedRoute><AppShell><FormulalarPage /></AppShell></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute><AppShell><SettingsPage /></AppShell></ProtectedRoute>} />
                 <Route path="/dashboard/*" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
 
                 {/* 404 */}
