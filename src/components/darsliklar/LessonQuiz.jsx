@@ -365,16 +365,18 @@ MUHIM: Faqat JSON massiv qaytar, boshqa hech narsa yozma!`;
                         let cls = '';
                         if (isAnswerChecked) {
                             if (index === question.correct) {
-                                cls = 'bg-emerald-500/15 border-emerald-500 text-emerald-600 dark:text-emerald-400';
+                                // To'g'ri javob — yashil + yengil pulse
+                                cls = 'bg-emerald-500/15 border-emerald-500 text-emerald-600 dark:text-emerald-400 animate-pop';
                             } else if (index === selectedOption) {
-                                cls = 'bg-red-500/15 border-red-500 text-red-500 dark:text-red-400';
+                                // Noto'g'ri tanlov — qizil + silkinish
+                                cls = 'bg-red-500/15 border-red-500 text-red-500 dark:text-red-400 animate-shake';
                             } else {
                                 cls = 'theme-card border theme-border theme-muted opacity-60';
                             }
                         } else if (selectedOption === index) {
-                            cls = 'bg-blue-500/15 border-blue-500 text-blue-600 dark:text-blue-400';
+                            cls = 'bg-brand-500/15 border-brand-500 text-brand-600 dark:text-brand-400';
                         } else {
-                            cls = 'theme-card border theme-border theme-text hover:border-blue-500/50 hover:bg-blue-500/5 cursor-pointer';
+                            cls = 'theme-card border theme-border theme-text hover:border-brand-500/50 hover:bg-brand-500/5 cursor-pointer';
                         }
 
                         return (

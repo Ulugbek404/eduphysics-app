@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import CountUp from '../ui/CountUp';
 
 /**
  * Reusable Statistics Card Component
@@ -16,6 +17,7 @@ export default function StatsCard({
     return (
         <motion.div
             onClick={onClick}
+            variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
             whileHover={{ y: -4 }}
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
             className={`
@@ -36,7 +38,7 @@ export default function StatsCard({
             </div>
 
             <div className="text-[28px] font-bold theme-text mb-1 tabular-nums tracking-tight">
-                {value}
+                {/^\d+$/.test(String(value).trim()) ? <CountUp value={Number(value)} /> : value}
             </div>
 
             <div className="flex items-center justify-between mt-2">

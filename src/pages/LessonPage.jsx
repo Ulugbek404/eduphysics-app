@@ -404,6 +404,7 @@ export default function LessonPage() {
                         initial={{ opacity: 0, scale: 0.5, y: 50 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, y: -50 }}
+                        transition={{ type: 'spring', stiffness: 350, damping: 18 }}
                         className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-8 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl shadow-2xl shadow-yellow-500/30 flex items-center gap-3"
                     >
                         <Star size={28} className="text-white fill-white" />

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
     BarChart2, BookOpen, Library, FlaskConical, Target, Zap,
     Trophy, MessageSquare, Settings, LogOut, Crown, ArrowRight, TrendingUp
@@ -16,7 +17,7 @@ import BottomNav from '../ui/BottomNav';
  * DashboardPage bunga O'RALMAYDI — unda o'z ichki sidebar/tab tizimi bor.
  */
 
-function NavItem({ icon, label, path, active, onClick }) {
+function NavItem({ icon, label, active, onClick }) {
     return (
         <button
             onClick={onClick}
@@ -30,7 +31,11 @@ function NavItem({ icon, label, path, active, onClick }) {
             `}
         >
             {active && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-brand-500 rounded-r-full" />
+                <motion.div
+                    layoutId="sidebar-active-indicator"
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-brand-500 rounded-r-full"
+                />
             )}
             <div className={`flex-shrink-0 transition-transform duration-200 ${active ? 'scale-110 text-brand-500' : 'group-hover:scale-110 group-hover:text-brand-500'}`}>
                 {React.cloneElement(icon, { size: 20 })}
@@ -45,6 +50,7 @@ function NavItem({ icon, label, path, active, onClick }) {
 export default function AppShell({ children }) {
     const navigate = useNavigate();
     const location = useLocation();
+    const reducedMotion = useReducedMotion();
     const { userData, user } = useAuth();
     const { t } = useLanguage();
     const isAdmin = userData?.role === 'admin';
@@ -159,9 +165,17 @@ export default function AppShell({ children }) {
                 </div>
             </aside>
 
-            {/* ── Asosiy kontent ── */}
+            {/* ── Asosiy kontent — sahifa almashganda yumshoq kirish ── */}
             <main className="lg:ml-[220px] pb-20 lg:pb-0 min-h-screen">
-                {children}
+                <motion.div
+                    key={location.pathname}
+                    initial={reducedMotion ? false : { opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
+                    className="min-h-screen"
+                >
+                    {children}
+                </motion.div>
             </main>
 
             {/* ── Mobile pastki navigatsiya ── */}

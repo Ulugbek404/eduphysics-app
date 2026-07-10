@@ -16,6 +16,7 @@ export default function QuickActionCard({
     return (
         <motion.button
             onClick={onClick}
+            variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
             whileHover={{ y: -4 }}
             whileTap={{ scale: 0.98 }}
             transition={{ type: "spring", stiffness: 400, damping: 25 }}

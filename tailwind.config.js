@@ -68,6 +68,8 @@ export default {
         'slideInLeft': 'slideInLeft 0.4s ease-out',
         'slideInRight': 'slideInRight 0.4s ease-out',
         'scaleIn': 'scaleIn 0.3s ease-out',
+        'shake': 'shake 0.4s ease-in-out',
+        'pop': 'pop 0.35s ease-out',
       },
 
       // Custom Keyframes
@@ -91,6 +93,16 @@ export default {
         scaleIn: {
           '0%': { opacity: '0', transform: 'scale(0.9)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        shake: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '20%, 60%': { transform: 'translateX(-6px)' },
+          '40%, 80%': { transform: 'translateX(6px)' },
+        },
+        pop: {
+          '0%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.03)' },
+          '100%': { transform: 'scale(1)' },
         },
       },
 

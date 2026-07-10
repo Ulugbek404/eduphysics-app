@@ -28,6 +28,7 @@ import { askAITutor } from '../services/aiService';
 import { useGeminiAI } from '../hooks/useGeminiAI';
 import EmptyState from '../components/ui/EmptyState';
 import PageHeader from '../components/ui/PageHeader';
+import CountUp from '../components/ui/CountUp';
 
 import StatsCard from '../components/dashboard/StatsCard';
 import QuickActionCard from '../components/dashboard/QuickActionCard';
@@ -1523,7 +1524,7 @@ function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStat
               <div className="px-3 py-1.5 rounded-lg bg-xp-500/15 text-xp-600 dark:text-xp-400 border border-xp-500/25 text-[12px] font-bold">
                 {userLevel}-daraja
               </div>
-              <span className="theme-text font-bold text-lg">{totalXP.toLocaleString()} <span className="text-xs theme-muted uppercase tracking-tighter">XP</span></span>
+              <span className="theme-text font-bold text-lg"><CountUp value={totalXP} /> <span className="text-xs theme-muted uppercase tracking-tighter">XP</span></span>
             </div>
             {/* XP progress bar towards next level */}
             <div className="space-y-2">
@@ -1558,7 +1559,12 @@ function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStat
           </h3>
           <div className="flex-1 h-[1px] bg-gradient-to-r from-teal-500/20 to-transparent" />
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <motion.div
+          initial="hidden"
+          animate="show"
+          variants={{ show: { transition: { staggerChildren: 0.05 } } }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+        >
           <StatsCard
             icon={Zap}
             label={t("dash_added_today") || "Bugun qo'shildi"}
@@ -1588,7 +1594,7 @@ function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStat
             subtitle={t("dash_consec_days") || "ketma-ket"}
             color="yellow"
           />
-        </div>
+        </motion.div>
       </div>
 
       {/* Quick Actions */}
@@ -1600,7 +1606,12 @@ function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStat
           </h3>
           <div className="flex-1 h-[1px] bg-gradient-to-r from-teal-500/20 to-transparent" />
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <motion.div
+          initial="hidden"
+          animate="show"
+          variants={{ show: { transition: { staggerChildren: 0.04, delayChildren: 0.1 } } }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+        >
           <QuickActionCard
             icon={BookOpen}
             title={t("nav_lessons") || "Darsliklar"}
@@ -1657,7 +1668,7 @@ function Dashboard({ setActiveTab, setTargetChapter, userXP, userLevel, userStat
             color="emerald"
             onClick={() => navigate('/formulalar')}
           />
-        </div>
+        </motion.div>
       </div>
 
       {/* Recent Activity */}
@@ -1719,9 +1730,13 @@ function SidebarItem({ icon, label, id, active, set }) {
         }
       `}
     >
-      {/* Active left indicator bar */}
+      {/* Active left indicator bar — tab almashganda suzib o'tadi */}
       {isActive && (
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-teal-500 rounded-r-full shadow-[0_0_8px_rgba(20,184,166,0.6)]" />
+        <motion.div
+          layoutId="dash-sidebar-active-indicator"
+          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+          className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-teal-500 rounded-r-full shadow-[0_0_8px_rgba(20,184,166,0.6)]"
+        />
       )}
 
       {/* Hover shimmer sweep */}
