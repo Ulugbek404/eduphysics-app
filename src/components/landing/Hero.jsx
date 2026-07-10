@@ -29,17 +29,17 @@ const Hero = () => {
 
             {/* Floating Orbs */}
             <motion.div
-                className={`absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full blur-3xl ${isLight ? 'opacity-10' : 'opacity-20'}`}
+                className={`absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full blur-3xl ${isLight ? 'opacity-10' : 'opacity-20'}`}
                 animate={{ x: [0, 50, 0], y: [0, 30, 0], scale: [1, 1.1, 1] }}
                 transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
             />
             <motion.div
-                className={`absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full blur-3xl ${isLight ? 'opacity-10' : 'opacity-20'}`}
+                className={`absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-indigo-500 to-pink-500 rounded-full blur-3xl ${isLight ? 'opacity-10' : 'opacity-20'}`}
                 animate={{ x: [0, -50, 0], y: [0, -30, 0], scale: [1.1, 1, 1.1] }}
                 transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
             />
             <motion.div
-                className={`absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full blur-3xl ${isLight ? 'opacity-[0.07]' : 'opacity-15'}`}
+                className={`absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-r from-indigo-500 to-teal-500 rounded-full blur-3xl ${isLight ? 'opacity-[0.07]' : 'opacity-15'}`}
                 animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
                 transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
             />
@@ -60,7 +60,7 @@ const Hero = () => {
                     animate={{ opacity: [0.1, isLight ? 0.25 : 0.3, 0.1], scale: [1, 1.2, 1], y: [0, -20, 0] }}
                     transition={{ duration: 4, repeat: Infinity, delay: delay, ease: "easeInOut" }}
                 >
-                    <Icon className={`w-8 h-8 ${isLight ? 'text-indigo-400' : 'text-blue-300'}`} />
+                    <Icon className={`w-8 h-8 ${isLight ? 'text-indigo-400' : 'text-teal-300'}`} />
                 </motion.div>
             ))}
 
@@ -99,7 +99,7 @@ const Hero = () => {
                             <span className={`block mb-2 ${isLight ? 'text-slate-800' : 'text-white'}`}>
                                 {t('hero_title_1')}
                             </span>
-                            <span className="block bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 bg-clip-text text-transparent">
+                            <span className="block bg-gradient-to-r from-teal-500 via-cyan-500 to-teal-500 bg-clip-text text-transparent">
                                 {t('hero_title_2')}
                             </span>
                         </motion.h1>
@@ -118,7 +118,7 @@ const Hero = () => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.6 }}
                             className={`text-lg sm:text-xl max-w-3xl mx-auto leading-relaxed ${
-                                isLight ? 'text-slate-600' : 'text-blue-100'
+                                isLight ? 'text-slate-600' : 'text-teal-100'
                             }`}
                         >
                             {t('hero_subtitle')}
@@ -137,7 +137,7 @@ const Hero = () => {
                             onClick={() => navigate('/login')}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="group relative px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold text-lg rounded-2xl shadow-2xl shadow-blue-500/40 hover:shadow-blue-500/60 transition-all duration-300 overflow-hidden"
+                            className="group relative px-8 py-4 bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-bold text-lg rounded-2xl shadow-2xl shadow-teal-500/40 hover:shadow-teal-500/60 transition-all duration-300 overflow-hidden"
                         >
                             <span className="relative z-10 flex items-center gap-2">
                                 <Rocket className="w-5 h-5" />
@@ -198,7 +198,7 @@ const Hero = () => {
                                 <div className={`text-3xl font-bold mb-1 ${isLight ? 'text-slate-800' : 'text-white'}`}>
                                     {stat.value}
                                 </div>
-                                <div className={`text-sm ${isLight ? 'text-slate-500' : 'text-blue-200'}`}>
+                                <div className={`text-sm ${isLight ? 'text-slate-500' : 'text-teal-200'}`}>
                                     {t(stat.labelKey)}
                                 </div>
                             </motion.div>

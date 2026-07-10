@@ -48,11 +48,11 @@ const About = () => {
                         transition={{ duration: 0.6 }}
                         className={`backdrop-blur-sm border rounded-3xl p-8 hover:-translate-y-1 transition-all ${
                             isLight
-                                ? 'bg-white/90 border-blue-200 shadow-md hover:shadow-xl hover:shadow-blue-500/10'
-                                : 'bg-white/5 shadow-xl shadow-blue-900/20 border-blue-500/20 hover:shadow-2xl hover:shadow-blue-500/20'
+                                ? 'bg-white/90 border-teal-200 shadow-md hover:shadow-xl hover:shadow-teal-500/10'
+                                : 'bg-white/5 shadow-xl shadow-teal-900/20 border-teal-500/20 hover:shadow-2xl hover:shadow-teal-500/20'
                         }`}
                     >
-                        <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-500/30">
+                        <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-teal-500/30">
                             <Target className="w-8 h-8 text-white" />
                         </div>
                         <h3 className={`text-2xl font-bold mb-4 ${isLight ? 'text-slate-800' : 'text-white'}`}>
@@ -71,11 +71,11 @@ const About = () => {
                         transition={{ duration: 0.6 }}
                         className={`backdrop-blur-sm border rounded-3xl p-8 hover:-translate-y-1 transition-all ${
                             isLight
-                                ? 'bg-white/90 border-purple-200 shadow-md hover:shadow-xl hover:shadow-purple-500/10'
-                                : 'bg-white/5 shadow-xl shadow-purple-900/20 border-purple-500/20 hover:shadow-2xl hover:shadow-purple-500/20'
+                                ? 'bg-white/90 border-indigo-200 shadow-md hover:shadow-xl hover:shadow-indigo-500/10'
+                                : 'bg-white/5 shadow-xl shadow-indigo-900/20 border-indigo-500/20 hover:shadow-2xl hover:shadow-indigo-500/20'
                         }`}
                     >
-                        <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-purple-500/30">
+                        <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-500/30">
                             <Eye className="w-8 h-8 text-white" />
                         </div>
                         <h3 className={`text-2xl font-bold mb-4 ${isLight ? 'text-slate-800' : 'text-white'}`}>

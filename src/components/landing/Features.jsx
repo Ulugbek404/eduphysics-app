@@ -14,25 +14,25 @@ const Features = () => {
             icon: Atom,
             titleKey: 'feature_lab_title',
             descKey: 'feature_lab_desc',
-            gradient: 'from-purple-500 to-pink-500',
-            iconBg: isLight ? 'bg-purple-100' : 'bg-purple-500/10',
-            borderColor: isLight ? 'border-purple-200' : 'border-purple-500/20',
-            iconColor: 'text-purple-600',
+            gradient: 'from-indigo-500 to-pink-500',
+            iconBg: isLight ? 'bg-indigo-100' : 'bg-indigo-500/10',
+            borderColor: isLight ? 'border-indigo-200' : 'border-indigo-500/20',
+            iconColor: 'text-indigo-600',
         },
         {
             icon: Brain,
             titleKey: 'feature_ai_title',
             descKey: 'feature_ai_desc',
-            gradient: 'from-blue-500 to-purple-500',
-            iconBg: isLight ? 'bg-blue-100' : 'bg-blue-500/10',
-            borderColor: isLight ? 'border-blue-200' : 'border-blue-500/20',
-            iconColor: 'text-blue-600',
+            gradient: 'from-teal-500 to-indigo-500',
+            iconBg: isLight ? 'bg-teal-100' : 'bg-teal-500/10',
+            borderColor: isLight ? 'border-teal-200' : 'border-teal-500/20',
+            iconColor: 'text-teal-600',
         },
         {
             icon: FileText,
             titleKey: 'feature_test_title',
             descKey: 'feature_test_desc',
-            gradient: 'from-pink-500 to-purple-500',
+            gradient: 'from-pink-500 to-indigo-500',
             iconBg: isLight ? 'bg-pink-100' : 'bg-pink-500/10',
             borderColor: isLight ? 'border-pink-200' : 'border-pink-500/20',
             iconColor: 'text-pink-600',
@@ -41,9 +41,9 @@ const Features = () => {
             icon: TrendingUp,
             titleKey: 'feature_progress_title',
             descKey: 'feature_progress_desc',
-            gradient: 'from-purple-500 to-blue-500',
-            iconBg: isLight ? 'bg-indigo-100' : 'bg-purple-500/10',
-            borderColor: isLight ? 'border-indigo-200' : 'border-purple-500/20',
+            gradient: 'from-indigo-500 to-teal-500',
+            iconBg: isLight ? 'bg-indigo-100' : 'bg-indigo-500/10',
+            borderColor: isLight ? 'border-indigo-200' : 'border-indigo-500/20',
             iconColor: 'text-indigo-600',
         },
     ];
@@ -71,7 +71,7 @@ const Features = () => {
                 >
                     <h2 className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-4 ${isLight ? 'text-slate-800' : 'text-white'}`}>
                         {t('features_title')}{' '}
-                        <span className="bg-gradient-to-r from-cyan-500 to-purple-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-cyan-500 to-indigo-500 bg-clip-text text-transparent">
                             NurFizika?
                         </span>
                     </h2>
@@ -97,8 +97,8 @@ const Features = () => {
                                 whileHover={{ scale: 1.05, y: -10 }}
                                 className={`group relative border rounded-3xl p-8 transition-all duration-300 ${feature.borderColor} ${
                                     isLight
-                                        ? 'bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-xl hover:shadow-purple-500/10'
-                                        : 'bg-white/5 backdrop-blur-sm hover:shadow-2xl hover:shadow-purple-500/30 hover:bg-white/10'
+                                        ? 'bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-xl hover:shadow-indigo-500/10'
+                                        : 'bg-white/5 backdrop-blur-sm hover:shadow-2xl hover:shadow-indigo-500/30 hover:bg-white/10'
                                 }`}
                             >
                                 {/* Gradient Background on Hover */}
@@ -110,7 +110,7 @@ const Features = () => {
                                 </div>
 
                                 {/* Content */}
-                                <h3 className={`relative text-2xl font-bold mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-cyan-500 group-hover:to-purple-500 transition-all duration-300 ${
+                                <h3 className={`relative text-2xl font-bold mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-cyan-500 group-hover:to-indigo-500 transition-all duration-300 ${
                                     isLight ? 'text-slate-800' : 'text-white'
                                 }`}>
                                     {t(feature.titleKey)}
@@ -120,7 +120,7 @@ const Features = () => {
                                 </p>
 
                                 {/* Decorative Corner */}
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-500/10 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-500/10 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                             </motion.div>
                         );
                     })}

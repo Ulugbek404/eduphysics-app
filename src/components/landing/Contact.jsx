@@ -47,8 +47,8 @@ const Contact = () => {
         : 'bg-slate-800/50 backdrop-blur-sm border border-slate-700';
 
     const inputClass = isLight
-        ? 'w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors'
-        : 'w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors';
+        ? 'w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-teal-500 transition-colors'
+        : 'w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 transition-colors';
 
     const labelClass = isLight
         ? 'block text-slate-700 mb-2 font-medium text-sm'
@@ -83,7 +83,7 @@ const Contact = () => {
                     >
                         <div className={`${cardClass} rounded-3xl p-8`}>
                             <h3 className={`text-2xl font-bold mb-6 flex items-center gap-3 ${isLight ? 'text-slate-800' : 'text-white'}`}>
-                                <MessageSquare className="w-7 h-7 text-blue-500" />
+                                <MessageSquare className="w-7 h-7 text-teal-500" />
                                 {t('contact_form_title')}
                             </h3>
 
@@ -149,7 +149,7 @@ const Contact = () => {
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl hover:from-blue-500 hover:to-purple-500 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    className="w-full px-6 py-3 bg-gradient-to-r from-teal-600 to-indigo-600 text-white font-bold rounded-xl hover:from-teal-500 hover:to-indigo-500 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
                                     {isSubmitting ? t('contact_sending') : (
                                         <>
@@ -178,30 +178,30 @@ const Contact = () => {
 
                             <div className="space-y-5">
                                 <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                                        <Mail className="w-6 h-6 text-blue-500" />
+                                    <div className="w-12 h-12 bg-teal-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                                        <Mail className="w-6 h-6 text-teal-500" />
                                     </div>
                                     <div>
                                         <div className={`text-sm mb-1 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
                                             {t('contact_email_label')}
                                         </div>
                                         <a href="mailto:nurfizikasupport@gmail.com"
-                                            className={`transition-colors ${isLight ? 'text-slate-800 hover:text-blue-600' : 'text-white hover:text-blue-400'}`}>
+                                            className={`transition-colors ${isLight ? 'text-slate-800 hover:text-teal-600' : 'text-white hover:text-teal-400'}`}>
                                             nurfizikasupport@gmail.com
                                         </a>
                                     </div>
                                 </div>
 
                                 <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                                        <Phone className="w-6 h-6 text-purple-500" />
+                                    <div className="w-12 h-12 bg-indigo-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                                        <Phone className="w-6 h-6 text-indigo-500" />
                                     </div>
                                     <div>
                                         <div className={`text-sm mb-1 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
                                             {t('contact_telegram')}
                                         </div>
                                         <a href="tel:+998931863404"
-                                            className={`transition-colors ${isLight ? 'text-slate-800 hover:text-purple-600' : 'text-white hover:text-purple-400'}`}>
+                                            className={`transition-colors ${isLight ? 'text-slate-800 hover:text-indigo-600' : 'text-white hover:text-indigo-400'}`}>
                                             +998 (93) 186-34-04
                                         </a>
                                     </div>
@@ -268,7 +268,7 @@ const Contact = () => {
                 >
                     {/* QR Code Card */}
                     <div className={`${cardClass} rounded-3xl p-6 sm:p-8 max-w-sm w-full mx-auto relative overflow-hidden group flex flex-col h-full`}>
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl group-hover:bg-blue-500/30 transition-colors duration-500 pointer-events-none" />
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-teal-500/20 rounded-full blur-3xl group-hover:bg-teal-500/30 transition-colors duration-500 pointer-events-none" />
 
                         <h4 className={`text-xl font-bold mb-2 flex flex-col items-center justify-center gap-2 text-center ${isLight ? 'text-slate-800' : 'text-white'}`}>
                             <span className="text-2xl">📱</span>
@@ -280,7 +280,7 @@ const Contact = () => {
 
                         <div className="flex justify-center flex-shrink-0">
                             <div className="relative inline-block mt-2">
-                                <div className="absolute -inset-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-2xl blur-md opacity-40 group-hover:opacity-100 transition duration-500" />
+                                <div className="absolute -inset-2 bg-gradient-to-r from-teal-500 via-indigo-500 to-indigo-500 rounded-2xl blur-md opacity-40 group-hover:opacity-100 transition duration-500" />
                                 <img
                                     src="/qr-code.jpg"
                                     alt="NurFizika QR"
@@ -289,18 +289,18 @@ const Contact = () => {
                             </div>
                         </div>
 
-                        <p className="text-blue-500 font-bold tracking-widest text-xs sm:text-sm mt-6 text-center flex-shrink-0">
+                        <p className="text-teal-500 font-bold tracking-widest text-xs sm:text-sm mt-6 text-center flex-shrink-0">
                             eduphysics-app.web.app
                         </p>
                     </div>
 
                     {/* Location Card */}
                     <div className={`${cardClass} rounded-3xl p-6 sm:p-8 max-w-sm w-full mx-auto relative overflow-hidden group flex flex-col h-full`}>
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl group-hover:bg-purple-500/30 transition-colors duration-500 pointer-events-none" />
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl group-hover:bg-indigo-500/30 transition-colors duration-500 pointer-events-none" />
 
                         <div className="flex items-center gap-3 mb-2 justify-center sm:justify-start">
-                            <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0">
-                                <MapPin className="w-5 h-5 text-purple-500" />
+                            <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
+                                <MapPin className="w-5 h-5 text-indigo-500" />
                             </div>
                             <h4 className={`text-lg font-bold flex items-center gap-2 ${isLight ? 'text-slate-800' : 'text-white'}`}>
                                 {t('location_title')}
@@ -311,7 +311,7 @@ const Contact = () => {
                             {t('location_desc')}
                         </p>
 
-                        <div className={`relative w-full h-40 sm:h-48 md:h-56 rounded-2xl overflow-hidden border-2 transition-colors flex-shrink-0 ${isLight ? 'border-slate-200' : 'border-slate-700 group-hover:border-purple-500/50'}`}>
+                        <div className={`relative w-full h-40 sm:h-48 md:h-56 rounded-2xl overflow-hidden border-2 transition-colors flex-shrink-0 ${isLight ? 'border-slate-200' : 'border-slate-700 group-hover:border-indigo-500/50'}`}>
                             <iframe
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2995.6985040051833!2d69.2842065116773!3d41.339665799115144!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38ae8cae3baaaab3%3A0x70529ccdeede6c4!2sTashkent%20University%20of%20Information%20Technologies!5e0!3m2!1sen!2s!4v1703649600000!5m2!1sen!2s"
                                 width="100%"
@@ -366,7 +366,7 @@ const Contact = () => {
 
                     <div className={`relative rounded-3xl overflow-hidden border shadow-2xl ${isLight ? 'border-indigo-200 shadow-indigo-100' : 'border-indigo-500/20 shadow-indigo-900/40'
                         }`}>
-                        <div className="absolute -inset-[1px] bg-gradient-to-r from-blue-600/30 via-purple-600/30 to-indigo-600/30 rounded-3xl blur-sm pointer-events-none" />
+                        <div className="absolute -inset-[1px] bg-gradient-to-r from-teal-600/30 via-indigo-600/30 to-indigo-600/30 rounded-3xl blur-sm pointer-events-none" />
                         <div className="relative">
                             <SolarSystemAnimation />
                         </div>
@@ -386,7 +386,7 @@ const Contact = () => {
                         className="text-center mb-12"
                     >
                         <h3 className={`text-3xl font-bold mb-4 flex items-center justify-center gap-3 ${isLight ? 'text-slate-800' : 'text-white'}`}>
-                            <HelpCircle className="w-8 h-8 text-blue-500" />
+                            <HelpCircle className="w-8 h-8 text-teal-500" />
                             {t('footer_faq')}
                         </h3>
                     </motion.div>
@@ -412,7 +412,7 @@ const Contact = () => {
                                     <span className={`text-lg font-semibold pr-4 ${isLight ? 'text-slate-800' : 'text-white'}`}>
                                         {faq.question}
                                     </span>
-                                    <ChevronDown className={`w-6 h-6 text-blue-500 flex-shrink-0 transition-transform ${openFaq === index ? 'rotate-180' : ''}`} />
+                                    <ChevronDown className={`w-6 h-6 text-teal-500 flex-shrink-0 transition-transform ${openFaq === index ? 'rotate-180' : ''}`} />
                                 </button>
 
                                 {openFaq === index && (

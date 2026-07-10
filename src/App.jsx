@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { useAuth } from './contexts/AuthContext';
@@ -12,31 +12,33 @@ import PWAInstallBanner from './components/PWAInstallBanner';
 import SplashScreen from './components/SplashScreen';
 
 
-// Pages
+// Pages — birinchi ochilishda kerak bo'ladiganlar eager yuklanadi
 import LandingPage from './pages/LandingPage';
-import AboutPage from './pages/AboutPage';
-import ContactPage from './pages/ContactPage';
 import LoginPage from './components/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
-import DashboardPage from './pages/DashboardPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
-import ProgressPage from './pages/ProgressPage';
-import SettingsPage from './pages/SettingsPage';
-import MissionsPage from './pages/MissionsPage';
-import AdminDashboard from './pages/AdminDashboard';
+
+// Qolgan sahifalar lazy — bundle bo'linadi, birinchi ochilish tezlashadi
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+const ProgressPage = lazy(() => import('./pages/ProgressPage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const MissionsPage = lazy(() => import('./pages/MissionsPage'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 
 // Darsliklar Pages
-import CoursesPage from './pages/CoursesPage';
-import ChaptersPage from './pages/ChaptersPage';
-import LessonsListPage from './pages/LessonsListPage';
-import LessonPage from './pages/LessonPage';
-import KutubxonaPage from './pages/KutubxonaPage';
-import LaboratoriyaPage from './pages/LaboratoriyaPage';
-import OhmQonuni from './pages/OhmQonuni';
-import MolekulyarFizika from './pages/MolekulyarFizika';
-import LiveRoom from './pages/LiveRoom';
-import TestlarPage from './pages/TestlarPage';
-import FormulalarPage from './pages/FormulalarPage';
+const CoursesPage = lazy(() => import('./pages/CoursesPage'));
+const ChaptersPage = lazy(() => import('./pages/ChaptersPage'));
+const LessonsListPage = lazy(() => import('./pages/LessonsListPage'));
+const LessonPage = lazy(() => import('./pages/LessonPage'));
+const KutubxonaPage = lazy(() => import('./pages/KutubxonaPage'));
+const LaboratoriyaPage = lazy(() => import('./pages/LaboratoriyaPage'));
+const OhmQonuni = lazy(() => import('./pages/OhmQonuni'));
+const MolekulyarFizika = lazy(() => import('./pages/MolekulyarFizika'));
+const LiveRoom = lazy(() => import('./pages/LiveRoom'));
+const TestlarPage = lazy(() => import('./pages/TestlarPage'));
+const FormulalarPage = lazy(() => import('./pages/FormulalarPage'));
 
 // Route Guards
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -112,6 +114,7 @@ function AppRoutes() {
                     🔧 Tizim texnik ishlar olib borilmoqda — tez orada qayta ishga tushadi
                 </div>
             )}
+            <Suspense fallback={<LoadingScreen />}>
             <Routes>
                 {/* Public */}
                 <Route path="/" element={user ? <Navigate to={homeRedirect} replace /> : <LandingPage />} />
@@ -153,6 +156,7 @@ function AppRoutes() {
                 {/* 404 */}
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
+            </Suspense>
         </>
     );
 }

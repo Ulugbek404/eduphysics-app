@@ -46,7 +46,7 @@ const Footer = () => {
                     {/* Brand Section */}
                     <div className="lg:col-span-2">
                         <div className="flex items-center space-x-2 mb-4">
-                            <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg">
+                            <div className="bg-gradient-to-br from-teal-500 to-indigo-600 p-2 rounded-lg">
                                 <Atom size={24} className="text-white" />
                             </div>
                             <span className={`text-xl font-bold ${isLight ? 'text-slate-800' : 'text-white'}`}>
@@ -61,15 +61,15 @@ const Footer = () => {
                         {/* Contact Info */}
                         <div className={`space-y-2 text-sm ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>
                             <div className="flex items-center space-x-2">
-                                <Mail size={16} className="text-blue-500" />
+                                <Mail size={16} className="text-teal-500" />
                                 <span>support@ulugbekedu.uz</span>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <Phone size={16} className="text-blue-500" />
+                                <Phone size={16} className="text-teal-500" />
                                 <span>+998 (93) 186-34-04</span>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <MapPin size={16} className="text-blue-500" />
+                                <MapPin size={16} className="text-teal-500" />
                                 <span>{t('contact_location_value')}</span>
                             </div>
                         </div>

@@ -178,8 +178,8 @@ const Navbar = () => {
                                 onClick={() => navigate('/login')}
                                 className={`flex items-center space-x-2 px-4 py-2 transition-colors font-medium ${
                                     isLight
-                                        ? 'text-slate-700 hover:text-blue-600'
-                                        : 'text-white hover:text-blue-400'
+                                        ? 'text-slate-700 hover:text-teal-600'
+                                        : 'text-white hover:text-teal-400'
                                 }`}
                             >
                                 <LogIn size={18} />
@@ -187,7 +187,7 @@ const Navbar = () => {
                             </button>
                             <button
                                 onClick={() => navigate('/register')}
-                                className="flex items-center space-x-2 px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105"
+                                className="flex items-center space-x-2 px-6 py-2 bg-gradient-to-r from-teal-600 to-teal-500 text-white rounded-lg font-bold hover:shadow-lg hover:shadow-teal-500/50 transition-all duration-300 hover:scale-105"
                             >
                                 <UserPlus size={18} />
                                 <span>{t('nav_register')}</span>
@@ -313,7 +313,7 @@ const Navbar = () => {
                                         navigate('/register');
                                         setIsMobileMenuOpen(false);
                                     }}
-                                    className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold hover:shadow-lg hover:shadow-blue-500/50 transition-all"
+                                    className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-teal-600 to-teal-500 text-white rounded-lg font-bold hover:shadow-lg hover:shadow-teal-500/50 transition-all"
                                 >
                                     <UserPlus size={18} />
                                     <span>{t('nav_register')}</span>

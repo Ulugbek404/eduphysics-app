@@ -36,16 +36,16 @@ const Statistics = () => {
 
     const colorMap = {
         blue: {
-            gradient: 'from-blue-500 to-cyan-500',
-            bg: 'bg-blue-500/10',
-            text: 'text-blue-400',
-            border: 'border-blue-500/30',
+            gradient: 'from-teal-500 to-cyan-500',
+            bg: 'bg-teal-500/10',
+            text: 'text-teal-400',
+            border: 'border-teal-500/30',
         },
         purple: {
-            gradient: 'from-purple-500 to-pink-500',
-            bg: 'bg-purple-500/10',
-            text: 'text-purple-400',
-            border: 'border-purple-500/30',
+            gradient: 'from-indigo-500 to-pink-500',
+            bg: 'bg-indigo-500/10',
+            text: 'text-indigo-400',
+            border: 'border-indigo-500/30',
         },
         pink: {
             gradient: 'from-pink-500 to-rose-500',
@@ -74,7 +74,7 @@ const Statistics = () => {
                 >
                     <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
                         Bizning{' '}
-                        <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-teal-400 to-indigo-400 bg-clip-text text-transparent">
                             Natijalar
                         </span>
                     </h2>
