@@ -75,7 +75,10 @@ export default function LoginPage() {
         }
     };
 
-    const ADMIN_CODE = 'NURFIZIKA_ADMIN_2026';
+    // Kod bundle ichida ochiq ko'rinadi — bu faqat birinchi to'siq.
+    // Haqiqiy himoya: firestore.rules da yangi hujjat faqat role='student' bilan yaratiladi,
+    // admin rolini faqat Firebase Console orqali qo'lda berish kerak.
+    const ADMIN_CODE = import.meta.env.VITE_ADMIN_SIGNUP_CODE || null;
 
     const handleEmailSignUp = async (e) => {
         e.preventDefault();
@@ -96,7 +99,7 @@ export default function LoginPage() {
             setMessage('Parol kamida 6 ta belgidan iborat bo\'lishi kerak');
             return;
         }
-        if (isAdmin && adminCode !== ADMIN_CODE) {
+        if (isAdmin && (!ADMIN_CODE || adminCode !== ADMIN_CODE)) {
             setMessage('Admin kodi noto\'g\'ri! Iltimos to\'g\'ri kodni kiriting.');
             return;
         }

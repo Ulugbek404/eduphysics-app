@@ -36,16 +36,20 @@ service cloud.firestore {
       return val is string && val.size() <= maxLen;
     }
 
-    // Foydalanuvchi profili validatsiyasi (UPDATE uchun — role o'zgartirilmaydi)
+    // Foydalanuvchi profili validatsiyasi (UPDATE uchun)
+    // Muhim: request.resource.data — hujjatning YAKUNIY holati, shuning uchun
+    // "'role' in data" tekshiruvi ishlamaydi; o'zgargan maydonlarni diff() bilan aniqlaymiz
     function isValidUserUpdate() {
       let data = request.resource.data;
+      let changed = request.resource.data.diff(resource.data).affectedKeys();
       return (
+        // himoyalangan maydonlarni foydalanuvchi o'zi o'zgartira olmaydi
+        !changed.hasAny(['role', 'uid', 'email', 'blocked']) &&
         (!('displayName' in data) || isValidText(data.displayName, 100)) &&
         (!('bio' in data)         || isValidText(data.bio, 300)) &&
         (!('school' in data)      || isValidText(data.school, 150)) &&
         (!('phone' in data)       || isValidText(data.phone, 20)) &&
-        (!('learnedFormulas' in data) || data.learnedFormulas is list) && // formula o'rganish
-        (!('role' in data)        || false)  // role o'zgartirishga yo'l yo'q!
+        (!('learnedFormulas' in data) || data.learnedFormulas is list) // formula o'rganish
       );
     }
 
@@ -135,8 +139,11 @@ service cloud.firestore {
     match /rooms/{roomCode} {
       allow read:   if isLoggedIn();
       allow create: if isLoggedIn() && isAdmin();
-      // Faqat status va answeredCount yangilanadi:
-      allow update: if isLoggedIn();
+      // Admin (host) hamma maydonni, oddiy o'quvchi faqat answeredCount ni yangilaydi
+      allow update: if isLoggedIn() && (
+        isAdmin() ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['answeredCount'])
+      );
       allow delete: if isLoggedIn() && isAdmin();
 
       match /players/{uid} {
@@ -159,9 +166,13 @@ service cloud.firestore {
       // Tashqaridan ham yuborish mumkin (login talab qilinmaydi)
       // LEKIN: validatsiya kerak
       allow create: if (
+        request.resource.data.keys().hasOnly(['name', 'email', 'subject', 'message', 'createdAt', 'read']) &&
         request.resource.data.keys().hasAll(['name', 'message']) &&
         isValidText(request.resource.data.name, 100) &&
-        isValidText(request.resource.data.message, 1000)
+        isValidText(request.resource.data.message, 1000) &&
+        (!('email' in request.resource.data)   || isValidText(request.resource.data.email, 150)) &&
+        (!('subject' in request.resource.data) || isValidText(request.resource.data.subject, 200)) &&
+        (!('read' in request.resource.data)    || request.resource.data.read == false)
       );
       allow read, update, delete: if isAdmin();
     }

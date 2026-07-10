@@ -8,13 +8,21 @@ const { HumanMessage, SystemMessage } = require("@langchain/core/messages");
  * Rasm yuklash va tahlil qilish imkoniyati bilan.
  */
 
+const ALLOWED_ORIGINS = [
+    'https://eduphysics-app.web.app',
+    'https://eduphysics-app.firebaseapp.com',
+    'http://localhost:5173',
+];
+
 exports.handler = async (event, context) => {
-    // CORS headers
+    // CORS headers — faqat ruxsat etilgan originlar
+    const origin = event.headers?.origin || event.headers?.Origin || '';
     const headers = {
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Vary': 'Origin'
     };
 
     // OPTIONS request uchun (CORS preflight)

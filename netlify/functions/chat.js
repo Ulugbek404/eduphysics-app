@@ -1,9 +1,17 @@
+const ALLOWED_ORIGINS = [
+    "https://eduphysics-app.web.app",
+    "https://eduphysics-app.firebaseapp.com",
+    "http://localhost:5173",
+];
+
 export default async (req, context) => {
-    // CORS headers
+    // CORS headers — faqat ruxsat etilgan originlar
+    const origin = req.headers.get("origin") || "";
     const headers = {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
         "Access-Control-Allow-Headers": "Content-Type",
         "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Vary": "Origin",
     };
 
     if (req.method === "OPTIONS") {
@@ -17,16 +25,24 @@ export default async (req, context) => {
     try {
         const { message } = await req.json();
 
-        // Kalitlarni environment variables dan olamiz (yoki fallback sifatida hardcode qilamiz)
+        if (typeof message !== "string" || message.length === 0 || message.length > 4000) {
+            return new Response(JSON.stringify({ error: "Noto'g'ri so'rov" }), {
+                status: 400,
+                headers: { ...headers, "Content-Type": "application/json" },
+            });
+        }
+
+        // Kalitlar FAQAT environment variables dan olinadi
         const keys = [
             process.env.GEMINI_API_KEY_1,
             process.env.GEMINI_API_KEY_2
         ].filter(Boolean);
 
         if (keys.length === 0) {
-            // Fallback for immediate usage if env vars are not set yet
-            keys.push("AIzaSyCC8uEzh1px6KKsXP8FEkh_JS_3F1ErtDQ");
-            keys.push("AIzaSyBUzgU8ARMbZX1OYGv0f_cIqQJqaWdlGVM");
+            return new Response(JSON.stringify({ error: "API key not configured" }), {
+                status: 500,
+                headers: { ...headers, "Content-Type": "application/json" },
+            });
         }
 
         // Random bitta kalitni tanlash
