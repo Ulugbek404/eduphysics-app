@@ -12,7 +12,7 @@ export const Skeleton = ({ className = '', variant = 'default' }) => {
     return (
         <div
             className={`
-        bg-slate-800/50 animate-pulse rounded
+        bg-card animate-pulse rounded
         ${variants[variant]} ${className}
       `}
             aria-label="Loading..."
@@ -21,7 +21,7 @@ export const Skeleton = ({ className = '', variant = 'default' }) => {
 };
 
 export const SkeletonCard = () => (
-    <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-4 md:p-5 space-y-3">
+    <div className="bg-card border border-line rounded-2xl p-4 md:p-5 space-y-3">
         <Skeleton variant="title" />
         <Skeleton variant="text" />
         <Skeleton variant="text" className="w-1/2" />
@@ -33,10 +33,10 @@ export const ComponentLoader = ({ text = "Yuklanmoqda..." }) => (
     <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center space-y-4">
             <div className="relative">
-                <div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-50 animate-pulse"></div>
-                <div className="relative w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <div className="absolute inset-0 bg-brand-500 rounded-full blur-xl opacity-50 animate-pulse"></div>
+                <div className="relative w-16 h-16 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
             </div>
-            <p className="text-slate-400 font-medium">{text}</p>
+            <p className="text-soft font-medium">{text}</p>
         </div>
     </div>
 );

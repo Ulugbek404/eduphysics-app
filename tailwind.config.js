@@ -1,3 +1,5 @@
+import colors from 'tailwindcss/colors';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: 'class', // class asosida dark mode
@@ -15,37 +17,41 @@ export default {
       '2xl': '1536px',
     },
     extend: {
-      // ── Tema ranglari ──
+      // ── Rang tizimi ──────────────────────────────────────────────
+      // brand  — asosiy brend (teal): navigatsiya, progress, asosiy tugmalar
+      // ai     — faqat AI funksiyalari (AI ustoz, AI test) uchun belgi
+      // xp     — XP / streak / yutuqlar (gamifikatsiya)
+      // ok / danger — test natijalari va semantik holatlar
       colors: {
         'white-fixed': '#ffffff',
         'black-fixed': '#000000',
-        primary: {
-          50: '#EFF6FF', 100: '#DBEAFE', 200: '#BFDBFE', 300: '#93C5FD',
-          400: '#60A5FA', 500: '#3B82F6', 600: '#2563EB', 700: '#1D4ED8',
-          800: '#1E40AF', 900: '#1E3A8A',
-        },
-        accent: {
-          50: '#FAF5FF', 100: '#F3E8FF', 200: '#E9D5FF', 300: '#D8B4FE',
-          400: '#C084FC', 500: '#A855F7', 600: '#9333EA', 700: '#7E22CE',
-          800: '#6B21A8', 900: '#581C87',
-        },
-        // Dark tema ranglari
-        'theme-dark': {
-          bg: '#020617', surface: '#0f172a', card: '#1e293b',
-          border: '#334155', text: '#f8fafc', muted: '#94a3b8',
-        },
-        // Light tema ranglari
-        'theme-light': {
-          bg: '#f8fafc', surface: '#ffffff', card: '#f1f5f9',
-          border: '#e2e8f0', text: '#0f172a', muted: '#64748b',
-        },
-        // Black tema ranglari
-        'theme-black': {
-          bg: '#000000', surface: '#0a0a0a', card: '#141414',
-          border: '#262626', text: '#ffffff', muted: '#737373',
-        },
+        brand: colors.teal,
+        ai: colors.indigo,
+        xp: colors.amber,
+        ok: colors.emerald,
+        danger: colors.red,
       },
 
+      // ── Semantik yuzalar — theme.css o'zgaruvchilariga ulangan ───
+      // (html.light / html.dark almashganda avtomatik moslashadi)
+      backgroundColor: {
+        app: 'var(--bg-primary)',
+        surface: 'var(--bg-surface)',
+        card: 'var(--bg-card)',
+        'card-hover': 'var(--bg-card-hover)',
+        elevated: 'var(--bg-elevated)',
+        field: 'var(--bg-input)',
+      },
+      textColor: {
+        main: 'var(--text-primary)',
+        soft: 'var(--text-secondary)',
+        faint: 'var(--text-muted)',
+      },
+      borderColor: {
+        line: 'var(--border-color)',
+        'line-light': 'var(--border-light)',
+        'line-brand': 'var(--border-brand)',
+      },
 
       // Custom Font Family
       fontFamily: {
@@ -102,9 +108,9 @@ export default {
 
       // Custom Box Shadow
       boxShadow: {
-        'glow-blue': '0 0 20px rgba(59, 130, 246, 0.3)',
-        'glow-purple': '0 0 20px rgba(168, 85, 247, 0.3)',
-        'glow-green': '0 0 20px rgba(16, 185, 129, 0.3)',
+        'card': 'var(--shadow-card)',
+        'glow-brand': '0 0 20px rgba(13, 148, 136, 0.3)',
+        'glow-ai': '0 0 20px rgba(99, 102, 241, 0.3)',
       },
 
       // Custom Z-Index

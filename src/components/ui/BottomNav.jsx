@@ -98,7 +98,7 @@ export default function BottomNav() {
         <>
             {/* ── Bottom Tab Bar ─────────────────────────────────────────── */}
             <nav
-                className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800"
+                className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-t border-line"
                 style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
             >
                 <div className="flex items-stretch h-16">
@@ -114,15 +114,15 @@ export default function BottomNav() {
                                     relative flex flex-col items-center justify-center flex-1
                                     transition-all duration-200 touch-manipulation select-none
                                     ${active
-                                        ? 'text-indigo-400'
-                                        : 'text-slate-500 active:bg-slate-800/50'
+                                        ? 'text-brand-500'
+                                        : 'text-faint active:bg-card-hover'
                                     }
                                 `}
                                 aria-label={tab.label}
                             >
                                 {/* Active dot indicator */}
                                 <span className={`
-                                    absolute top-1.5 w-1 h-1 rounded-full bg-indigo-400
+                                    absolute top-1.5 w-1 h-1 rounded-full bg-brand-500
                                     transition-all duration-200
                                     ${active ? 'opacity-100 scale-100' : 'opacity-0 scale-0'}
                                 `} />
@@ -166,8 +166,8 @@ export default function BottomNav() {
                 <div
                     className={`
                         absolute bottom-0 left-0 right-0
-                        bg-slate-900 rounded-t-3xl
-                        border-t border-slate-700/60
+                        bg-surface rounded-t-3xl
+                        border-t border-line
                         shadow-2xl shadow-black/50
                         transition-transform duration-300 ease-out
                         ${panelOpen ? 'translate-y-0' : 'translate-y-full'}
@@ -176,17 +176,17 @@ export default function BottomNav() {
                 >
                     {/* Handle bar */}
                     <div className="flex justify-center pt-3 pb-1">
-                        <div className="w-10 h-1 bg-slate-700 rounded-full" />
+                        <div className="w-10 h-1 bg-card-hover rounded-full" />
                     </div>
 
                     {/* Panel header */}
                     <div className="flex items-center justify-between px-5 pt-2 pb-4">
-                        <p className="text-slate-400 text-xs font-semibold tracking-widest uppercase">
+                        <p className="text-soft text-xs font-semibold tracking-widest uppercase">
                             {t('nav_all_sections') || "Barcha Bo'limlar"}
                         </p>
                         <button
                             onClick={() => setPanelOpen(false)}
-                            className="p-1.5 rounded-xl bg-slate-800 text-slate-400 hover:text-white transition-colors"
+                            className="p-1.5 rounded-xl bg-card text-soft hover:text-main transition-colors"
                         >
                             <X size={16} />
                         </button>
@@ -202,7 +202,7 @@ export default function BottomNav() {
                                     onClick={() => handleMenuItemClick(item)}
                                     className="
                                         flex items-center gap-3
-                                        bg-slate-800/80 hover:bg-slate-700/80
+                                        bg-card hover:bg-card-hover
                                         active:scale-95
                                         rounded-2xl p-4
                                         transition-all duration-150
@@ -212,7 +212,7 @@ export default function BottomNav() {
                                     <div className={`p-2 rounded-xl flex-shrink-0 ${item.iconBg}`}>
                                         <Icon size={18} className={item.iconColor} />
                                     </div>
-                                    <span className="text-white text-sm font-medium leading-tight">
+                                    <span className="text-main text-sm font-medium leading-tight">
                                         {item.label}
                                     </span>
                                 </button>
@@ -221,7 +221,7 @@ export default function BottomNav() {
                     </div>
 
                     {/* Divider */}
-                    <div className="h-px bg-slate-800 mx-4" />
+                    <div className="h-px bg-card-hover mx-4" />
 
                     {/* Admin Panel button - admin uchun */}
                     {isAdmin && (
@@ -254,15 +254,15 @@ export default function BottomNav() {
                             onClick={() => { setPanelOpen(false); navigate('/settings'); }}
                             className="
                                 flex-1 flex items-center justify-center gap-2
-                                bg-slate-800 hover:bg-slate-700
+                                bg-card hover:bg-card-hover
                                 active:scale-95
                                 rounded-2xl py-3.5
                                 transition-all duration-150
                                 touch-manipulation
                             "
                         >
-                            <Settings size={16} className="text-slate-400" />
-                            <span className="text-slate-300 text-sm font-medium">{t('nav_settings') || 'Sozlamalar'}</span>
+                            <Settings size={16} className="text-soft" />
+                            <span className="text-soft text-sm font-medium">{t('nav_settings') || 'Sozlamalar'}</span>
                         </button>
 
                         <button

@@ -11,13 +11,13 @@ export const Card = ({
     // Base styles
     const baseStyles = "rounded-2xl transition-all duration-200";
 
-    // Variants
+    // Variants — theme.css tokenlari, ikkala temada ishlaydi
     const variants = {
-        default: "bg-slate-800/50 border border-slate-700/50",
-        elevated: "bg-slate-800 shadow-xl border border-slate-700",
-        outlined: "bg-transparent border border-slate-700 hover:border-slate-600",
-        glass: "bg-slate-900/40 backdrop-blur-xl border border-white/10 shadow-2xl",
-        gradient: "bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50",
+        default: "bg-card border border-line",
+        elevated: "bg-elevated shadow-card border border-line",
+        outlined: "bg-transparent border border-line hover:border-line-light",
+        glass: "bg-surface/60 backdrop-blur-xl border border-line shadow-card",
+        gradient: "bg-card border border-line",
     };
 
     // Responsive Padding
@@ -37,7 +37,7 @@ export const Card = ({
     };
 
     const interactiveStyles = onClick
-        ? "cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:border-blue-500/50 active:scale-[0.99] touch-manipulation"
+        ? "cursor-pointer hover:-translate-y-0.5 hover:shadow-card hover:border-brand-500/50 active:scale-[0.99] touch-manipulation"
         : "";
 
     return (
@@ -58,13 +58,13 @@ export const CardHeader = ({ children, className = '' }) => (
 );
 
 export const CardTitle = ({ children, className = '' }) => (
-    <h3 className={`text-lg font-bold text-white flex items-center gap-2 ${className}`}>
+    <h3 className={`text-lg font-bold text-main flex items-center gap-2 ${className}`}>
         {children}
     </h3>
 );
 
 export const CardDescription = ({ children, className = '' }) => (
-    <p className={`text-sm text-slate-400 leading-relaxed ${className}`}>
+    <p className={`text-sm text-soft leading-relaxed ${className}`}>
         {children}
     </p>
 );
